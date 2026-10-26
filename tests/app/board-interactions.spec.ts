@@ -94,16 +94,23 @@ test('right-drag pans continuously, nearest left column selects calendar, saves 
 
 test('horizontal wheel, empty-board left drag and keyboard scrolling follow the same nearest-day rule',async()=>{
   await seed();const bounds=(await board().boundingBox())!;
-  await page.mouse.move(bounds.x+bounds.width/2,bounds.y+bounds.height-60);await page.mouse.wheel(160,0);
+  // Wheel input goes through native hit-testing. Keep its target near the
+  // board's center rather than the bottom of an oversized emulated viewport.
+  const wheelPoint={x:bounds.x+bounds.width/2,y:bounds.y+bounds.height/2};
+  await page.mouse.move(wheelPoint.x,wheelPoint.y);await page.mouse.wheel(160,0);
   try {
     await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-26');
   } catch(error) {
     // Preserve useful geometry in CI logs without changing the native gesture
     // or requiring stored screenshots/artifacts to diagnose the failure.
-    console.log('Board wheel failure:',await board().evaluate((host)=>{
-      const bounds=host.getBoundingClientRect();const x=bounds.x+bounds.width/2;const y=bounds.y+bounds.height-60;
-      const target=document.elementFromPoint(x,y);
+    console.log('Board wheel failure:',await board().evaluate((host,point)=>{
+      const bounds=host.getBoundingClientRect();
+      const target=document.elementFromPoint(point.x,point.y);
       return {scrollLeft:host.scrollLeft,scrollWidth:host.scrollWidth,clientWidth:host.clientWidth,viewport:{width:innerWidth,height:innerHeight},bounds:bounds.toJSON(),target:target?.className,overflowX:getComputedStyle(host).overflowX,focused:document.hasFocus(),columns:[...host.querySelectorAll('[data-testid="board-day"]')].slice(0,3).map((column)=>({date:(column as HTMLElement).dataset.date,left:column.getBoundingClientRect().left,width:column.getBoundingClientRect().width}))};
+    },wheelPoint));
+    console.log('Native wheel surface:',await app.evaluate(({BrowserWindow,screen})=>{
+      const window=BrowserWindow.getAllWindows()[0]!;
+      return {window:window.getBounds(),content:window.getContentBounds(),display:screen.getPrimaryDisplay().workArea};
     }));
     throw error;
   }
