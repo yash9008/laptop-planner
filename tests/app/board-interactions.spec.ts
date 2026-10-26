@@ -7,7 +7,16 @@ test.beforeEach(async()=>{
   directory=await mkdtemp(join(tmpdir(),'laptop-planner-board-interactions-'));
   const env=Object.fromEntries(Object.entries(process.env).filter((entry):entry is [string,string]=>entry[1]!==undefined));delete env.ELECTRON_RUN_AS_NODE;
   app=await electron.launch({args:[resolve('.')],env:{...env,TZ:'Asia/Kolkata',LAPTOP_PLANNER_TEST_DATA_DIR:directory,LAPTOP_PLANNER_TEST_NOW:'2026-10-25T07:30:00.000Z'}});
-  page=await app.firstWindow();await page.setViewportSize({width:1440,height:900});
+  page=await app.firstWindow();
+  // Match the native content surface to the emulated page viewport. Native
+  // wheel hit-testing must not target pixels below the real window's edge.
+  const contentSize=await app.evaluate(({BrowserWindow})=>{
+    const window=BrowserWindow.getAllWindows()[0]!;
+    const before=window.getContentSize();window.setContentSize(1440,900);
+    return {before,after:window.getContentSize()};
+  });
+  if(process.env.CI)console.log('Board native content size:',contentSize);
+  await page.setViewportSize({width:1440,height:900});
   await expect(page.getByRole('region',{name:'Multi-day board',exact:true})).toBeVisible();
 });
 test.afterEach(async()=>{await app?.close();await rm(directory,{recursive:true,force:true});});
