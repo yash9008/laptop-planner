@@ -20,6 +20,14 @@ See [user guide](docs/user-guide.md), [UI behavior](docs/ui-reference.md), and [
 
 Requires Apple Silicon macOS and Node 24.22.1+.
 
+For background validation, push to the public repository and watch
+[Planner checks](https://github.com/yash9008/laptop-planner/actions/workflows/check.yml).
+The full check runs on GitHub's standard Apple Silicon macOS runner, so its
+Electron windows do not open on your desktop. See
+[the hosted testing guide](docs/github-actions.md) for setup and result handling.
+Local `npm run check` and `npm run verify:package` still open application windows;
+coding agents should use hosted GUI testing by default as described in `AGENTS.md`.
+
 ```sh
 npm ci
 npm start

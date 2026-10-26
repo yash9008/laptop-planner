@@ -2,9 +2,13 @@
 
 ## Current setup
 
-`.github/workflows/check.yml` is prepared for a public GitHub repository. It
-has not yet been run on GitHub. A successful first hosted run is required
-before treating the full Electron suite as verified in this environment.
+The public repository is
+[yash9008/laptop-planner](https://github.com/yash9008/laptop-planner), with
+`.github/workflows/check.yml` enabled on push, pull request, and manual dispatch.
+The [first hosted run](https://github.com/yash9008/laptop-planner/actions/runs/40301944117)
+is in progress for commit `e47a1a1de87203d803427c6339de05911231ca8a`.
+A successful result is required before treating the full Electron suite as
+verified in this environment.
 
 The workflow uses the standard Apple Silicon `macos-26` runner, Node.js
 24.22.1, `npm ci`, and `npm run check`. This runs the existing type check,
@@ -41,6 +45,22 @@ Push the source revision to test, then wait for that revision's **Planner
 checks** result. Open a run to inspect installation and test logs; failed
 screenshots are not retained because artifact uploads are disabled. A
 skipped, cancelled, or timed-out run is not a successful test result.
+
+GitHub CLI is installed on this Mac and authenticated as `yash9008`. From the
+repository directory:
+
+```sh
+git push origin HEAD
+gh run list --repo yash9008/laptop-planner --workflow check.yml --commit "$(git rev-parse HEAD)" --limit 1 --json databaseId,status,conclusion,url,headSha
+```
+
+If the push-triggered run has not appeared yet, wait briefly and list again.
+Use the returned run ID with `gh run watch RUN_ID --repo
+yash9008/laptop-planner --exit-status`, then use `gh run view RUN_ID --repo
+yash9008/laptop-planner --log-failed` if it fails. Confirm the local working
+tree is clean before testing: an uncommitted change has not been uploaded and
+is not covered by a remote run. Re-running a historical commit does not test
+new local edits.
 
 Ask coding agents to use this hosted workflow for GUI tests and report the
 commit and run URL. They should not run local GUI suites or launch previews

@@ -85,7 +85,19 @@ test('right-drag pans continuously, nearest left column selects calendar, saves 
 
 test('horizontal wheel, empty-board left drag and keyboard scrolling follow the same nearest-day rule',async()=>{
   await seed();const bounds=(await board().boundingBox())!;
-  await page.mouse.move(bounds.x+bounds.width/2,bounds.y+bounds.height-60);await page.mouse.wheel(160,0);await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-26');
+  await page.mouse.move(bounds.x+bounds.width/2,bounds.y+bounds.height-60);await page.mouse.wheel(160,0);
+  try {
+    await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-26');
+  } catch(error) {
+    // Preserve useful geometry in CI logs without changing the native gesture
+    // or requiring stored screenshots/artifacts to diagnose the failure.
+    console.log('Board wheel failure:',await board().evaluate((host)=>{
+      const bounds=host.getBoundingClientRect();const x=bounds.x+bounds.width/2;const y=bounds.y+bounds.height-60;
+      const target=document.elementFromPoint(x,y);
+      return {scrollLeft:host.scrollLeft,scrollWidth:host.scrollWidth,clientWidth:host.clientWidth,viewport:{width:innerWidth,height:innerHeight},bounds:bounds.toJSON(),target:target?.className,overflowX:getComputedStyle(host).overflowX,focused:document.hasFocus(),columns:[...host.querySelectorAll('[data-testid="board-day"]')].slice(0,3).map((column)=>({date:(column as HTMLElement).dataset.date,left:column.getBoundingClientRect().left,width:column.getBoundingClientRect().width}))};
+    }));
+    throw error;
+  }
   await panBy(272,'left');await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-27');
   await board().focus();await page.keyboard.press('ArrowLeft');await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-26');
   await page.screenshot({path:'test-results/board-calendar-follows-pan.png'});

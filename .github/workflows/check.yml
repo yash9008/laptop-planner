@@ -4,17 +4,25 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      validation:
+        description: Validation to run (diagnostics do not replace full checks)
+        type: choice
+        default: full
+        options:
+          - full
+          - board-wheel-diagnostic
 
 permissions:
   contents: read
 
 concurrency:
-  group: planner-checks-${{ github.ref }}
+  group: planner-checks-${{ github.ref }}-${{ inputs.validation || 'full' }}
   cancel-in-progress: true
 
 jobs:
   check:
-    name: Full checks on Apple Silicon macOS
+    name: ${{ inputs.validation == 'board-wheel-diagnostic' && 'Board wheel diagnostic on macOS' || 'Full checks on Apple Silicon macOS' }}
     # Standard hosted runners are free for public repositories. Skip this job
     # if the repository becomes private rather than consume a paid allowance.
     if: ${{ github.event.repository.private == false }}
@@ -39,7 +47,12 @@ jobs:
         run: npm ci
 
       - name: Type-check, build, and run every test suite
+        if: ${{ inputs.validation != 'board-wheel-diagnostic' }}
         run: npm run check
+
+      - name: Repeat the native board wheel test for diagnosis
+        if: ${{ inputs.validation == 'board-wheel-diagnostic' }}
+        run: npm run build && npm run test:app -- board-interactions.spec.ts --grep 'horizontal wheel' --repeat-each 5
 
       # Logs stay in the Actions run. Deliberately do not upload artifacts,
       # create caches, package releases, or use larger runners.
