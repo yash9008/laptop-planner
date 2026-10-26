@@ -1,0 +1,33 @@
+{
+  "reviewedAt": "2026-10-26T09:08:49.188Z",
+  "reports": [
+    {
+      "name": "quick-add-dismissal-restores-trigger-focus",
+      "triggerFocused": true,
+      "activeTag": "BUTTON",
+      "activeLabel": "Add task",
+      "shellInert": false
+    },
+    {
+      "name": "editor-dismissal-restores-trigger-focus",
+      "triggerFocused": true,
+      "activeTag": "BUTTON",
+      "activeLabel": null,
+      "shellInert": false
+    },
+    {
+      "name": "child-dismissal-restores-parent-trigger-focus",
+      "childAutoFocused": true,
+      "triggerFocused": true,
+      "activeTag": "BUTTON",
+      "insideParent": true,
+      "aOpenedUnrelatedComposer": false,
+      "editorStillOpen": true
+    },
+    {
+      "name": "focus-origin-switches-from-toolbar-to-column",
+      "columnTriggerFocused": true,
+      "activeLabel": "Add task for 2026-10-25"
+    }
+  ]
+}

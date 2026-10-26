@@ -1,0 +1,117 @@
+{
+  "reports": [
+    {
+      "name": "pristine-editor-cache-overwrites-new-estimate",
+      "afterPopover": 60,
+      "reopenedValue": "1h",
+      "afterEditorSave": 60
+    },
+    {
+      "name": "failed-delete-loses-retained-title-draft",
+      "recordStillExists": true,
+      "reopenedTitle": "Uncommitted title",
+      "expectedDraft": "Uncommitted title"
+    },
+    {
+      "name": "quick-add-focus-escapes-modal",
+      "insideDialog": true,
+      "activeTag": "BUTTON",
+      "activeLabel": null
+    },
+    {
+      "name": "editor-focus-escapes-modal",
+      "insideDialog": true,
+      "activeTag": "BUTTON",
+      "activeLabel": "Close dialog"
+    },
+    {
+      "name": "pending-save-can-be-dismissed",
+      "closedWhileSaving": false
+    },
+    {
+      "name": "estimate-save-failure-has-no-inline-error",
+      "inlineAlerts": 1,
+      "retainedInput": "1h 30m",
+      "failedSelectionMinutes": 90
+    },
+    {
+      "name": "nested-estimate-placement",
+      "viewport": {
+        "width": 860,
+        "height": 680
+      },
+      "anchor": {
+        "x": 392,
+        "y": 200,
+        "width": 23,
+        "height": 23
+      },
+      "panel": {
+        "x": 392,
+        "y": 227,
+        "width": 160,
+        "height": 380
+      },
+      "parent": {
+        "x": 95,
+        "y": 24,
+        "width": 670,
+        "height": 632
+      },
+      "outsideViewport": false,
+      "offsetBelowAnchor": 4
+    },
+    {
+      "name": "keyboard-date-default-after-board-pan",
+      "selectedBoardDate": "2026-10-26",
+      "composerDate": "2026-10-26"
+    },
+    {
+      "name": "nested-estimate-wide",
+      "anchor": {
+        "x": 685,
+        "y": 302.00390625,
+        "width": 23,
+        "height": 23
+      },
+      "panel": {
+        "x": 685,
+        "y": 329,
+        "width": 160,
+        "height": 380
+      },
+      "parent": {
+        "x": 385,
+        "y": 126.00390625,
+        "width": 670,
+        "height": 647.9921875
+      },
+      "extendsPastEditor": false,
+      "offsetX": 0,
+      "offsetBelowAnchor": 3.99609375
+    },
+    {
+      "name": "quick-add-dismissal-restores-trigger-focus",
+      "triggerFocused": false,
+      "activeTag": "BODY",
+      "activeLabel": null,
+      "shellInert": false
+    },
+    {
+      "name": "editor-dismissal-restores-trigger-focus",
+      "triggerFocused": false,
+      "activeTag": "BODY",
+      "activeLabel": null,
+      "shellInert": false
+    },
+    {
+      "name": "child-dismissal-restores-parent-trigger-focus",
+      "childAutoFocused": false,
+      "triggerFocused": false,
+      "activeTag": "BODY",
+      "insideParent": false,
+      "aOpenedUnrelatedComposer": true,
+      "editorStillOpen": false
+    }
+  ]
+}

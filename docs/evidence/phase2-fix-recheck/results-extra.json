@@ -1,0 +1,14 @@
+{
+  "reviewedAt": "2026-10-26T08:42:27.794Z",
+  "reports": [
+    {
+      "name": "child-dismissal-restores-parent-trigger-focus",
+      "childAutoFocused": false,
+      "triggerFocused": false,
+      "activeTag": "BODY",
+      "insideParent": false,
+      "aOpenedUnrelatedComposer": true,
+      "editorStillOpen": false
+    }
+  ]
+}

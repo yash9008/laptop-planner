@@ -1,0 +1,10 @@
+{
+  "reviewedAt": "2026-10-26T09:03:25.060Z",
+  "reports": [
+    {
+      "name": "focus-origin-switches-from-toolbar-to-column",
+      "columnTriggerFocused": false,
+      "activeLabel": "Add task"
+    }
+  ]
+}

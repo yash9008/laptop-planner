@@ -1,0 +1,19 @@
+node_modules/
+out/
+release/
+.test-build/
+test-results/
+playwright-report/
+*.sqlite*
+.DS_Store
+
+# Local credentials and personal backups must never be published.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+Backups/
+
+# Captured third-party runtime reference evidence stays on this Mac.
+/docs/evidence/sunsama-*

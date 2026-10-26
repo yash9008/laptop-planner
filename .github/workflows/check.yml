@@ -1,0 +1,45 @@
+name: Planner checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: planner-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Full checks on Apple Silicon macOS
+    # Standard hosted runners are free for public repositories. Skip this job
+    # if the repository becomes private rather than consume a paid allowance.
+    if: ${{ github.event.repository.private == false }}
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.22.1'
+          package-manager-cache: false
+
+      - name: Verify macOS arm64 runtime
+        run: node -e "if (process.platform !== 'darwin' || process.arch !== 'arm64') throw new Error('Tests require macOS arm64');"
+
+      - name: Install dependencies and verify native SQLite
+        run: npm ci
+
+      - name: Type-check, build, and run every test suite
+        run: npm run check
+
+      # Logs stay in the Actions run. Deliberately do not upload artifacts,
+      # create caches, package releases, or use larger runners.
