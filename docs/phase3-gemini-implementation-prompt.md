@@ -2,6 +2,41 @@
 
 Implement **UI Phase 3 only** in `/Users/yashsawant/Documents/Projects/sunsama clone` when the user sends this prompt as an implementation instruction. This saved planning document alone does not authorize execution. Phase 3 covers filters, global search, and utility panels. Keep Phase 4's command palette/Focus screen and Phase 5's exhaustive motion work out of scope.
 
+## Implementation and review roles
+
+Antigravity implements Phase 3 and performs its own verification. Codex will
+independently review the implementation after the user reports that Antigravity
+has finished. Deliver a concrete handoff marked **Ready for Codex review**;
+do not mark Phase 3 independently accepted or infer acceptance from a green
+CI run alone. Complete the implementation and required checks rather than
+stopping after a plan. The user will initiate the review; do not send messages
+to another agent or chat.
+
+## Repository and GitHub access
+
+The public remote is `https://github.com/yash9008/laptop-planner.git`.
+GitHub CLI is installed at `/opt/homebrew/bin/gh` and was authenticated as
+`yash9008` when this prompt was prepared. Antigravity can invoke the same CLI
+from its terminal; access depends on its terminal permissions and the existing
+macOS login/keychain session. Check access rather than assuming a ChatGPT
+plugin is required:
+
+```sh
+cd "/Users/yashsawant/Documents/Projects/sunsama clone"
+git status --short
+git remote -v
+/opt/homebrew/bin/gh auth status
+```
+
+Record the starting commit and branch in the handoff. Work on a dedicated
+Phase 3 branch, preserving any existing user changes. Commit and push the
+implementation, relevant tests, and handoff to `origin` for hosted validation.
+Do not upload personal data, credentials, generated builds/releases, or ignored
+reference captures. Do not force-push or change repository visibility, account
+billing, runner type, or payment settings. If CLI authentication is unavailable
+to Antigravity, report the actual error and required user action; do not
+silently switch to local GUI tests.
+
 ## Read and preserve the baseline
 
 Read AGENTS.md, PLAN.md, docs/phase2-final-review.md, docs/phase2-interaction-contract.md, docs/motion-timings.md, and the current source/tests. Historical Phase 2 review findings are resolved as described in the final review; preserve their fixes and regression tests. Do not rerun reference-capture harnesses into existing evidence directories or overwrite their screenshots/results.
@@ -82,4 +117,29 @@ artifacts. Keep Actions usage on the free standard public-repository runner
 and do not enable paid features. If hosted validation is blocked, report that
 blocker rather than launching local GUI tests or claiming success.
 
+After committing and pushing, identify the full push-triggered run for that
+exact commit:
+
+```sh
+git push -u origin HEAD
+/opt/homebrew/bin/gh run list --repo yash9008/laptop-planner --workflow check.yml --event push --commit "$(git rev-parse HEAD)" --limit 1 --json databaseId,status,conclusion,url,headSha
+```
+
+If the run has not appeared yet, wait briefly and list again. Use its returned
+ID with `/opt/homebrew/bin/gh run watch RUN_ID --repo
+yash9008/laptop-planner --exit-status`. On failure, read `/opt/homebrew/bin/gh
+run view RUN_ID --repo yash9008/laptop-planner --log-failed`, fix the cause,
+commit/push, and wait for the new revision's full check. A diagnostic-only,
+historical, pending, cancelled, timed-out, or skipped run does not satisfy the
+full-check requirement. Do not add skip instructions to implementation or
+test-change commits, remove assertions, or enable retries simply to obtain a
+green result. Do not finish while required checks are still running.
+
 Update `docs/phase3-implementation-handoff.md` with the final changed files, exact commands/results, cases actually exercised, screenshots, remaining limitations, and any departure from this specification. Separate reported implementation from verified acceptance; keep reviewer evidence immutable. Stop after Phase 3 for review. Do not start Phase 4 or build/install a DMG.
+
+End with **Ready for Codex review** only when the required implementation and
+self-verification are complete. Include the branch, starting commit, tested
+commit, full CI run URL/result, the handoff path, actual visual evidence, and
+any remaining limitations. If a required item is blocked or incomplete, state
+that plainly instead. Codex will review the diff and acceptance behavior,
+inspect the evidence, and run independent hosted checks/probes as needed.
