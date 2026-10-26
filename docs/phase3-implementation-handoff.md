@@ -110,10 +110,10 @@ All GUI suites, Electron interaction tests, and visual captures ran exclusively 
 
 - **Branch**: `ui-phase-3`
 - **Starting commit**: `0e84d7c`
-- **Tested commit**: `a2e147e1db420c8365113324d44c188fc86e1636`
-- **Full CI run URL**: [https://github.com/yash9008/laptop-planner/actions/runs/40332291867](https://github.com/yash9008/laptop-planner/actions/runs/40332291867)
-- **CI Job**: `Full checks on Apple Silicon macOS` (Job ID: `121604541416`)
-- **Outcome**: `success` (elapsed: 6m 9s)
+- **Tested implementation commit**: [`a2e147e`](https://github.com/yash9008/laptop-planner/commit/a2e147e1db420c8365113324d44c188fc86e1636) ([CI Run #40332291867](https://github.com/yash9008/laptop-planner/actions/runs/40332291867), 6m 9s, 89 passed)
+- **Head commit**: [`398d6e8`](https://github.com/yash9008/laptop-planner/commit/398d6e82292716c849612ada954cc717fac1aa9a) ([CI Run #40333932952](https://github.com/yash9008/laptop-planner/actions/runs/40333932952), 6m 26s, 89 passed)
+- **CI Job**: `Full checks on Apple Silicon macOS` (Job IDs: `121604541416`, `121610324762`)
+- **Outcome**: `success`
 
 ### Test suite breakdown
 
