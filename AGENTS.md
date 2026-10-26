@@ -55,8 +55,10 @@ required.
 
 The public repository uses `.github/workflows/check.yml` for the complete
 `npm run check` command. Push the intended source revision, wait for that exact
-commit's **Planner checks** run, inspect failures, and report the run URL and
-commit. Do not describe skipped, cancelled, timed-out, or pending checks as
+commit's push-triggered **Planner checks** run and its **Full checks on Apple
+Silicon macOS** job, inspect failures, and report the run URL and commit.
+The optional manual board-wheel diagnostic does not replace the full suite.
+Do not describe skipped, cancelled, timed-out, or pending checks as
 passing. If hosted execution is unavailable, report the blocker instead of
 silently falling back to local GUI tests. See [docs/github-actions.md](docs/github-actions.md).
 

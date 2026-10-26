@@ -68,4 +68,18 @@ Add behavioral regressions, not just happy-path clicks or assertions of CSS clas
 
 Use the existing real Electron fixture patterns, temporary data directories, controlled clocks, and observable completion. Update existing tests only for intentional UI flow changes while retaining acceptance assertions. Run focused checks while working, then `npm run check` at the completed phase boundary. Run a disposable real-app preview, inspect wide/narrow screenshots, and fix failures. Do not claim a check passed if tools were unavailable or results were merely inferred.
 
+**Run GUI validation in the background on GitHub, not on this Mac.** The user
+wants to keep using their browser without test windows or focus interruptions.
+Use the public `yash9008/laptop-planner` repository and its standard macOS
+**Planner checks** workflow for the complete `npm run check`; use the
+push-triggered full job for the exact uploaded revision, not the optional
+board-wheel diagnostic. Follow `docs/github-actions.md` and `AGENTS.md`.
+Disposable Electron previews and visual checks must also run on a hosted
+desktop unless the user explicitly requests local execution. Retrieve and
+inspect actual synthetic screenshot evidence before claiming visual
+verification; the current workflow retains logs but does not upload screenshot
+artifacts. Keep Actions usage on the free standard public-repository runner
+and do not enable paid features. If hosted validation is blocked, report that
+blocker rather than launching local GUI tests or claiming success.
+
 Update `docs/phase3-implementation-handoff.md` with the final changed files, exact commands/results, cases actually exercised, screenshots, remaining limitations, and any departure from this specification. Separate reported implementation from verified acceptance; keep reviewer evidence immutable. Stop after Phase 3 for review. Do not start Phase 4 or build/install a DMG.

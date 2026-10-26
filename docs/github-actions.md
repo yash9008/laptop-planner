@@ -6,15 +6,25 @@ The public repository is
 [yash9008/laptop-planner](https://github.com/yash9008/laptop-planner), with
 `.github/workflows/check.yml` enabled on push, pull request, and manual dispatch.
 The [first hosted run](https://github.com/yash9008/laptop-planner/actions/runs/40301944117)
-is in progress for commit `e47a1a1de87203d803427c6339de05911231ca8a`.
-A successful result is required before treating the full Electron suite as
-verified in this environment.
+passed type-check/build, 78 scheduler tests in each of two time zones, 63
+database tests, and 67 of 68 Electron tests. Its board wheel test failed.
+The [focused diagnostic after test setup adjustments](https://github.com/yash9008/laptop-planner/actions/runs/40303786511)
+passed all five repetitions on commit `9d7278a3a010057e4b299eda9de0ac2475d5d995`.
+The [full check for the same revision](https://github.com/yash9008/laptop-planner/actions/runs/40303785779)
+passed on October 26, 2026: type-check/build, 78 scheduler tests in each of
+Asia/Kolkata and America/Los_Angeles, 63 database tests, and all 68 Electron
+tests. The full job took 4 minutes 51 seconds, including runner setup and
+dependency installation. It used the standard `macos-26` runner and uploaded
+zero artifacts. Later documentation-only verification updates do not change
+the tested application or test source revision identified above.
 
 The workflow uses the standard Apple Silicon `macos-26` runner, Node.js
 24.22.1, `npm ci`, and `npm run check`. This runs the existing type check,
 build, scheduler tests in both time zones, database tests in Electron's
-native runtime, and every real Electron UI test. No tests are skipped or
-rewritten to hide windows. The test windows open on GitHub's desktop.
+native runtime, and every real Electron UI test. The default full check does
+not skip tests or rewrite them to hide windows. The test windows open on
+GitHub's desktop. A manual `board-wheel-diagnostic` option repeats one test
+five times to investigate wheel delivery; it does not replace the full check.
 
 ## No paid runner usage
 
@@ -51,7 +61,7 @@ repository directory:
 
 ```sh
 git push origin HEAD
-gh run list --repo yash9008/laptop-planner --workflow check.yml --commit "$(git rev-parse HEAD)" --limit 1 --json databaseId,status,conclusion,url,headSha
+gh run list --repo yash9008/laptop-planner --workflow check.yml --event push --commit "$(git rev-parse HEAD)" --limit 1 --json databaseId,status,conclusion,url,headSha
 ```
 
 If the push-triggered run has not appeared yet, wait briefly and list again.
@@ -61,6 +71,12 @@ yash9008/laptop-planner --log-failed` if it fails. Confirm the local working
 tree is clean before testing: an uncommitted change has not been uploaded and
 is not covered by a remote run. Re-running a historical commit does not test
 new local edits.
+
+The board fixture aligns the native Electron content size with its 1440x900
+page viewport. Its wheel gesture targets the board center instead of its
+former bottom-edge coordinate; that coordinate produced no scrolling in the
+hosted diagnostics. All original scrolling, day-selection, drag, and keyboard
+assertions remain. The application implementation was not changed for CI.
 
 Ask coding agents to use this hosted workflow for GUI tests and report the
 commit and run URL. They should not run local GUI suites or launch previews
