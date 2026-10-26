@@ -74,7 +74,13 @@ export function useBoardDrag({ panel, tasks, busy, viewDate, onMove }:{
     return {date,beforeTaskId:before?.dataset.rowTask??null};
   }
   function over(event:ReactDragEvent<HTMLElement>) {
-    if(!current.current || current.current.phase!=='dragging')return;
+    if(!current.current || current.current.phase!=='dragging') {
+      if (event.dataTransfer.types.includes('text/plain') || event.dataTransfer.types.includes('application/x-laptop-planner-task')) {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+      }
+      return;
+    }
     event.preventDefault();event.dataTransfer.dropEffect='move';pointer.current={x:event.clientX,y:event.clientY};
     const target=spotAt(event.clientX,event.clientY);
     if(target && (target.date!==current.current.target.date || target.beforeTaskId!==current.current.target.beforeTaskId))publish({...current.current,target});
@@ -86,7 +92,20 @@ export function useBoardDrag({ panel, tasks, busy, viewDate, onMove }:{
     publish({...active,target,phase:'settling'});
   }
   function drop(event:ReactDragEvent<HTMLElement>) {
-    if(!current.current)return;
+    if(!current.current) {
+      const taskId = event.dataTransfer.getData('application/x-laptop-planner-task') || event.dataTransfer.getData('text/plain');
+      if (taskId && !busy) {
+        event.preventDefault();
+        event.stopPropagation();
+        const under = document.elementFromPoint(event.clientX, event.clientY);
+        const column = under?.closest<HTMLElement>('[data-board-date]');
+        if (column) {
+          const date = column.dataset.boardDate === 'backlog' ? null : column.dataset.boardDate!;
+          void onMove({ id: taskId, plannedDate: date, beforeTaskId: null, viewDate });
+        }
+      }
+      return;
+    }
     event.preventDefault();event.stopPropagation();pointer.current={x:event.clientX,y:event.clientY};
     const target=spotAt(event.clientX,event.clientY)??current.current.target;
     settle(target,true);

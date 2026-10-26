@@ -15,6 +15,10 @@ import { FocusBar } from './components/FocusBar';
 import { PlanningBoard } from './components/PlanningBoard';
 import { CalendarDock, readCalendarWidth } from './components/CalendarDock';
 import { DailyWorkload } from './components/DailyWorkload';
+import { FilterChooser } from './components/FilterChooser';
+import { SearchPanel } from './components/SearchPanel';
+import { BacklogPanel } from './components/BacklogPanel';
+import { RecoveryPanel } from './components/RecoveryPanel';
 
 export function App() {
   const [day, setDay] = useState<PlannerDay | null>(null);
@@ -25,7 +29,12 @@ export function App() {
   const [calendarWidth, setCalendarWidth] = useState(readCalendarWidth);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const [filterAnchor, setFilterAnchor] = useState<HTMLElement | null>(null);
+  const [filterQuery, setFilterQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'incomplete' | 'completed'>('all');
+  const [filterProjectId, setFilterProjectId] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeUtilityPanel, setActiveUtilityPanel] = useState<'backlog' | 'search' | 'recovery' | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [projectEditor, setProjectEditor] = useState<PlannerProject | null | undefined>(undefined);
   const [eventEditor, setEventEditor] = useState<{ event: PlannerEvent | null; minute: number } | null>(null);
@@ -145,6 +154,7 @@ export function App() {
     if (taskId) {
       const card =
         document.querySelector<HTMLElement>(`[data-task-id="${taskId}"] .task-title`) ??
+        document.querySelector<HTMLElement>(`[data-task-id="${taskId}"] .search-result-main`) ??
         document.querySelector<HTMLElement>(`[data-task-id="${taskId}"]`);
       if (card && card.isConnected) {
         card.focus({ preventScroll: true });
@@ -156,6 +166,14 @@ export function App() {
       document.querySelector<HTMLElement>('.planning-board') ??
       document.querySelector<HTMLElement>('.planner-main');
     fallback?.focus({ preventScroll: true });
+  }
+
+  const isFilterActive = filterQuery.trim() !== '' || filterStatus !== 'all' || filterProjectId !== 'all';
+
+  function clearFilters() {
+    setFilterQuery('');
+    setFilterStatus('all');
+    setFilterProjectId('all');
   }
 
   function goToDate(date?: string) {
@@ -463,7 +481,9 @@ export function App() {
     setProjectEditor(undefined);
     setDeleted(null);
     setSelectedProjectId('');
-    setQuery('');
+    clearFilters();
+    setSearchQuery('');
+    setActiveUtilityPanel(null);
     setView('board');
     setBoardCalendarDate(null);
     setBoardNavigationKey((value) => value + 1);
@@ -559,11 +579,19 @@ export function App() {
       : view === 'project'
       ? day?.allTasks.filter((task) => task.projectId === selectedProjectId) ?? []
       : day?.tasks ?? [];
-  const matches = (task: PlannerTask) =>
-    !query.trim() ||
-    `${task.title} ${task.notes} ${day?.projects.find((project) => project.id === task.projectId)?.title ?? ''}`
-      .toLowerCase()
-      .includes(query.trim().toLowerCase());
+  const matches = (task: PlannerTask) => {
+    const q = filterQuery.trim().toLowerCase();
+    if (q) {
+      const proj = day?.projects.find((project) => project.id === task.projectId);
+      const text = `${task.title} ${task.notes || ''} ${proj?.title ?? ''}`.toLowerCase();
+      if (!text.includes(q)) return false;
+    }
+    if (filterStatus === 'incomplete' && task.completed) return false;
+    if (filterStatus === 'completed' && !task.completed) return false;
+    if (filterProjectId === 'none' && task.projectId) return false;
+    if (filterProjectId !== 'all' && filterProjectId !== 'none' && task.projectId !== filterProjectId) return false;
+    return true;
+  };
   const filteredTasks = visibleTasks.filter(matches);
   const incomplete = filteredTasks.filter((task) => !task.completed);
   const completed = filteredTasks.filter((task) => task.completed);
@@ -590,6 +618,7 @@ export function App() {
     activeEditorMode !== null ||
     activeEstimatePopover !== null ||
     activeTaskMenu !== null ||
+    filterOpen ||
     eventEditor !== null ||
     projectEditor !== undefined ||
     storageOpen;
@@ -996,138 +1025,137 @@ export function App() {
         </div>
       </aside>
 
-      <div
-        className={`workspace ${calendarOpen ? 'has-calendar' : 'calendar-hidden'}`}
-        style={{ '--calendar-width': calendarWidth === null ? undefined : `${calendarWidth}px` } as CSSProperties}
-      >
-        <header className="workspace-topbar">
-          <div className="toolbar-left">
-            <button className="toolbar-button" aria-label="Go to today" disabled={!day || busy} onClick={() => goToDate()}>
-              <Icon name="calendar" size={16} />
-              {displayDay?.date === day?.today
-                ? 'Today'
-                : displayDay?.date === shiftDate(day?.today ?? '2026-01-01', 1)
-                ? 'Tomorrow'
-                : displayDay
-                ? dateLabel(displayDay.date, { month: 'short', day: 'numeric' })
-                : 'Today'}
-            </button>
-            {day && (
-              <div className="date-navigation">
-                <button
-                  className="icon-button"
-                  aria-label="Previous day"
-                  disabled={busy || loading || day.date <= (view === 'board' ? '0001-01-07' : '0001-01-01')}
-                  onClick={() => goToDate(shiftDate(day.date, view === 'board' ? -7 : -1))}
-                >
-                  <Icon name="left" size={17} />
+      {(() => {
+        const isDockOpen = Boolean(activeUtilityPanel || (calendarOpen && day));
+        return (
+          <div
+            className={`workspace ${isDockOpen ? 'has-calendar' : 'calendar-hidden'}`}
+            style={{ '--calendar-width': calendarWidth === null ? undefined : `${calendarWidth}px` } as CSSProperties}
+          >
+            <header className="workspace-topbar">
+              <div className="toolbar-left">
+                <button className="toolbar-button" aria-label="Go to today" disabled={!day || busy} onClick={() => goToDate()}>
+                  <Icon name="calendar" size={16} />
+                  {displayDay?.date === day?.today
+                    ? 'Today'
+                    : displayDay?.date === shiftDate(day?.today ?? '2026-01-01', 1)
+                    ? 'Tomorrow'
+                    : displayDay
+                    ? dateLabel(displayDay.date, { month: 'short', day: 'numeric' })
+                    : 'Today'}
                 </button>
-                <label className="date-picker" title="Go to date">
-                  <input
-                    aria-label="Go to date"
-                    type="date"
-                    min="0001-01-01"
-                    max="9999-12-31"
-                    value={displayDay?.date ?? day.date}
-                    disabled={busy || loading}
-                    onChange={(event) => {
-                      if (event.target.value) goToDate(event.target.value);
+                {day && (
+                  <div className="date-navigation">
+                    <button
+                      className="icon-button"
+                      aria-label="Previous day"
+                      disabled={busy || loading || day.date <= (view === 'board' ? '0001-01-07' : '0001-01-01')}
+                      onClick={() => goToDate(shiftDate(day.date, view === 'board' ? -7 : -1))}
+                    >
+                      <Icon name="left" size={17} />
+                    </button>
+                    <label className="date-picker" title="Go to date">
+                      <input
+                        aria-label="Go to date"
+                        type="date"
+                        min="0001-01-01"
+                        max="9999-12-31"
+                        value={displayDay?.date ?? day.date}
+                        disabled={busy || loading}
+                        onChange={(event) => {
+                          if (event.target.value) goToDate(event.target.value);
+                        }}
+                      />
+                    </label>
+                    <button
+                      className="icon-button"
+                      aria-label="Next day"
+                      disabled={busy || loading || day.date >= (view === 'board' ? '9999-12-25' : '9999-12-31')}
+                      onClick={() => goToDate(shiftDate(day.date, view === 'board' ? 7 : 1))}
+                    >
+                      <Icon name="right" size={17} />
+                    </button>
+                  </div>
+                )}
+                <button
+                  className={`toolbar-button ${filterOpen ? 'selected' : ''} ${isFilterActive ? 'has-active-filter' : ''}`}
+                  aria-label="Filter tasks"
+                  aria-expanded={filterOpen}
+                  onClick={(e) => {
+                    setFilterAnchor(e.currentTarget);
+                    setFilterOpen(!filterOpen);
+                  }}
+                >
+                  <Icon name="filter" size={17} />
+                  <span>Filter</span>
+                  {isFilterActive && <i className="filter-dot" />}
+                </button>
+                {filterOpen && (
+                  <FilterChooser
+                    anchor={filterAnchor}
+                    filterQuery={filterQuery}
+                    onQueryChange={setFilterQuery}
+                    filterStatus={filterStatus}
+                    onStatusChange={setFilterStatus}
+                    filterProjectId={filterProjectId}
+                    onProjectChange={setFilterProjectId}
+                    projects={day?.projects ?? []}
+                    isFilterActive={isFilterActive}
+                    onClear={clearFilters}
+                    onDismiss={() => {
+                      setFilterOpen(false);
+                      setFilterAnchor(null);
+                      filterAnchor?.focus({ preventScroll: true });
                     }}
                   />
-                </label>
+                )}
+              </div>
+              <div className="toolbar-right">
+                <span className={`save-status ${error ? 'has-error' : ''}`} role="status">
+                  <span className={`status-dot ${error ? 'warning' : ''}`} />
+                  {busy ? 'Saving…' : error ? 'Needs attention' : 'Saved locally'}
+                </span>
+                <div className="view-switch" aria-label="Planner view">
+                  <button
+                    aria-label="Board view"
+                    aria-pressed={view === 'board'}
+                    title="Board view"
+                    onClick={() => setView('board')}
+                    disabled={busy}
+                  >
+                    <Icon name="board" size={15} />
+                    <span>Board</span>
+                  </button>
+                  <button
+                    aria-label="Today view"
+                    aria-pressed={view === 'day'}
+                    title="Today view"
+                    onClick={() => {
+                      setView('day');
+                      if (boardCalendarDate) goToDate(boardCalendarDate);
+                    }}
+                    disabled={busy}
+                  >
+                    <Icon name="today" size={15} />
+                    <span>Day</span>
+                  </button>
+                </div>
                 <button
-                  className="icon-button"
-                  aria-label="Next day"
-                  disabled={busy || loading || day.date >= (view === 'board' ? '9999-12-25' : '9999-12-31')}
-                  onClick={() => goToDate(shiftDate(day.date, view === 'board' ? 7 : 1))}
+                  className="button primary toolbar-add"
+                  aria-label="Add task"
+                  title="Add task · A"
+                  onClick={(e) => openNew(undefined, e.currentTarget)}
+                  disabled={!day || busy || loading}
                 >
-                  <Icon name="right" size={17} />
+                  <Icon name="plus" size={17} />
+                  <span>Add task</span>
                 </button>
               </div>
-            )}
-            <button
-              className={`toolbar-button ${filterOpen ? 'selected' : ''}`}
-              aria-label="Filter tasks"
-              aria-expanded={filterOpen}
-              onClick={() => {
-                setFilterOpen(!filterOpen);
-                if (filterOpen) setQuery('');
-              }}
-            >
-              <Icon name="filter" size={17} />
-              <span>Filter</span>
-              {query && <i className="filter-dot" />}
-            </button>
-          </div>
-          <div className="toolbar-right">
-            <span className={`save-status ${error ? 'has-error' : ''}`} role="status">
-              <span className={`status-dot ${error ? 'warning' : ''}`} />
-              {busy ? 'Saving…' : error ? 'Needs attention' : 'Saved locally'}
-            </span>
-            <div className="view-switch" aria-label="Planner view">
-              <button
-                aria-label="Board view"
-                aria-pressed={view === 'board'}
-                title="Board view"
-                onClick={() => setView('board')}
-                disabled={busy}
-              >
-                <Icon name="board" size={15} />
-                <span>Board</span>
-              </button>
-              <button
-                aria-label="Today view"
-                aria-pressed={view === 'day'}
-                title="Today view"
-                onClick={() => {
-                  setView('day');
-                  if (boardCalendarDate) goToDate(boardCalendarDate);
-                }}
-                disabled={busy}
-              >
-                <Icon name="today" size={15} />
-                <span>Day</span>
-              </button>
-            </div>
-            <button
-              className="button primary toolbar-add"
-              aria-label="Add task"
-              title="Add task · A"
-              onClick={(e) => openNew(undefined, e.currentTarget)}
-              disabled={!day || busy || loading}
-            >
-              <Icon name="plus" size={17} />
-              <span>Add task</span>
-            </button>
-          </div>
-        </header>
+            </header>
 
-        <div className="workspace-context">
-          {filterOpen && (
-            <div className="filter-panel">
-              <Icon name="search" size={17} />
-              <input
-                aria-label="Search tasks"
-                autoFocus
-                placeholder="Filter by task, notes, or project…"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-              />
-              <span>Filters the view</span>
-              <button
-                className="icon-button"
-                aria-label="Clear task filter"
-                onClick={() => {
-                  setQuery('');
-                  setFilterOpen(false);
-                }}
-              >
-                <Icon name="close" size={16} />
-              </button>
+            <div className="workspace-context">
+              {displayDay && (view === 'day' || view === 'board') && <DailyWorkload day={displayDay} />}
             </div>
-          )}
-          {displayDay && (view === 'day' || view === 'board') && <DailyWorkload day={displayDay} />}
-        </div>
 
         {day && (
           <FocusBar
@@ -1267,23 +1295,23 @@ export function App() {
                         {incomplete.map((task, index) => taskCard(task, index))}
                         {!filteredTasks.length && (
                           <div className="empty-state">
-                            <Icon name={query ? 'search' : view === 'focus' ? 'focus' : 'note'} size={28} />
+                            <Icon name={isFilterActive ? 'search' : view === 'focus' ? 'focus' : 'note'} size={28} />
                             <h3>
-                              {query
+                              {isFilterActive
                                 ? 'No matching tasks'
                                 : view === 'backlog'
                                 ? 'A little room for later'
                                 : 'What deserves your time?'}
                             </h3>
                             <p>
-                              {query
-                                ? 'Try another word, or clear your filter.'
+                              {isFilterActive
+                                ? 'Try another word, or clear your filters.'
                                 : view === 'backlog'
                                 ? 'Capture an idea now. Give it a day later.'
                                 : 'Add a task, give it an estimate, and make space for it.'}
                             </p>
-                            {query ? (
-                              <button className="button secondary" onClick={() => setQuery('')}>
+                            {isFilterActive ? (
+                              <button className="button secondary" onClick={clearFilters}>
                                 Clear filter
                               </button>
                             ) : (
@@ -1311,44 +1339,104 @@ export function App() {
               </>
             )}
           </main>
-          {displayDay && calendarOpen && (
+          {isDockOpen && (
             <CalendarDock width={calendarWidth} onResize={setCalendarWidth}>
-              <DayCalendar
-                day={displayDay}
-                busy={busy}
-                onEdit={(task) => {
-                  if (!busy) openEditor(task);
-                }}
-                onAddEvent={addEvent}
-                onEditEvent={(event) => setEventEditor({ event, minute: event.start.minute })}
-                onChangeEvent={changeEvent}
-              />
+              {activeUtilityPanel === 'backlog' ? (
+                <BacklogPanel
+                  day={day}
+                  busy={busy}
+                  onOpenTask={(task, el) => openEditor(task, el)}
+                  onEstimate={(task, anchor) => {
+                    originatingElement.current = anchor;
+                    originatingTaskId.current = task.id;
+                    setActiveEstimatePopover({ task, anchor });
+                  }}
+                  onOpenMenu={(task, anchor) => {
+                    originatingElement.current = anchor;
+                    originatingTaskId.current = task.id;
+                    setActiveTaskMenu({ task, anchor });
+                  }}
+                  onToggleComplete={(task) => {
+                    void commit(() =>
+                      window.planner.setTaskCompleted({
+                        id: task.id,
+                        completed: !task.completed,
+                        viewDate: day!.date,
+                      })
+                    );
+                  }}
+                  onAdd={() => openNew(null)}
+                  onClose={() => setActiveUtilityPanel(null)}
+                  onMoveToBacklog={(id) => void moveTask(id, null)}
+                />
+              ) : activeUtilityPanel === 'search' ? (
+                <SearchPanel
+                  day={day}
+                  query={searchQuery}
+                  onQueryChange={setSearchQuery}
+                  onOpenTask={(task, el) => openEditor(task, el)}
+                  onToggleComplete={(task) => {
+                    void commit(() =>
+                      window.planner.setTaskCompleted({
+                        id: task.id,
+                        completed: !task.completed,
+                        viewDate: day!.date,
+                      })
+                    );
+                  }}
+                  onClose={() => setActiveUtilityPanel(null)}
+                  busy={busy}
+                />
+              ) : activeUtilityPanel === 'recovery' ? (
+                <RecoveryPanel
+                  day={day}
+                  error={error}
+                  busy={busy}
+                  onRefresh={() => void refresh(followingToday.current ? undefined : dateRef.current)}
+                  onResumeFocus={(taskId) => {
+                    if (day) void commit(() => window.planner.startFocus({ id: taskId, viewDate: day.date }));
+                  }}
+                  onOpenTask={(task, el) => openEditor(task, el)}
+                  onOpenStorage={() => {
+                    setStorageTitle('Local storage');
+                    setStorageOpen(true);
+                  }}
+                  onClose={() => setActiveUtilityPanel(null)}
+                />
+              ) : calendarOpen && displayDay ? (
+                <DayCalendar
+                  day={displayDay}
+                  busy={busy}
+                  onEdit={(task) => {
+                    if (!busy) openEditor(task);
+                  }}
+                  onAddEvent={addEvent}
+                  onEditEvent={(event) => setEventEditor({ event, minute: event.start.minute })}
+                  onChangeEvent={changeEvent}
+                />
+              ) : null}
             </CalendarDock>
           )}
           <aside className="utility-rail" aria-label="Quick panels">
             <button
-              className={`rail-button ${calendarOpen ? 'active' : ''}`}
-              aria-label={calendarOpen ? 'Hide calendar' : 'Show calendar'}
+              className={`rail-button ${calendarOpen && activeUtilityPanel === null ? 'active' : ''}`}
+              aria-label={calendarOpen && activeUtilityPanel === null ? 'Hide calendar' : 'Show calendar'}
               title="Calendar"
-              onClick={() => setCalendarOpen(!calendarOpen)}
+              onClick={() => {
+                if (activeUtilityPanel !== null) {
+                  setActiveUtilityPanel(null);
+                  setCalendarOpen(true);
+                } else {
+                  setCalendarOpen(!calendarOpen);
+                }
+              }}
             >
               <Icon name="calendar" size={20} />
             </button>
             <button
-              className={`rail-button ${view === 'focus' ? 'active' : ''}`}
-              aria-label="Open focus view"
-              title="Focus"
-              onClick={() => {
-                setView('focus');
-                goToDate();
-              }}
-            >
-              <Icon name="focus" size={20} />
-            </button>
-            <button
-              className={`rail-button ${view === 'backlog' ? 'active' : ''}`}
-              aria-label="Open backlog view"
-              title="Backlog"
+              className={`rail-button ${activeUtilityPanel === 'backlog' ? 'active' : ''}`}
+              aria-label="Open backlog panel"
+              title="Backlog panel"
               data-backlog-drop="true"
               onDragOver={(event) => {
                 if (event.dataTransfer.types.includes('text/plain')) {
@@ -1361,11 +1449,44 @@ export function App() {
                 const id = event.dataTransfer.getData('text/plain');
                 if (id && !busy) void moveTask(id, null);
               }}
-              onClick={() => setView('backlog')}
+              onClick={() => {
+                setActiveUtilityPanel((prev) => (prev === 'backlog' ? null : 'backlog'));
+              }}
             >
               <Icon name="archive" size={20} />
             </button>
+            <button
+              className={`rail-button ${activeUtilityPanel === 'search' ? 'active' : ''}`}
+              aria-label="Open search panel"
+              title="Search panel"
+              onClick={() => {
+                setActiveUtilityPanel((prev) => (prev === 'search' ? null : 'search'));
+              }}
+            >
+              <Icon name="search" size={20} />
+            </button>
+            <button
+              className={`rail-button ${activeUtilityPanel === 'recovery' ? 'active' : ''}`}
+              aria-label="Open recovery panel"
+              title="Recovery panel"
+              onClick={() => {
+                setActiveUtilityPanel((prev) => (prev === 'recovery' ? null : 'recovery'));
+              }}
+            >
+              <Icon name="storage" size={20} />
+            </button>
             <div className="rail-divider" />
+            <button
+              className={`rail-button ${view === 'focus' ? 'active' : ''}`}
+              aria-label="Open focus view"
+              title="Focus"
+              onClick={() => {
+                setView('focus');
+                goToDate();
+              }}
+            >
+              <Icon name="focus" size={20} />
+            </button>
             <button
               className="rail-button"
               aria-label="Create fixed event"
@@ -1378,7 +1499,9 @@ export function App() {
           </aside>
         </div>
       </div>
-    </div>
+    );
+  })()}
+</div>
 
       {(() => {
         const creationDraft = activeCreation ? creationDrafts[activeCreation.key] : undefined;
