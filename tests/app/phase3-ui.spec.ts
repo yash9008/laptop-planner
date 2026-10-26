@@ -48,7 +48,8 @@ async function addTask(title: string, estimate = '45m', plannedDate: string | nu
       const minutes = estimate.endsWith('h')
         ? parseInt(estimate, 10) * 60
         : parseInt(estimate, 10);
-      return window.planner.saveTask({
+      const res = await window.planner.saveTask({
+        id: crypto.randomUUID(),
         create: true,
         title,
         notes: '',
@@ -56,6 +57,8 @@ async function addTask(title: string, estimate = '45m', plannedDate: string | nu
         plannedMinutes: minutes,
         viewDate: day.value.date,
       });
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
     },
     { title, estimate, plannedDate }
   );
@@ -66,7 +69,8 @@ async function addProject(title: string) {
     async ({ title }) => {
       const day = await window.planner.getDay();
       if (!day.ok) throw new Error(day.error.message);
-      return window.planner.saveProject({
+      const res = await window.planner.saveProject({
+        id: crypto.randomUUID(),
         create: true,
         title,
         color: '#4f46e5',
@@ -74,6 +78,8 @@ async function addProject(title: string) {
         deadline: null,
         viewDate: day.value.date,
       });
+      if (!res.ok) throw new Error(res.error.message);
+      return res.value;
     },
     { title }
   );
@@ -89,7 +95,8 @@ test('combined project, status, and text filters affect view presentation only w
 
   // Task 1: Incomplete with project
   await page.evaluate(async ({ projectId }) => {
-    await window.planner.saveTask({
+    const res = await window.planner.saveTask({
+      id: crypto.randomUUID(),
       create: true,
       title: 'Alpha Report',
       notes: 'Important notes',
@@ -98,11 +105,13 @@ test('combined project, status, and text filters affect view presentation only w
       projectId,
       viewDate: '2026-10-25',
     });
+    if (!res.ok) throw new Error(res.error.message);
   }, { projectId });
 
   // Task 2: Completed with project
   await page.evaluate(async ({ projectId }) => {
     const res = await window.planner.saveTask({
+      id: crypto.randomUUID(),
       create: true,
       title: 'Alpha Review',
       notes: '',
@@ -182,6 +191,7 @@ test('global local search matches across completed tasks, backlog, and dates out
   // 2. Completed task
   await page.evaluate(async () => {
     const res = await window.planner.saveTask({
+      id: crypto.randomUUID(),
       create: true,
       title: 'Archived Meeting',
       notes: 'Quarterly review notes',
@@ -427,17 +437,19 @@ test('filtered whole-card drag with hidden neighboring tasks preserves beforeTas
   await expect(todayCol.getByTestId('board-task')).toHaveCount(2);
 
   // Move Task Visible Three before Task Visible One
-  const cardThree = todayCol.getByTestId('board-task').filter({ hasText: 'Task Visible Three' });
-  const cardOne = todayCol.getByTestId('board-task').filter({ hasText: 'Task Visible One' });
-
-  const threeBox = (await cardThree.boundingBox())!;
-  const oneBox = (await cardOne.boundingBox())!;
-
-  // Drag and drop
-  await page.mouse.move(threeBox.x + threeBox.width / 2, threeBox.y + threeBox.height / 2);
+  const titleThree = page.getByRole('button', { name: 'Task Visible Three', exact: true });
+  const rectThree = (await titleThree.boundingBox())!;
+  await page.mouse.move(rectThree.x + rectThree.width / 2, rectThree.y + rectThree.height / 2);
   await page.mouse.down();
-  await page.mouse.move(oneBox.x + oneBox.width / 2, oneBox.y + 5, { steps: 8 });
+  await page.mouse.move(rectThree.x + rectThree.width / 2 + 10, rectThree.y + rectThree.height / 2, { steps: 3 });
+  await expect(page.getByTestId('board-drop-placeholder')).toBeVisible();
+
+  const titleOne = page.getByRole('button', { name: 'Task Visible One', exact: true });
+  const rectOne = (await titleOne.boundingBox())!;
+  await page.mouse.move(rectOne.x + rectOne.width / 2, rectOne.y + 4, { steps: 5 });
+  await page.mouse.move(rectOne.x + rectOne.width / 2 + 1, rectOne.y + 4);
   await page.mouse.up();
+  await expect(page.getByTestId('board-drop-placeholder')).toHaveCount(0);
 
   // Verify order in database
   const afterSnap = await snapshot();
@@ -531,6 +543,7 @@ test('captures Phase 3 visual evidence on hosted runner', async () => {
   await page.evaluate(async ({ projId }) => {
     const viewDate = '2026-10-25';
     await window.planner.saveTask({
+      id: crypto.randomUUID(),
       create: true,
       title: 'Analyze performance benchmarks',
       notes: 'Investigate frame times during board panning.',
@@ -540,6 +553,7 @@ test('captures Phase 3 visual evidence on hosted runner', async () => {
       viewDate,
     });
     await window.planner.saveTask({
+      id: crypto.randomUUID(),
       create: true,
       title: 'Review SQLite WAL write checkpoints',
       notes: 'Ensure safety copy is retained before restore.',
@@ -549,6 +563,7 @@ test('captures Phase 3 visual evidence on hosted runner', async () => {
       viewDate,
     });
     await window.planner.saveTask({
+      id: crypto.randomUUID(),
       create: true,
       title: 'Design quarterly planning rituals',
       notes: '',
