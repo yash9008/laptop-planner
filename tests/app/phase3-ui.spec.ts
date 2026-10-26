@@ -602,6 +602,8 @@ test('captures Phase 3 visual evidence on hosted runner', async () => {
     await window.planner.startFocus({ id: taskId, viewDate: '2026-10-25' });
     await window.planner.pauseFocus({ id: taskId, viewDate: '2026-10-25' });
   }, { taskId });
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Add task', exact: true })).toBeEnabled();
   await page.getByRole('button', { name: 'Open recovery panel', exact: true }).click();
   await expect(page.getByTestId('recovery-panel')).toBeVisible();
   await expect(page.locator('.recovery-focus-card')).toBeVisible();
