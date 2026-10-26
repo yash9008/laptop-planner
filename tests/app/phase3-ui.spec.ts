@@ -380,7 +380,7 @@ test('parent/child Escape containment, forward/reverse Tab, focus restoration, r
   // Open child EstimatePopover inside TaskEditor
   const estimateBtn = editor.locator('.estimate-trigger-btn');
   await estimateBtn.click();
-  const estimatePopover = page.getByRole('dialog', { name: 'Choose estimated duration', exact: true });
+  const estimatePopover = page.getByRole('dialog', { name: 'Planned time presets', exact: true });
   await expect(estimatePopover).toBeVisible();
 
   // First Escape closes ONLY the child EstimatePopover
