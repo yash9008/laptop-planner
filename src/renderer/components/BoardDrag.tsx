@@ -16,6 +16,11 @@ export function useBoardDrag({ panel, tasks, busy, viewDate, onMove }:{
   panel:React.RefObject<HTMLElement|null>;tasks:PlannerTask[];busy:boolean;viewDate:string;
   onMove(input:MoveTaskInput):Promise<string|null>;
 }) {
+  const tasksRef = useRef(tasks); tasksRef.current = tasks;
+  const busyRef = useRef(busy); busyRef.current = busy;
+  const viewDateRef = useRef(viewDate); viewDateRef.current = viewDate;
+  const onMoveRef = useRef(onMove); onMoveRef.current = onMove;
+
   const [drag,setDrag]=useState<CardDrag|null>(null);
   const current=useRef<CardDrag|null>(null);
   const pointer=useRef({x:0,y:0});
@@ -31,9 +36,9 @@ export function useBoardDrag({ panel, tasks, busy, viewDate, onMove }:{
   useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;nativeImage.current?.remove();document.body.classList.remove('is-task-dragging');};},[]);
 
   function begin(event:ReactDragEvent<HTMLElement>) {
-    const source=(event.target as Element).closest<HTMLElement>('[data-testid="board-task"][data-task-id]');
-    const task=tasks.find((row)=>row.id===source?.dataset.taskId);
-    if(busy || !allowed.current || !source || !task){event.preventDefault();return;}
+    const source=(event.target as Element).closest<HTMLElement>('.task-card[data-task-id]');
+    const task=tasksRef.current.find((row)=>row.id===source?.dataset.taskId);
+    if(busyRef.current || !allowed.current || !source || !task){event.preventDefault();return;}
     event.stopPropagation();
     const rect=source.getBoundingClientRect();
     const clone=source.cloneNode(true) as HTMLElement;
@@ -51,12 +56,12 @@ export function useBoardDrag({ panel, tasks, busy, viewDate, onMove }:{
     event.dataTransfer.setData('application/x-laptop-planner-task',task.id);
     event.dataTransfer.setDragImage(clone,offsetX,offsetY);
     requestAnimationFrame(()=>{clone.remove();if(nativeImage.current===clone)nativeImage.current=null;});
-    const originalRows=grouped(tasks.filter((row)=>row.plannedDate===task.plannedDate));
+    const originalRows=grouped(tasksRef.current.filter((row)=>row.plannedDate===task.plannedDate));
     const original={date:task.plannedDate,beforeTaskId:originalRows[originalRows.findIndex((row)=>row.id===task.id)+1]?.id??null};
     pointer.current={x:event.clientX,y:event.clientY};handled.current=false;externalDestination.current=null;
     if(document.activeElement instanceof HTMLElement)document.activeElement.blur();
     document.body.classList.add('is-task-dragging');
-    publish({task,baseline:tasks,original,target:original,html,width:rect.width,height:rect.height,margin:parseFloat(getComputedStyle(source).marginBottom)||8,offsetX,offsetY,phase:'dragging'});
+    publish({task,baseline:tasksRef.current,original,target:original,html,width:rect.width,height:rect.height,margin:parseFloat(getComputedStyle(source).marginBottom)||8,offsetX,offsetY,phase:'dragging'});
   }
   function spotAt(x:number,y:number):BoardDropSpot|null {
     const active=current.current;const host=panel.current;if(!active || !host)return null;
@@ -88,20 +93,25 @@ export function useBoardDrag({ panel, tasks, busy, viewDate, onMove }:{
   function settle(target:BoardDropSpot,save:boolean,destination:DOMRect|null=null) {
     const active=current.current;if(!active || active.phase==='settling')return;
     handled.current=true;externalDestination.current=destination;suppressClick.current=true;
-    pending.current=save?Promise.resolve(onMove({id:active.task.id,plannedDate:target.date,beforeTaskId:target.beforeTaskId,viewDate})).catch(()=> 'Unable to save this move.'):Promise.resolve(null);
+    pending.current=save?Promise.resolve(onMoveRef.current({id:active.task.id,plannedDate:target.date,beforeTaskId:target.beforeTaskId,viewDate:viewDateRef.current})).catch(()=> 'Unable to save this move.'):Promise.resolve(null);
     publish({...active,target,phase:'settling'});
   }
   function drop(event:ReactDragEvent<HTMLElement>) {
     if(!current.current) {
       const taskId = event.dataTransfer.getData('application/x-laptop-planner-task') || event.dataTransfer.getData('text/plain');
-      if (taskId && !busy) {
+      if (taskId && !busyRef.current) {
         event.preventDefault();
         event.stopPropagation();
         const under = document.elementFromPoint(event.clientX, event.clientY);
         const column = under?.closest<HTMLElement>('[data-board-date]');
         if (column) {
           const date = column.dataset.boardDate === 'backlog' ? null : column.dataset.boardDate!;
-          void onMove({ id: taskId, plannedDate: date, beforeTaskId: null, viewDate });
+          const candidates = [...column.querySelectorAll<HTMLElement>('[data-row-task]')];
+          const before = candidates.find((node) => {
+            const rect = node.getBoundingClientRect();
+            return event.clientY < rect.top + rect.height / 2;
+          });
+          void onMoveRef.current({ id: taskId, plannedDate: date, beforeTaskId: before?.dataset.rowTask ?? null, viewDate: viewDateRef.current });
         }
       }
       return;

@@ -313,6 +313,9 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   .task-checkbox { transition: background 50ms ease, border-color 50ms ease, opacity 50ms ease; }
   .task-tools, .task-add-bar, .toolbar-button, .icon-button, .drag-handle { transition: opacity 200ms ease; }
   .menu-item { transition: background 150ms ease, border-color 150ms ease, color 150ms ease; }
+  .filter-segment { transition: background 150ms ease, color 150ms ease; }
+  .search-result-item { transition: border-color 150ms ease, background 150ms ease; }
+  .rail-button { transition: background 200ms ease, color 200ms ease, opacity 200ms ease; }
 }
 
 /* A paused session stays reachable without displacing the board's day headings. */
@@ -340,7 +343,10 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 .planning-board { cursor: grab; outline-offset: -3px; }
 .planning-board.is-panning, .planning-board.is-panning * { cursor: grabbing !important; user-select: none !important; }
 .planning-board .board-column-heading, .planning-board .task-add-bar, .planning-board .task-tools, .planning-board .task-checkbox { cursor: default; }
-@media (prefers-reduced-motion: reduce) { .board-task-slot { scroll-behavior: auto; } }
+@media (prefers-reduced-motion: reduce) {
+  .board-task-slot { scroll-behavior: auto; }
+  .rail-button, .filter-segment, .search-result-item { transition: none !important; }
+}
 .settings-form { margin: 20px 0; }
 .settings-form h3, .backup-settings h3 { margin: 0 0 10px; font-size: 15px; }
 .settings-form>.button { align-self: flex-start; }
@@ -857,7 +863,6 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   padding: 5px 6px;
   border-radius: 3px;
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
 }
 
 .filter-segment:hover:not(.active) {
@@ -1033,8 +1038,12 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   border: 1px solid #2d2d33;
   border-radius: 6px;
   background: #1f1f23;
-  transition: border-color 150ms ease, background 150ms ease;
   min-width: 0;
+}
+
+.search-result-item.is-active-result {
+  border-color: #555562;
+  background: #25252b;
 }
 
 .search-result-item:hover {
@@ -1228,7 +1237,6 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 
 /* Utility Rail Button Transitions */
 .rail-button {
-  transition: background 200ms ease, color 200ms ease, opacity 200ms ease;
 }
 
 .rail-button.active {

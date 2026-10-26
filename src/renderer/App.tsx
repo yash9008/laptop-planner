@@ -13,6 +13,7 @@ import { ProjectEditor } from './components/ProjectEditor';
 import { EventEditor } from './components/EventEditor';
 import { FocusBar } from './components/FocusBar';
 import { PlanningBoard } from './components/PlanningBoard';
+import { useBoardDrag } from './components/BoardDrag';
 import { CalendarDock, readCalendarWidth } from './components/CalendarDock';
 import { DailyWorkload } from './components/DailyWorkload';
 import { FilterChooser } from './components/FilterChooser';
@@ -56,6 +57,9 @@ export function App() {
   const [activeTaskMenu, setActiveTaskMenu] = useState<{ task: PlannerTask; anchor: HTMLElement } | null>(null);
   const originatingElement = useRef<HTMLElement | null>(null);
   const originatingTaskId = useRef<string | null>(null);
+  const originatingSurface = useRef<'board' | 'search' | 'backlog' | 'recovery' | 'calendar' | 'other'>('board');
+  const [activeSearchResultId, setActiveSearchResultId] = useState<string | null>(null);
+  const prevActiveUtilityPanel = useRef<'backlog' | 'search' | 'recovery' | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -145,7 +149,100 @@ export function App() {
     }
   }, [activeEditorMode]);
 
+  useEffect(() => {
+    if (prevActiveUtilityPanel.current && !activeUtilityPanel) {
+      const closed = prevActiveUtilityPanel.current;
+      let selector = '';
+      if (closed === 'search') selector = 'button[aria-label="Open search panel"]';
+      else if (closed === 'backlog') selector = 'button[aria-label="Open backlog panel"]';
+      else if (closed === 'recovery') selector = 'button[aria-label="Open recovery panel"]';
+      const opener = document.querySelector<HTMLElement>(selector);
+      opener?.focus({ preventScroll: true });
+    }
+    prevActiveUtilityPanel.current = activeUtilityPanel;
+  }, [activeUtilityPanel]);
+
   function restoreOriginatingFocus(taskId?: string | null) {
+    const surface = originatingSurface.current;
+
+    if (surface === 'search') {
+      const searchPanel = document.querySelector<HTMLElement>('[data-testid="search-panel"]');
+      if (searchPanel && searchPanel.isConnected) {
+        const el = originatingElement.current;
+        if (el && el.isConnected && searchPanel.contains(el)) {
+          el.focus({ preventScroll: true });
+          return;
+        }
+        if (taskId) {
+          const taskBtn = searchPanel.querySelector<HTMLElement>(`[data-task-id="${taskId}"] .search-result-main`);
+          if (taskBtn && taskBtn.isConnected) {
+            taskBtn.focus({ preventScroll: true });
+            return;
+          }
+        }
+        const remainingResult = searchPanel.querySelector<HTMLElement>('.search-result-main');
+        if (remainingResult && remainingResult.isConnected) {
+          remainingResult.focus({ preventScroll: true });
+          return;
+        }
+        const searchInput = searchPanel.querySelector<HTMLElement>('input[aria-label="Search all tasks"], input');
+        if (searchInput && searchInput.isConnected) {
+          searchInput.focus({ preventScroll: true });
+          return;
+        }
+        searchPanel.focus({ preventScroll: true });
+        return;
+      }
+    }
+
+    if (surface === 'backlog') {
+      const backlogPanel = document.querySelector<HTMLElement>('[data-testid="backlog-panel"]');
+      if (backlogPanel && backlogPanel.isConnected) {
+        const el = originatingElement.current;
+        if (el && el.isConnected && backlogPanel.contains(el)) {
+          el.focus({ preventScroll: true });
+          return;
+        }
+        if (taskId) {
+          const taskBtn = backlogPanel.querySelector<HTMLElement>(`[data-task-id="${taskId}"] .task-title`);
+          if (taskBtn && taskBtn.isConnected) {
+            taskBtn.focus({ preventScroll: true });
+            return;
+          }
+        }
+        const remaining = backlogPanel.querySelector<HTMLElement>('.task-title');
+        if (remaining && remaining.isConnected) {
+          remaining.focus({ preventScroll: true });
+          return;
+        }
+        const closeBtn = backlogPanel.querySelector<HTMLElement>('.panel-close-btn');
+        if (closeBtn && closeBtn.isConnected) {
+          closeBtn.focus({ preventScroll: true });
+          return;
+        }
+        backlogPanel.focus({ preventScroll: true });
+        return;
+      }
+    }
+
+    if (surface === 'recovery') {
+      const recoveryPanel = document.querySelector<HTMLElement>('[data-testid="recovery-panel"]');
+      if (recoveryPanel && recoveryPanel.isConnected) {
+        const el = originatingElement.current;
+        if (el && el.isConnected && recoveryPanel.contains(el)) {
+          el.focus({ preventScroll: true });
+          return;
+        }
+        const fallback = recoveryPanel.querySelector<HTMLElement>('button');
+        if (fallback && fallback.isConnected) {
+          fallback.focus({ preventScroll: true });
+          return;
+        }
+        recoveryPanel.focus({ preventScroll: true });
+        return;
+      }
+    }
+
     const el = originatingElement.current;
     if (el && el.isConnected) {
       el.focus({ preventScroll: true });
@@ -154,7 +251,6 @@ export function App() {
     if (taskId) {
       const card =
         document.querySelector<HTMLElement>(`[data-task-id="${taskId}"] .task-title`) ??
-        document.querySelector<HTMLElement>(`[data-task-id="${taskId}"] .search-result-main`) ??
         document.querySelector<HTMLElement>(`[data-task-id="${taskId}"]`);
       if (card && card.isConnected) {
         card.focus({ preventScroll: true });
@@ -220,13 +316,30 @@ export function App() {
     setActiveEditorMode('quick');
   }
 
-  function openEditor(task: PlannerTask, originatingEl?: HTMLElement) {
+  function openEditor(
+    task: PlannerTask,
+    originatingEl?: HTMLElement,
+    surface?: 'board' | 'search' | 'backlog' | 'recovery' | 'calendar' | 'other'
+  ) {
     originatingElement.current =
       originatingEl ??
       (document.activeElement instanceof HTMLElement && document.activeElement !== document.body
         ? document.activeElement
         : null);
     originatingTaskId.current = task.id;
+    const detectedSurface =
+      surface ??
+      (originatingEl?.closest('[data-testid="search-panel"]')
+        ? 'search'
+        : originatingEl?.closest('[data-testid="backlog-panel"]')
+        ? 'backlog'
+        : originatingEl?.closest('[data-testid="recovery-panel"]')
+        ? 'recovery'
+        : 'board');
+    originatingSurface.current = detectedSurface;
+    if (detectedSurface === 'search') {
+      setActiveSearchResultId(task.id);
+    }
 
     const latestTask = day?.allTasks.find((t) => t.id === task.id) ?? task;
     const freshDraft = taskToDraft(latestTask, day?.date ?? '2026-01-01');
@@ -527,6 +640,15 @@ export function App() {
   async function moveBoardTask(input: MoveTaskInput) {
     return commit(() => window.planner.moveTask(input));
   }
+
+  const boardPanelRef = useRef<HTMLElement | null>(null);
+  const dnd = useBoardDrag({
+    panel: boardPanelRef,
+    tasks: day?.allTasks ?? [],
+    busy,
+    viewDate: day?.date ?? '',
+    onMove: moveBoardTask,
+  });
 
   async function remove(task: PlannerTask) {
     if (!day) return;
@@ -1199,6 +1321,8 @@ export function App() {
                   <>
                     <h1 className="sr-only">Your week</h1>
                     <PlanningBoard
+                      panelRef={boardPanelRef}
+                      dnd={dnd}
                       day={day}
                       selectedDate={displayDay!.date}
                       busy={busy}
@@ -1262,7 +1386,7 @@ export function App() {
                           {view === 'project' ? 'Project tasks' : view === 'backlog' ? 'Future tasks' : 'Your tasks'}
                         </h2>
                         <span className="completion-count">
-                          {completed.length} of {filteredTasks.length} done
+                          {visibleTasks.filter((task) => task.completed).length} of {visibleTasks.length} done
                         </span>
                       </div>
                       <div className="completion-track">
@@ -1345,15 +1469,18 @@ export function App() {
                 <BacklogPanel
                   day={day}
                   busy={busy}
-                  onOpenTask={(task, el) => openEditor(task, el)}
+                  dndHandlers={dnd.handlers}
+                  onOpenTask={(task, el) => openEditor(task, el, 'backlog')}
                   onEstimate={(task, anchor) => {
                     originatingElement.current = anchor;
                     originatingTaskId.current = task.id;
+                    originatingSurface.current = 'backlog';
                     setActiveEstimatePopover({ task, anchor });
                   }}
                   onOpenMenu={(task, anchor) => {
                     originatingElement.current = anchor;
                     originatingTaskId.current = task.id;
+                    originatingSurface.current = 'backlog';
                     setActiveTaskMenu({ task, anchor });
                   }}
                   onToggleComplete={(task) => {
@@ -1373,8 +1500,9 @@ export function App() {
                 <SearchPanel
                   day={day}
                   query={searchQuery}
+                  activeTaskId={activeSearchResultId}
                   onQueryChange={setSearchQuery}
-                  onOpenTask={(task, el) => openEditor(task, el)}
+                  onOpenTask={(task, el) => openEditor(task, el, 'search')}
                   onToggleComplete={(task) => {
                     void commit(() =>
                       window.planner.setTaskCompleted({
@@ -1396,7 +1524,7 @@ export function App() {
                   onResumeFocus={(taskId) => {
                     if (day) void commit(() => window.planner.startFocus({ id: taskId, viewDate: day.date }));
                   }}
-                  onOpenTask={(task, el) => openEditor(task, el)}
+                  onOpenTask={(task, el) => openEditor(task, el, 'recovery')}
                   onOpenStorage={() => {
                     setStorageTitle('Local storage');
                     setStorageOpen(true);

@@ -6,6 +6,7 @@ import { Icon } from './Icon';
 export interface SearchPanelProps {
   day: PlannerDay | null;
   query: string;
+  activeTaskId?: string | null;
   onQueryChange(query: string): void;
   onOpenTask(task: PlannerTask, originatingEl?: HTMLElement): void;
   onToggleComplete(task: PlannerTask): void;
@@ -16,6 +17,7 @@ export interface SearchPanelProps {
 export function SearchPanel({
   day,
   query,
+  activeTaskId,
   onQueryChange,
   onOpenTask,
   onToggleComplete,
@@ -133,7 +135,7 @@ export function SearchPanel({
             return (
               <article
                 key={task.id}
-                className={`search-result-item ${task.completed ? 'completed-task' : ''}`}
+                className={`search-result-item ${task.completed ? 'completed-task' : ''} ${task.id === activeTaskId ? 'is-active-result' : ''}`}
                 data-task-id={task.id}
                 data-testid="search-result-item"
               >

@@ -4,12 +4,16 @@ import { dateLabel,formatDuration } from '../../shared/task-input';
 import { Icon } from './Icon';
 import { useBoardDrag } from './BoardDrag';
 
-export function PlanningBoard({day,selectedDate,busy,navigationKey,onMove,onAdd,onOpenDay,onActiveDay,renderTask,matches}:{
+export function PlanningBoard({panelRef: externalPanelRef,dnd: externalDnd,day,selectedDate,busy,navigationKey,onMove,onAdd,onOpenDay,onActiveDay,renderTask,matches}:{
+  panelRef?: React.RefObject<HTMLElement | null>;
+  dnd?: ReturnType<typeof useBoardDrag>;
   day:PlannerDay;selectedDate:string;busy:boolean;navigationKey:number;onMove(input:MoveTaskInput):Promise<string|null>;onAdd(date:string|null):void;
   onOpenDay(date:string):void;onActiveDay(date:string):void;renderTask(task:PlannerTask,index:number):ReactNode;matches(task:PlannerTask):boolean;
 }) {
-  const panel=useRef<HTMLElement>(null);
-  const dnd=useBoardDrag({panel,tasks:day.allTasks,busy,viewDate:day.date,onMove});
+  const internalPanel=useRef<HTMLElement>(null);
+  const panel = externalPanelRef ?? internalPanel;
+  const internalDnd=useBoardDrag({panel,tasks:day.allTasks,busy,viewDate:day.date,onMove});
+  const dnd = externalDnd ?? internalDnd;
   const animation=useRef<number|null>(null);const velocity=useRef(0);
   const scrollFrame=useRef<number|null>(null);
   const activeDate=useRef('');

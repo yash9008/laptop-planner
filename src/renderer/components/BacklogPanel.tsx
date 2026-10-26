@@ -1,10 +1,12 @@
 import type { PlannerDay, PlannerTask } from '../../shared/contracts';
 import { formatDuration } from '../../shared/task-input';
 import { Icon } from './Icon';
+import type { useBoardDrag } from './BoardDrag';
 
 export interface BacklogPanelProps {
   day: PlannerDay | null;
   busy?: boolean;
+  dndHandlers?: ReturnType<typeof useBoardDrag>['handlers'];
   onOpenTask(task: PlannerTask, originatingEl?: HTMLElement): void;
   onEstimate(task: PlannerTask, anchor: HTMLElement): void;
   onOpenMenu(task: PlannerTask, anchor: HTMLElement): void;
@@ -17,6 +19,7 @@ export interface BacklogPanelProps {
 export function BacklogPanel({
   day,
   busy = false,
+  dndHandlers,
   onOpenTask,
   onEstimate,
   onOpenMenu,
@@ -84,7 +87,13 @@ export function BacklogPanel({
         </button>
       </div>
 
-      <div className="panel-body backlog-panel-body" role="list">
+      <div
+        className="panel-body backlog-panel-body"
+        role="list"
+        onPointerDownCapture={dndHandlers?.onPointerDownCapture}
+        onDragStartCapture={dndHandlers?.onDragStartCapture}
+        onDragEndCapture={dndHandlers?.onDragEndCapture}
+      >
         {backlog.length === 0 ? (
           <div className="panel-empty-state">
             <Icon name="archive" size={28} />
@@ -106,11 +115,6 @@ export function BacklogPanel({
                 data-task-id={task.id}
                 data-completed={task.completed}
                 draggable={!busy}
-                onDragStart={(event) => {
-                  event.dataTransfer.setData('text/plain', task.id);
-                  event.dataTransfer.setData('application/x-laptop-planner-task', task.id);
-                  event.dataTransfer.effectAllowed = 'move';
-                }}
               >
                 <div className="card-topline">
                   <span className="task-time">{project ? project.title : 'Backlog'}</span>
@@ -144,11 +148,6 @@ export function BacklogPanel({
                     draggable={!busy}
                     aria-label={`Drag ${task.title} to a day`}
                     title="Drag to a day"
-                    onDragStart={(event) => {
-                      event.dataTransfer.setData('text/plain', task.id);
-                      event.dataTransfer.setData('application/x-laptop-planner-task', task.id);
-                      event.dataTransfer.effectAllowed = 'move';
-                    }}
                   >
                     <Icon name="grip" size={15} />
                   </button>

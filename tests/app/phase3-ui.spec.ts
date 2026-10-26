@@ -604,11 +604,14 @@ test('captures Phase 3 visual evidence on hosted runner', async () => {
   }, { taskId });
   await page.getByRole('button', { name: 'Open recovery panel', exact: true }).click();
   await expect(page.getByTestId('recovery-panel')).toBeVisible();
+  await expect(page.locator('.recovery-focus-card')).toBeVisible();
+  await expect(page.locator('.recovery-focus-title')).toBeVisible();
   const recoveryBuf = await page.screenshot();
   console.log('=== SCREENSHOT: ui-phase3-recovery-panel.png ===\n' + recoveryBuf.toString('base64') + '\n=== END SCREENSHOT ===');
 
   // 5. Laptop Responsive Width (860x680)
   await page.setViewportSize({ width: 860, height: 680 });
+  await expect(page.locator('.recovery-focus-card')).toBeVisible();
   const laptopBuf = await page.screenshot();
   console.log('=== SCREENSHOT: ui-phase3-laptop.png ===\n' + laptopBuf.toString('base64') + '\n=== END SCREENSHOT ===');
 });
