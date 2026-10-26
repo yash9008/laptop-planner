@@ -1,0 +1,81 @@
+{
+  "reviewed_branch": "ui-phase-3",
+  "reviewed_commit": "29b0d08ff79e465f9d76040f0d0927ec150798ee",
+  "baseline_run": "https://github.com/yash9008/laptop-planner/actions/runs/40311821520",
+  "baseline_existing_electron_tests": {
+    "passed": 77,
+    "failed": 0
+  },
+  "review_branch": "codex/phase3-review",
+  "review_commit": "c40e1906ca4e747d4e221fc5b497fcc1765e488c",
+  "review_run": "https://github.com/yash9008/laptop-planner/actions/runs/40320259859",
+  "runner": "macos-26 arm64",
+  "scheduler": {
+    "Asia/Kolkata": 78,
+    "America/Los_Angeles": 78
+  },
+  "database": {
+    "passed": 63,
+    "failed": 0
+  },
+  "full_electron_suite": {
+    "passed": 80,
+    "failed": 5
+  },
+  "independent_probes": {
+    "passed": 3,
+    "failed": 5
+  },
+  "observations": {
+    "R1": {
+      "query": "Needle",
+      "saved_title": "Different title",
+      "result_count": 0,
+      "focus": {
+        "tag": "BUTTON",
+        "text": "Different title",
+        "inSearch": false
+      }
+    },
+    "R2": {
+      "preview_count": 0,
+      "expected_order": [
+        "Incoming backlog",
+        "Alpha destination",
+        "Beta destination"
+      ],
+      "actual_order": [
+        "Alpha destination",
+        "Beta destination",
+        "Incoming backlog"
+      ]
+    },
+    "R3": {
+      "before": "1 of 2 done",
+      "filter": "Completed",
+      "after": "1 of 1 done"
+    },
+    "R4": {
+      "media": "prefers-reduced-motion: reduce",
+      "computed_transition_durations": {
+        ".rail-button": "0.2s, 0.2s, 0.2s",
+        ".filter-segment": "0.15s, 0.15s",
+        ".search-result-item": "0.15s, 0.15s"
+      },
+      "elapsed_animation_measurement": false
+    },
+    "R5": {
+      "action": "Close search panel",
+      "active_element": "BODY",
+      "rail_trigger_focused": false
+    }
+  },
+  "passing_independent_cases": [
+    "failed Search edit keeps draft and query and succeeds on retry",
+    "Recovery and storage tools reachable after no-snapshot read failure",
+    "hidden calendar and mounted panned board preserved through panel switches"
+  ],
+  "application_modified_by_review": false,
+  "local_gui_execution": false,
+  "personal_database_used": false
+}

@@ -28,7 +28,7 @@ This sequence follows the user's request to make the app feel closer to Sunsama,
 | --- | --- | --- |
 | 1 — Board and calendar workspace | Complete; awaiting user review | Neutral surfaces, quieter toolbar/sidebar, clearer task cards and current-day headings, workload totals above the board/day list, and a resizable calendar with keyboard controls and a remembered width |
 | 2 — Task editing and quick actions | Complete; R1–R8 independently rechecked; ready for Phase 3 | Quick-add composer, centered task detail editor, estimate popover and task menu; verified 50 ms checkbox and 200 ms card/control feedback, with component-specific motion evidence; preserve drafts and failed-save recovery |
-| 3 — Finding and organizing work | Planned | Project/status filters, global search and backlog/search/recovery side panels; verified navigation opacity/icon feedback, plus trigger verification before adopting the 300 ms layout-margin rule; preserve date/scroll continuity |
+| 3 — Finding and organizing work | Implemented; independent review requires R1–R5 fixes | Project/status filters, global search and backlog/search/recovery side panels; verified navigation opacity/icon feedback, plus trigger verification before adopting the 300 ms layout-margin rule; preserve date/scroll continuity |
 | 4 — Keyboard navigation and focused work | Planned | Command palette, shortcuts and a true single-task Focus screen; verify actual Focus/palette transitions, including the loaded 300 ms Focus-calendar opacity rule, with the existing elapsed-time timer |
 | 5 — Motion parity acceptance | Planned | Compare motion against controlled reference evidence; test normal/reduced motion, enter/exit, delays, interruption/reversal, cancellation, errors, focus, narrow windows and drag behavior; distinguish CSS definitions from observed elapsed spans and report unmatched effects |
 
@@ -84,6 +84,19 @@ Historical initial review: [phase2-implementation-review.md](docs/phase2-impleme
   - [Estimate popover screenshot](docs/screenshots/ui-phase2-estimate-popover.png)
   - [Task actions menu screenshot](docs/screenshots/ui-phase2-task-menu.png)
 - Source/development build only; packaged app and DMG have not been rebuilt for UI Phase 2.
+
+### UI Phase 3 independent review — October 26, 2026
+
+Gemini's implementation on `ui-phase-3` at `29b0d08` passes its 77 existing
+Electron tests, type-check/build, 78 scheduler tests in each of two time zones,
+and 63 database tests on the hosted macOS runner. The independent
+[Phase 3 review](docs/phase3-implementation-review.md) reproduced five issues:
+search-result focus after removing a match, backlog-panel insertion/preview,
+filtered completion totals, reduced-motion transitions, and panel-close focus.
+Eight additional hosted probes produced five failures and three passes; the
+combined Electron suite reported 80 passed and 5 failed. The application code
+was not changed by the review. Phase 3 needs fixes and independent re-review;
+Phase 4 has not been authorized.
 
 ## Previously recorded release verification
 
