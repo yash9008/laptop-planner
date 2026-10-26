@@ -174,6 +174,7 @@ test('independent: panel switching preserves a hidden calendar and panned board'
   await board.focus();
   await page.keyboard.press('ArrowRight');
   await expect(page.getByLabel('Go to date', {exact: true})).toHaveValue('2026-10-26');
+  await expect.poll(async () => board.evaluate(host => host.scrollLeft)).toBeCloseTo(272, 0);
   const before = await board.evaluate(host => {host.dataset.independentReviewIdentity = 'same-node'; return host.scrollLeft;});
   await page.getByRole('button', {name: 'Open search panel', exact: true}).click();
   await page.getByLabel('Search all tasks').fill('Continuity');
