@@ -76,14 +76,55 @@ The following table establishes explicit state ownership across the renderer lif
   8. Visible popup bounds, rapid panel switching, and motion timing adherence.
   9. Visual evidence capture on hosted Apple Silicon runner.
 
-## Changed files
+## Verification and CI evidence
 
-- [`src/renderer/components/FilterChooser.tsx`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/src/renderer/components/FilterChooser.tsx): New anchored keyboard-accessible filter chooser popover.
-- [`src/renderer/components/SearchPanel.tsx`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/src/renderer/components/SearchPanel.tsx): New global local-data search utility panel.
-- [`src/renderer/components/BacklogPanel.tsx`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/src/renderer/components/BacklogPanel.tsx): New backlog utility panel with task actions and drag-to-date support.
-- [`src/renderer/components/RecoveryPanel.tsx`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/src/renderer/components/RecoveryPanel.tsx): New recovery and storage utility panel.
-- [`src/renderer/components/BoardDrag.tsx`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/src/renderer/components/BoardDrag.tsx): Updated to handle external drag-and-drop into board columns (e.g. from backlog panel).
-- [`src/renderer/App.tsx`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/src/renderer/App.tsx): Integrated filter chooser, separate search and filter states, utility panel dock host, rail controls, and focus restoration.
-- [`src/renderer/styles.css`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/src/renderer/styles.css): Complete styling and layout for filter chooser, utility panels, and rail controls matching charcoal design system.
-- [`tests/app/phase3-ui.spec.ts`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/tests/app/phase3-ui.spec.ts): Full behavioral regression suite.
-- [`docs/phase3-implementation-handoff.md`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/docs/phase3-implementation-handoff.md): State and ownership documentation and handoff record.
+### Execution environment
+All GUI suites, Electron interaction tests, and visual captures ran exclusively on GitHub Actions hosted Apple Silicon macOS runners in accordance with `AGENTS.md` and `docs/github-actions.md` (no local test windows or desktop focus interruptions). Local verification was restricted to non-GUI checks (typecheck, build, pure scheduler tests, and Electron-runtime database tests).
+
+- **Branch**: `ui-phase-3`
+- **Starting commit**: `0e84d7c`
+- **Tested commit**: `691722b`
+- **Full CI run URL**: [https://github.com/yash9008/laptop-planner/actions/runs/40311022708](https://github.com/yash9008/laptop-planner/actions/runs/40311022708)
+- **CI Job**: `Full checks on Apple Silicon macOS` (Job ID: `121531938101`)
+- **Outcome**: `success` (elapsed: 4m 12s)
+
+### Test suite breakdown
+
+| Suite | Runner / Environment | Tests | Result | Details |
+| --- | --- | --- | --- | --- |
+| `npm run typecheck` | Local & Hosted Node / `tsc --noEmit` | N/A | Pass | 0 TypeScript diagnostic errors |
+| `npm run build` | Local & Hosted Vite & esbuild | N/A | Pass | Clean build of renderer, preload, main, assets |
+| `npm run test:scheduler` | Node test runner (Asia/Kolkata & UTC) | 78 | Pass | 0 runtime dependencies; 270-minute example & split-block invariants verified |
+| `npm run test:db` | Electron 45 native runtime runner | 63 | Pass | Schema migrations, focus checkpoints, backup & restore, atomic transactions |
+| `npm run test:app` | Playwright real Electron on macOS arm64 | 77 | Pass | All 77 integration and UI tests passed, including all 9 Phase 3 acceptance tests |
+
+### Acceptance tests exercised (`tests/app/phase3-ui.spec.ts`)
+1. **Filters**: Combined project, status, and text filters affect view presentation only while underlying tasks, order, schedules, and capacity totals remain unchanged under a controlled clock (`2026-10-25`).
+2. **Global Search Scope**: Matches across completed tasks, backlog, and dates outside board; ignores view filters with clear scope disclosure (`All tasks · ignores view filters`); verifies separation of local and global query state.
+3. **Search Interaction & Stability**: Search result open -> edit -> save/fail/retry -> close preserves search query, stable result targeting, drafts, selected date, and focus restoration to the originating result trigger.
+4. **Dock & Navigation Resilience**: Repeated Backlog/Search/Recovery/Calendar switching after panning preserves calendar preference, width, board position, and query states in wide (1440x900) and narrow (860x680) viewports without horizontal overflow or header clipping.
+5. **Escape Containment & Modal Focus**: Parent/child Escape containment (EstimatePopover inside TaskEditor closes child first, second Escape closes parent and restores focus to task title button); Tab and Shift+Tab cycling; shortcut `A` guard during modal ownership.
+6. **Filtered Drag & Drop**: Filtered whole-card drag with hidden neighboring tasks preserves `beforeTaskId` contract and relative order without reordering hidden records.
+7. **Recovery & Storage Access**: Recovery panel exposes paused focus session, explicit resume button, unaffected elapsed time, and direct routing to local storage tools even under read/write errors.
+8. **Layout & Timings**: Visible popup bounds within viewport, rapid panel switching without race conditions, and reduced motion styling adherence without jitter.
+9. **Visual Evidence Capture**: Captures real macOS arm64 renderer screenshots at 1440x900 and 860x680 viewports.
+
+## Visual evidence
+
+The following screenshots were captured on the hosted macOS Apple Silicon runner during test execution and extracted to `docs/screenshots/`:
+
+| Artifact | Resolution | Content / Verification Focus |
+| --- | --- | --- |
+| [`ui-phase3-filter-chooser.png`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/docs/screenshots/ui-phase3-filter-chooser.png) | 1440x900 | Anchored filter popover showing search input, status segment controls (`All`, `Incomplete`, `Completed`), project select, and Clear action below the Filter button. |
+| [`ui-phase3-search-panel.png`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/docs/screenshots/ui-phase3-search-panel.png) | 1440x900 | Global local search panel in right dock with query, scope disclosure, result counts, date meta, project tag, and task completion checkbox. |
+| [`ui-phase3-backlog-panel.png`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/docs/screenshots/ui-phase3-backlog-panel.png) | 1440x900 | Backlog utility panel in right dock with draggable backlog cards, estimate badges, and action menus alongside interactive board. |
+| [`ui-phase3-recovery-panel.png`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/docs/screenshots/ui-phase3-recovery-panel.png) | 1440x900 | Recovery utility panel in right dock exposing paused focus session (`45m` elapsed), explicit "Resume timer" button, task details link, and storage management tools. |
+| [`ui-phase3-laptop.png`](file:///Users/yashsawant/Documents/Projects/sunsama%20clone/docs/screenshots/ui-phase3-laptop.png) | 860x680 | Narrow laptop responsive layout with utility dock open, verified absence of horizontal document overflow, and readable controls. |
+
+## Limitations and boundaries
+
+1. **Phase 4 Exclusions**: In strict adherence to scope, command palette (`Cmd+K`), global keyboard action router, and full-screen True Focus view are intentionally deferred to Phase 4.
+2. **Phase 5 Polish**: Micro-interactions, custom transition curves, and FLIP card animations are deferred to Phase 5.
+3. **Local Storage Authority**: All search and filter operations evaluate purely in-memory against local SQLite-backed planner state (`day.allTasks`). There are no external indexers, remote telemetry, or web dependencies.
+4. **Focus Authority**: Resuming focus from the Recovery panel or focus timer maintains UTC elapsed time authority without fabricating interrupted time. Recovered timers require explicit user resumption and never auto-resume.
+
