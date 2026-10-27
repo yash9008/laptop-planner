@@ -67,7 +67,12 @@ test('switching and editing focus updates the native menu; deleting the task rem
 test('sleep and clean restart keep a paused menu timer and exclude closed time',async()=>{
   await add();await start();await advance(6000);await expect.poll(title).toBe('00:06');
   await app.evaluate(({powerMonitor})=>powerMonitor.emit('suspend'));await expect.poll(title).toBe('Ⅱ 00:06');await expect.poll(()=>menuLabel('focus-state')).toBe('Paused for sleep');
-  await advance(3600000);await app.evaluate(({powerMonitor})=>powerMonitor.emit('resume'));expect(await title()).toBe('Ⅱ 00:06');
+  await advance(3600000);
+  await app.evaluate(async({powerMonitor})=>{
+    powerMonitor.emit('resume');
+    await new Promise<void>((resolve)=>setImmediate(resolve));
+  });
+  await expect.poll(title).toBe('Ⅱ 00:06');
   await clickMenu('focus-toggle');
   await expect.poll(()=>menuLabel('focus-toggle')).toBe('Pause timer');
   expect(await app.evaluate(()=>globalThis.menuBarTest?.errors)).toEqual([]);
@@ -87,8 +92,11 @@ test('repeated sleep and explicit native resume preserve only the committed runn
     await expect.poll(()=>menuLabel('focus-state')).toBe('Paused for sleep');
     await expect.poll(title).toBe(`Ⅱ 00:${String(cycle*2).padStart(2,'0')}`);
     await advance(3600000);
-    await app.evaluate(({powerMonitor})=>powerMonitor.emit('resume'));
-    expect(await title()).toBe(`Ⅱ 00:${String(cycle*2).padStart(2,'0')}`);
+    await app.evaluate(async({powerMonitor})=>{
+      powerMonitor.emit('resume');
+      await new Promise<void>((resolve)=>setImmediate(resolve));
+    });
+    await expect.poll(title).toBe(`Ⅱ 00:${String(cycle*2).padStart(2,'0')}`);
     await clickMenu('focus-toggle');
     await expect.poll(()=>menuLabel('focus-toggle')).toBe('Pause timer');
     expect(await app.evaluate(()=>globalThis.menuBarTest?.errors)).toEqual([]);
