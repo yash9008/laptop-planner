@@ -349,17 +349,17 @@ test('drag motion: whole-card lift, placeholder reflow, settling, edge scrolling
     'Card Beta',
   ]);
 
-  // 3. Reduced Motion: move Gamma back after Beta
+  // 3. Reduced Motion: move Gamma between Alpha and Beta (before Beta)
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await lift('Card Gamma');
-  await point('Card Beta', 'bottom');
+  await point('Card Beta', 'top');
   await page.mouse.up();
   await expect(page.getByTestId('board-drop-placeholder')).toHaveCount(0);
 
   await expect.poll(async () => (await snapshot()).tasks.map((t) => t.title)).toEqual([
     'Card Alpha',
-    'Card Beta',
     'Card Gamma',
+    'Card Beta',
   ]);
 });
 
