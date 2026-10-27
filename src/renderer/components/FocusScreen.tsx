@@ -176,7 +176,7 @@ export function FocusScreen({
           )}
         </div>
 
-        <h1 className="focus-screen-title">{task.title}</h1>
+        <h1 className="focus-screen-title" data-testid="focus-title">{task.title}</h1>
 
         <div className="focus-screen-notes">
           {task.notes ? (

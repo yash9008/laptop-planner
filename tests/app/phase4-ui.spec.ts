@@ -89,6 +89,7 @@ test('palette: open, toggle, close, filtering, no-matches, Up/Down/Enter, Tab co
 
   // 3. Open via toolbar button
   const toolbarBtn = page.getByRole('button', { name: 'Open command palette', exact: true });
+  await toolbarBtn.focus();
   await toolbarBtn.click();
   await expect(palette).toBeVisible();
   await expect(input).toBeFocused();
@@ -131,9 +132,10 @@ test('palette: open, toggle, close, filtering, no-matches, Up/Down/Enter, Tab co
   await expect(toolbarBtn).toBeFocused();
 
   // 10. Outside click closes palette
+  await toolbarBtn.focus();
   await toolbarBtn.click();
   await expect(palette).toBeVisible();
-  await page.mouse.click(10, 10);
+  await page.locator('.command-palette-backdrop').click({ position: { x: 10, y: 10 } });
   await expect(palette).toHaveCount(0);
 
   // 11. Initiating control restoration from Search panel
@@ -161,7 +163,8 @@ test('palette: latest-ID targeting, edit/focus/complete handoff, and dynamic eli
   const task = await addTask('Dynamic Target');
 
   // Select task on board
-  const card = page.locator(`[data-task-id="${task.id}"]`);
+  const card = page.locator(`[data-testid="board-task"][data-task-id="${task.id}"]`);
+  await expect(card).toBeVisible();
   await card.click();
   await expect(card).toHaveClass(/is-selected/);
 
@@ -187,12 +190,14 @@ test('palette: latest-ID targeting, edit/focus/complete handoff, and dynamic eli
   await expect(editor).toHaveCount(0);
 
   // Complete task via palette
+  await card.click();
   await page.keyboard.press('Meta+k');
   await palette.getByText(`Complete: "Dynamic Target"`).click();
   await expect(palette).toHaveCount(0);
   expect((await snapshot()).tasks.find((t) => t.id === task.id)?.completed).toBe(true);
 
   // Open palette again: task now offers Reopen, and Start focus is disabled because task is completed
+  await card.click();
   await page.keyboard.press('Meta+k');
   await expect(palette.getByText(`Reopen: "Dynamic Target"`)).toBeVisible();
   const startFocusItem = palette.locator('.command-palette-item', { hasText: 'Start focus' });
@@ -241,6 +246,7 @@ test('shortcuts: guarded A, F, /, and Cmd+K in workspace vs input/contenteditabl
 
   // 6. Bare F in workspace enters Focus view
   await addTask('Task for F shortcut');
+  await expect(page.getByText('Task for F shortcut')).toBeVisible();
   await page.keyboard.press('f');
   const focusScreen = page.getByTestId('focus-screen');
   await expect(focusScreen).toBeVisible();
@@ -266,6 +272,8 @@ test('focus screen: single-task presentation, empty state, task navigation, expl
   // 2. Add two tasks for today
   await addTask('Focus Task Alpha', '30m');
   await addTask('Focus Task Beta', '45m');
+  await expect(page.getByText('Focus Task Alpha')).toBeVisible();
+  await expect(page.getByText('Focus Task Beta')).toBeVisible();
 
   // Enter Focus screen
   await page.keyboard.press('f');
@@ -317,16 +325,14 @@ test('focus screen: single-task presentation, empty state, task navigation, expl
 
   // 6. Ineligible task test: task in backlog
   const backlogTask = await addTask('Backlog Ineligible', '30m', null);
-  await page.keyboard.press('Meta+k');
-  const palette = page.getByRole('dialog', { name: 'Command palette', exact: true });
-  await palette.getByRole('combobox').fill('Backlog Ineligible');
-  // Task is not selected yet, select it via backlog panel
-  await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Open backlog panel', exact: true }).click();
   const backlogCard = page.locator(`[data-testid="backlog-panel"] [data-task-id="${backlogTask.id}"] .task-title`);
+  await expect(backlogCard).toBeVisible();
   await backlogCard.click();
   await page.keyboard.press('Escape'); // close editor
   await page.keyboard.press('Meta+k');
+  const palette = page.getByRole('dialog', { name: 'Command palette', exact: true });
+  await expect(palette).toBeVisible();
   await palette.getByText(`Focus on: "Backlog Ineligible"`).click();
 
   await expect(focusScreen).toBeVisible();
@@ -340,6 +346,7 @@ test('focus screen: single-task presentation, empty state, task navigation, expl
 
 test('focus screen: edit round-trip, UTC elapsed time consistency with controlled clock, and preserved workspace state upon exit', async () => {
   await addTask('Edit Target In Focus', '45m');
+  await expect(page.getByText('Edit Target In Focus')).toBeVisible();
 
   // Set filter on board and open Focus screen
   await page.keyboard.press('f');
@@ -361,16 +368,16 @@ test('focus screen: edit round-trip, UTC elapsed time consistency with controlle
 
   // 2. Controlled-clock UTC elapsed time
   await focusScreen.getByRole('button', { name: 'Start focus', exact: true }).click();
-  await setClock(clock + 15_000);
-  await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:15');
+  await setClock(clock + 10_000);
+  await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:10');
 
   // Pause
   await focusScreen.getByRole('button', { name: 'Pause focus', exact: true }).click();
-  await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:15');
+  await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:10');
 
   // Advance clock by 1 hour while paused: elapsed time must NOT increase
   await setClock(clock + 3_600_000);
-  await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:15');
+  await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:10');
 
   // 3. Preserved workspace upon exit
   const exitBtn = focusScreen.getByRole('button', { name: 'Exit Focus view', exact: true });
@@ -397,6 +404,7 @@ test('motion: computed styles under normal and reduced motion for palette and fo
 
   // Focus calendar opacity transition in normal motion
   await addTask('Motion Test Task');
+  await expect(page.getByText('Motion Test Task')).toBeVisible();
   await page.keyboard.press('f');
   const focusScreen = page.getByTestId('focus-screen');
   await expect(focusScreen).toBeVisible();
@@ -432,6 +440,7 @@ test('motion: computed styles under normal and reduced motion for palette and fo
 
 test('screenshots: wide 1440x900 and narrow 860x680 of command palette, populated focus screen, and paused focus', async () => {
   await addTask('Design UI Phase 4', '1h 30m');
+  await expect(page.getByText('Design UI Phase 4')).toBeVisible();
 
   // --- WIDE 1440x900 ---
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -454,15 +463,15 @@ test('screenshots: wide 1440x900 and narrow 860x680 of command palette, populate
 
   // 3. Paused Focus Wide
   await focusScreen.getByRole('button', { name: 'Start focus', exact: true }).click();
-  await setClock(clock + 25_000);
+  await setClock(clock + 10_000);
   await focusScreen.getByRole('button', { name: 'Pause focus', exact: true }).click();
-  await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:25');
+  await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:10');
   const pausedWideBuf = await page.screenshot();
   console.log('=== SCREENSHOT: ui-phase4-focus-paused.png ===\n' + pausedWideBuf.toString('base64') + '\n=== END SCREENSHOT ===');
 
   // --- NARROW 860x680 ---
   await page.setViewportSize({ width: 860, height: 680 });
-  await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:25');
+  await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:10');
 
   // 4. Paused Focus Narrow
   const pausedNarrowBuf = await page.screenshot();

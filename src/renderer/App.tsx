@@ -368,6 +368,7 @@ export function App() {
     if (detectedSurface === 'search') {
       setActiveSearchResultId(task.id);
     }
+    setSelectedTaskId(task.id);
 
     const latestTask = day?.allTasks.find((t) => t.id === task.id) ?? task;
     const freshDraft = taskToDraft(latestTask, day?.date ?? '2026-01-01');
@@ -786,9 +787,13 @@ export function App() {
 
   useEffect(() => {
     if (view === 'focus' && day) {
-      if (focusTaskId && !day.allTasks.some((t) => t.id === focusTaskId)) {
-        const nextIncomplete = day.tasks.find((t) => !t.completed && t.plannedDate === day.today);
-        setFocusTaskId(nextIncomplete?.id ?? day.tasks.find((t) => !t.completed)?.id ?? null);
+      if (!focusTaskId || !day.allTasks.some((t) => t.id === focusTaskId)) {
+        const activeOrPausedFocus =
+          day.focus?.taskId && day.allTasks.some((t) => t.id === day.focus?.taskId)
+            ? day.focus.taskId
+            : null;
+        const nextIncomplete = day.allTasks.find((t) => !t.completed && t.plannedDate === day.today);
+        setFocusTaskId(activeOrPausedFocus ?? nextIncomplete?.id ?? null);
       }
     }
   }, [view, day, focusTaskId]);
@@ -807,8 +812,8 @@ export function App() {
     } else if (selectedTaskId && day?.allTasks.some((t) => t.id === selectedTaskId)) {
       chosenId = selectedTaskId;
     } else if (day) {
-      const todayIncomplete = day.tasks.find((t) => !t.completed && t.plannedDate === day.today);
-      chosenId = todayIncomplete ? todayIncomplete.id : (day.tasks.find((t) => !t.completed)?.id ?? null);
+      const todayIncomplete = day.allTasks.find((t) => !t.completed && t.plannedDate === day.today);
+      chosenId = todayIncomplete ? todayIncomplete.id : null;
     }
     setFocusTaskId(chosenId);
     setView('focus');
@@ -826,15 +831,35 @@ export function App() {
     }, 0);
   }
 
+  const pendingPaletteRestore = useRef(false);
+
   function openCommandPalette(triggerEl?: HTMLElement) {
-    captureTaskOrigin(selectedTaskId, triggerEl);
+    const trigger =
+      triggerEl ??
+      (document.activeElement instanceof HTMLElement && document.activeElement !== document.body
+        ? document.activeElement
+        : undefined);
+    const cardEl = trigger?.closest<HTMLElement>('[data-task-id]');
+    const taskIdFromEl = cardEl?.dataset.taskId;
+    const finalTaskId = taskIdFromEl ?? selectedTaskId;
+    if (finalTaskId) {
+      setSelectedTaskId(finalTaskId);
+    }
+    captureTaskOrigin(finalTaskId, trigger);
     setCommandPaletteOpen(true);
   }
 
   function closeCommandPalette() {
+    pendingPaletteRestore.current = true;
     setCommandPaletteOpen(false);
-    restoreOriginatingFocus(originatingTaskId.current);
   }
+
+  useEffect(() => {
+    if (!commandPaletteOpen && pendingPaletteRestore.current) {
+      pendingPaletteRestore.current = false;
+      restoreOriginatingFocus(originatingTaskId.current);
+    }
+  }, [commandPaletteOpen]);
 
   const selectedTask = selectedTaskId && day ? day.allTasks.find((t) => t.id === selectedTaskId) : null;
 
@@ -1549,10 +1574,12 @@ export function App() {
       </aside>
 
       {(() => {
-        const isDockOpen = Boolean(activeUtilityPanel || (calendarOpen && day && view !== 'focus'));
+        const isDockOpen = Boolean(activeUtilityPanel || (calendarOpen && day));
         const currentFocusTask =
           focusTaskId && day ? day.allTasks.find((t) => t.id === focusTaskId) ?? null : null;
-        const todayIncompleteTasks = day?.tasks.filter((t) => !t.completed) ?? [];
+        const todayIncompleteTasks = day
+          ? day.allTasks.filter((t) => t.plannedDate === day.today && !t.completed)
+          : [];
         const eligibleFocusTasks =
           currentFocusTask && !todayIncompleteTasks.some((t) => t.id === currentFocusTask.id)
             ? [currentFocusTask, ...todayIncompleteTasks]
@@ -1737,7 +1764,9 @@ export function App() {
                   window.planner.setTaskCompleted({ id, completed, viewDate: day.date })
                 );
                 if (!res && completed) {
-                  const remaining = day.tasks.filter((t) => !t.completed && t.id !== id);
+                  const remaining = day.allTasks.filter(
+                    (t) => !t.completed && t.plannedDate === day.today && t.id !== id
+                  );
                   if (remaining.length > 0 && remaining[0]) {
                     setFocusTaskId(remaining[0].id);
                   } else {
@@ -1948,6 +1977,8 @@ export function App() {
                   onAdd={() => openNew(null)}
                   onClose={() => setActiveUtilityPanel(null)}
                   onMoveToBacklog={(id) => void moveTask(id, null)}
+                  selectedTaskId={selectedTaskId}
+                  onSelectTask={(id) => setSelectedTaskId(id)}
                 />
               ) : activeUtilityPanel === 'search' ? (
                 <SearchPanel

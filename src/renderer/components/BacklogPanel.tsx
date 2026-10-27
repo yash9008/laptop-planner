@@ -14,6 +14,8 @@ export interface BacklogPanelProps {
   onAdd(): void;
   onClose(): void;
   onMoveToBacklog?(taskId: string): void;
+  selectedTaskId?: string | null;
+  onSelectTask?(id: string): void;
 }
 
 export function BacklogPanel({
@@ -27,6 +29,8 @@ export function BacklogPanel({
   onAdd,
   onClose,
   onMoveToBacklog,
+  selectedTaskId,
+  onSelectTask,
 }: BacklogPanelProps) {
   const backlog = day?.backlog ?? [];
 
@@ -110,11 +114,23 @@ export function BacklogPanel({
             return (
               <article
                 key={task.id}
-                className={`task-card backlog-panel-card ${task.completed ? 'completed-task' : ''}`}
+                className={`task-card backlog-panel-card ${task.completed ? 'completed-task' : ''} ${
+                  selectedTaskId === task.id ? 'is-selected' : ''
+                }`}
                 data-testid="backlog-panel-item"
                 data-task-id={task.id}
                 data-completed={task.completed}
+                aria-selected={selectedTaskId === task.id}
                 draggable={!busy}
+                onClick={(e) => {
+                  const target = e.target as HTMLElement;
+                  if (!target.closest('button, input, textarea, select, [role="button"], [role="checkbox"]')) {
+                    onSelectTask?.(task.id);
+                  }
+                }}
+                onFocus={() => {
+                  onSelectTask?.(task.id);
+                }}
               >
                 <div className="card-topline">
                   <span className="task-time">{project ? project.title : 'Backlog'}</span>
