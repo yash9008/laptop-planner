@@ -1,0 +1,82 @@
+{
+  "reviewed_branch": "ui-phase-3",
+  "reviewed_commit": "f9fd68cf952594cda3563b563ca0fd171ddb9d20",
+  "baseline_run": "https://github.com/yash9008/laptop-planner/actions/runs/40335015789",
+  "baseline_electron": {
+    "passed": 89,
+    "failed": 0
+  },
+  "review_branch": "codex/phase3-fix-review",
+  "review_commit": "ec08ceab6e1e8ab3d56096f320975cb3895a4baf",
+  "review_run": "https://github.com/yash9008/laptop-planner/actions/runs/40450745690",
+  "status": "completed",
+  "conclusion": "failure",
+  "job": {
+    "name": "Full checks on Apple Silicon macOS",
+    "id": 122012613573,
+    "conclusion": "failure"
+  },
+  "scheduler": {
+    "Asia/Kolkata": 78,
+    "America/Los_Angeles": 78
+  },
+  "database": {
+    "passed": 63,
+    "failed": 0
+  },
+  "electron": {
+    "passed": 89,
+    "failed": 3
+  },
+  "additional_probes": {
+    "passed": 0,
+    "failed": 3
+  },
+  "original_findings": {
+    "R1": "original reproduction passes",
+    "R2": "original reproduction passes",
+    "R3": "original reproduction passes",
+    "R4": "original reproduction passes",
+    "R5": "original reproduction passes"
+  },
+  "observations": {
+    "R6": {
+      "action": "Dismiss toolbar quick-add after Search result editing with Search still open",
+      "expected_focus": "toolbar Add task",
+      "actual_focus": {
+        "tag": "BUTTON",
+        "label": "Open Findable task",
+        "inSearch": true,
+        "inBacklog": false
+      }
+    },
+    "R7": {
+      "action": "Schedule last Backlog task from title editor",
+      "committed_date": "2026-10-25",
+      "backlog_row_count": 0,
+      "expected_focus": "visible fallback inside Backlog panel",
+      "actual_focus": {
+        "tag": "BODY",
+        "inSearch": false,
+        "inBacklog": false
+      }
+    },
+    "R8": {
+      "action": "Schedule last Backlog task from task menu editor",
+      "committed_date": "2026-10-25",
+      "backlog_row_count": 0,
+      "expected_focus": "visible fallback inside Backlog panel",
+      "actual_focus": {
+        "tag": "BUTTON",
+        "text": "Only backlog task",
+        "inSearch": false,
+        "inBacklog": false
+      }
+    }
+  },
+  "screenshot_source_run": "https://github.com/yash9008/laptop-planner/actions/runs/40335015789",
+  "local_gui_execution": false,
+  "personal_database_used": false,
+  "application_modified_by_review": false,
+  "review_log_sha256": "d2f2372ec59c5c87cf1cefa403f515503cbdf18a78828e30179cdf3e0fc95de6"
+}

@@ -1,0 +1,52 @@
+2026-10-27T04:37:48.0561670Z ℹ tests 78
+2026-10-27T04:37:48.0563050Z ℹ pass 78
+2026-10-27T04:37:48.0563430Z ℹ fail 0
+2026-10-27T04:37:48.3667420Z ℹ tests 78
+2026-10-27T04:37:48.3668150Z ℹ pass 78
+2026-10-27T04:37:48.3668300Z ℹ fail 0
+2026-10-27T04:37:50.3343220Z ℹ tests 63
+2026-10-27T04:37:50.3344060Z ℹ pass 63
+2026-10-27T04:37:50.3344270Z ℹ fail 0
+2026-10-27T04:39:57.7437840Z INDEPENDENT_REVIEW_FOCUS {
+2026-10-27T04:39:57.7543120Z   tag: 'BUTTON',
+2026-10-27T04:39:57.7645550Z   label: 'Open Findable task',
+2026-10-27T04:39:57.7707880Z   text: 'Findable taskToday30m',
+2026-10-27T04:39:57.7715790Z   inSearch: true,
+2026-10-27T04:39:57.7716420Z   inBacklog: false
+2026-10-27T04:39:57.7766960Z }
+2026-10-27T04:39:58.2295210Z   ✘  34 tests/app/phase3-fix-review.spec.ts:48:1 › re-review: quick-add returns focus to its own trigger after editing a search result (12.5s)
+2026-10-27T04:40:11.0430420Z INDEPENDENT_REVIEW_FOCUS {
+2026-10-27T04:40:11.0432060Z   tag: 'BODY',
+2026-10-27T04:40:11.0433550Z   label: null,
+2026-10-27T04:40:11.0433840Z   text: '\n' +
+2026-10-27T04:40:11.0434540Z     '    Laptop PlannerHomeTodayFocusYOUR PLANNINGBacklogPROJECTSAdd projectSettingsLocal storageOnly on',
+2026-10-27T04:40:11.0435180Z   inSearch: false,
+2026-10-27T04:40:11.0435430Z   inBacklog: false
+2026-10-27T04:40:11.0435790Z }
+2026-10-27T04:40:11.7136560Z   ✘  35 tests/app/phase3-fix-review.spec.ts:70:3 › re-review: scheduling the last Backlog task preserves panel focus (title) (12.6s)
+2026-10-27T04:40:24.4120400Z INDEPENDENT_REVIEW_FOCUS {
+2026-10-27T04:40:24.4223080Z   tag: 'BUTTON',
+2026-10-27T04:40:24.4324600Z   label: null,
+2026-10-27T04:40:24.4427290Z   text: 'Only backlog task',
+2026-10-27T04:40:24.4528710Z   inSearch: false,
+2026-10-27T04:40:24.4631000Z   inBacklog: false
+2026-10-27T04:40:24.4732500Z }
+2026-10-27T04:40:25.0361750Z   ✘  36 tests/app/phase3-fix-review.spec.ts:70:3 › re-review: scheduling the last Backlog task preserves panel focus (menu) (12.6s)
+2026-10-27T04:44:57.5440100Z   1) tests/app/phase3-fix-review.spec.ts:48:1 › re-review: quick-add returns focus to its own trigger after editing a search result 
+2026-10-27T04:44:57.5646260Z     Error: expect(locator).toBeFocused() failed
+2026-10-27T04:44:57.5857860Z     Locator:  getByRole('button', { name: 'Add task', exact: true })
+2026-10-27T04:44:57.5959740Z     Expected: focused
+2026-10-27T04:44:57.6079250Z     Received: inactive
+2026-10-27T04:44:57.8236850Z   2) tests/app/phase3-fix-review.spec.ts:70:3 › re-review: scheduling the last Backlog task preserves panel focus (title) 
+2026-10-27T04:44:57.8444350Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T04:44:57.8640000Z     Expected: true
+2026-10-27T04:44:57.8660770Z     Received: false
+2026-10-27T04:44:57.8738660Z   3) tests/app/phase3-fix-review.spec.ts:70:3 › re-review: scheduling the last Backlog task preserves panel focus (menu) 
+2026-10-27T04:44:57.8744770Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T04:44:57.8746930Z     Expected: true
+2026-10-27T04:44:57.8747350Z     Received: false
+2026-10-27T04:44:57.8823840Z   3 failed
+2026-10-27T04:44:57.8827740Z     tests/app/phase3-fix-review.spec.ts:48:1 › re-review: quick-add returns focus to its own trigger after editing a search result 
+2026-10-27T04:44:57.8831760Z     tests/app/phase3-fix-review.spec.ts:70:3 › re-review: scheduling the last Backlog task preserves panel focus (title) 
+2026-10-27T04:44:57.8836180Z     tests/app/phase3-fix-review.spec.ts:70:3 › re-review: scheduling the last Backlog task preserves panel focus (menu) 
+2026-10-27T04:44:57.8839840Z   89 passed (7.1m)

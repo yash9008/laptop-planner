@@ -28,7 +28,7 @@ This sequence follows the user's request to make the app feel closer to Sunsama,
 | --- | --- | --- |
 | 1 — Board and calendar workspace | Complete; awaiting user review | Neutral surfaces, quieter toolbar/sidebar, clearer task cards and current-day headings, workload totals above the board/day list, and a resizable calendar with keyboard controls and a remembered width |
 | 2 — Task editing and quick actions | Complete; R1–R8 independently rechecked; ready for Phase 3 | Quick-add composer, centered task detail editor, estimate popover and task menu; verified 50 ms checkbox and 200 ms card/control feedback, with component-specific motion evidence; preserve drafts and failed-save recovery |
-| 3 — Finding and organizing work | Implemented; independent review requires R1–R5 fixes | Project/status filters, global search and backlog/search/recovery side panels; verified navigation opacity/icon feedback, plus trigger verification before adopting the 300 ms layout-margin rule; preserve date/scroll continuity |
+| 3 — Finding and organizing work | R1–R5 rechecked; R6–R8 focus fixes still required | Project/status filters, global search and backlog/search/recovery side panels; verified navigation opacity/icon feedback, plus trigger verification before adopting the 300 ms layout-margin rule; preserve date/scroll continuity |
 | 4 — Keyboard navigation and focused work | Planned | Command palette, shortcuts and a true single-task Focus screen; verify actual Focus/palette transitions, including the loaded 300 ms Focus-calendar opacity rule, with the existing elapsed-time timer |
 | 5 — Motion parity acceptance | Planned | Compare motion against controlled reference evidence; test normal/reduced motion, enter/exit, delays, interruption/reversal, cancellation, errors, focus, narrow windows and drag behavior; distinguish CSS definitions from observed elapsed spans and report unmatched effects |
 
@@ -97,6 +97,19 @@ Eight additional hosted probes produced five failures and three passes; the
 combined Electron suite reported 80 passed and 5 failed. The application code
 was not changed by the review. Phase 3 needs fixes and independent re-review;
 Phase 4 has not been authorized.
+
+### UI Phase 3 fix review — October 27, 2026
+
+The [independent fix review](docs/phase3-fix-review.md) checked `f9fd68c`
+and its successful full hosted run: 89 Electron tests, 63 database tests,
+and 78 scheduler tests in each of two time zones. The original R1–R5
+reproductions now pass, and the Recovery screenshot evidence is corrected.
+Three additional probes on unchanged application source reproduced R6–R8:
+quick-add inherits Search focus ownership, scheduling the last Backlog task
+through its title leaves focus on BODY, and the menu route focuses the board.
+The independent full suite reported 89 passed and 3 failed. Phase 3 remains
+unaccepted pending these focus fixes and hosted re-verification. Application
+code was not changed by the review; Phase 4 has not been started.
 
 ## Previously recorded release verification
 
