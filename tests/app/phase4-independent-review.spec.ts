@@ -117,6 +117,7 @@ test('independent phase4: Enter on the palette close control does not execute Ad
   await expect(dialog.getByRole('button', { name: 'Close command palette', exact: true })).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Open command palette', exact: true })).toBeFocused();
   await expect(page.getByRole('dialog', { name: 'New task', exact: true })).toHaveCount(0);
 });
 
@@ -137,6 +138,7 @@ test('independent phase4: palette to Search task editor preserves Search focus o
   await dialog.getByRole('option', { name: 'Task Edit task: "Search target"', exact: true }).click();
   const editor = page.getByRole('dialog', { name: 'Edit task', exact: true });
   await expect(editor).toBeVisible();
+  await expect(editor.getByLabel('Task title', { exact: true })).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(editor).toHaveCount(0);
   await expect.poll(() => search.evaluate(el => el.contains(document.activeElement))).toBe(true);
