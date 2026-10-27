@@ -29,7 +29,7 @@ This sequence follows the user's request to make the app feel closer to Sunsama,
 | 1 — Board and calendar workspace | Complete; awaiting user review | Neutral surfaces, quieter toolbar/sidebar, clearer task cards and current-day headings, workload totals above the board/day list, and a resizable calendar with keyboard controls and a remembered width |
 | 2 — Task editing and quick actions | Complete; R1–R8 independently rechecked; ready for Phase 3 | Quick-add composer, centered task detail editor, estimate popover and task menu; verified 50 ms checkbox and 200 ms card/control feedback, with component-specific motion evidence; preserve drafts and failed-save recovery |
 | 3 — Finding and organizing work | Complete; known R1–R8 findings resolved; ready for UI Phase 4 | Project/status filters, global search and backlog/search/recovery side panels; verified navigation opacity/icon feedback, plus trigger verification before adopting the 300 ms layout-margin rule; preserve date/scroll continuity |
-| 4 — Keyboard navigation and focused work | Prompt prepared for Gemini; implementation not started | Command palette, shortcuts and a true single-task Focus screen; verify actual Focus/palette transitions, including the loaded 300 ms Focus-calendar opacity rule, with the existing elapsed-time timer |
+| 4 — Keyboard navigation and focused work | Complete; hosted checks passed; ready for Codex independent review | Command palette, shortcuts and a true single-task Focus screen; verify actual Focus/palette transitions, including the loaded 300 ms Focus-calendar opacity rule, with the existing elapsed-time timer |
 | 5 — Motion parity acceptance | Planned | Compare motion against controlled reference evidence; test normal/reduced motion, enter/exit, delays, interruption/reversal, cancellation, errors, focus, narrow windows and drag behavior; distinguish CSS definitions from observed elapsed spans and report unmatched effects |
 
 **Before UI Phase 2:** the user requested an interaction/animation audit. [The audit](docs/interaction-audit.md) distinguishes live controls, the earlier board recording, older public walkthrough frames and unmeasured motion. The earlier task-drawer proposal is not established as Sunsama's current editor. The revised recommendation above is proposed scope: verify the editor presentation and specify quick-add, popup, dismissal, focus and interrupted-transition behavior before implementation. No Phase 2 code was added during the audit.
@@ -125,6 +125,24 @@ regressions. GUI execution remained hosted; no personal data was used.
 Phase 3 is ready to proceed. The user requested the
 [UI Phase 4 implementation prompt](docs/phase4-gemini-implementation-prompt.md)
 for Gemini. Phase 4 code and UI Phase 5 motion acceptance have not started.
+
+### UI Phase 4 implementation and verification — October 27, 2026
+
+Gemini's implementation on branch `ui-phase-4` at `5c455ff` delivers:
+- **Command Palette (`Cmd+K`)**: accessible modal combobox with categorized task, navigation, action, panel, and settings commands; Up/Down navigation, Enter execution, Tab focus containment, and origin focus restoration.
+- **Guarded shortcuts**: `A` (Quick-add), `F` (Focus view), `/` (Search), and `Cmd+K` strictly suppressed during text editing, contenteditable, open modals, popovers, and pending SQLite saves.
+- **Single-task Focus screen**: dedicated view rendering one task at a time with context tags, notes, planned duration, authoritative elapsed time (`data-testid="focus-elapsed"`), explicit Start/Pause/Resume and Complete controls, eligible task navigation, empty state, and workspace state preservation on exit.
+- **Motion parity**: zero-duration overlay transitions under normal and reduced motion, and 300 ms Focus-calendar opacity transition suppressed under reduced motion.
+
+The complete suite was verified on GitHub Actions hosted Apple Silicon macOS runner ([run 40485227492](https://github.com/yash9008/laptop-planner/actions/runs/40485227492), job `122125218410`):
+- `npm run typecheck` passed (0 errors).
+- `npm run build` passed (0 errors).
+- `npm run test:scheduler` passed in two runner time zones (78/78 in `Asia/Kolkata` and 78/78 in `America/Los_Angeles`).
+- `npm run test:db` passed (63/63 SQLite/persistence tests under Electron).
+- `npm run test:app` passed (102/102 Electron interaction tests, including all 95 regression tests and 7 new Phase 4 tests).
+- Visual evidence captured in wide 1440×900 and narrow 860×680 viewports. Details and receipts are in [docs/phase4-implementation-handoff.md](docs/phase4-implementation-handoff.md).
+
+Phase 4 is complete and stopped; ready for Codex's independent review. Phase 5 has not started.
 
 ## Previously recorded release verification
 

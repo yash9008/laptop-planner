@@ -55,3 +55,90 @@ This document records the state, shortcut ownership, implementation details, and
 4. **Motion & Reduced Motion (`styles.css`)**:
    - Zero-duration transition for overlays under normal and reduced motion.
    - Focus calendar opacity transition (300ms ease-in) under normal motion; suppressed to `none` under `prefers-reduced-motion: reduce`.
+
+## Verification Evidence — October 27, 2026
+
+The complete test suite and verification was executed entirely on GitHub Actions hosted Apple Silicon macOS runners in compliance with workspace testing rules. Local Electron GUI execution was avoided.
+
+- **Branch**: `ui-phase-4`
+- **Verified Commit**: [`5c455ff`](https://github.com/yash9008/laptop-planner/commit/5c455ff)
+- **GitHub Actions Run**: [Planner checks run 40485227492](https://github.com/yash9008/laptop-planner/actions/runs/40485227492)
+- **Runner Job**: [Full checks on Apple Silicon macOS (ID 122125218410)](https://github.com/yash9008/laptop-planner/actions/runs/40485227492/job/122125218410)
+- **Status**: **Success** (clean exit code 0 in 6m 4s)
+
+### Test Suite Execution Summary
+
+| Check / Suite | Target / Command | Result |
+| --- | --- | --- |
+| TypeScript Check | `npm run typecheck` (`tsc --noEmit`) | **Passed** (0 errors) |
+| Runtime & Bundle Build | `npm run build` (Vite client + esbuild main/preload) | **Passed** (0 errors) |
+| Scheduler Engine Acceptance | `npm run test:scheduler` (`Asia/Kolkata` & `America/Los_Angeles`) | **Passed** (78/78 × 2 = 156 passed) |
+| Database & Persistence Suite | `npm run test:db` (Native Electron SQLite runtime) | **Passed** (63/63 passed) |
+| Electron App Interaction Tests | `npm run test:app` (Playwright on real Electron shell) | **Passed** (102/102 passed) |
+
+### Phase 4 Test Suite (`tests/app/phase4-ui.spec.ts`)
+
+1. **`palette: open, toggle, close, filtering, no-matches, Up/Down/Enter, Tab containment, Escape, and outside-click across surfaces`** (2.4s):
+   - Opens via `Cmd+K` and toolbar button.
+   - Categorized results (Task, Navigation, Actions, Panels, Settings).
+   - Filtering dynamically narrows results; reports accessible empty state on no match.
+   - Up/Down arrow selection, Tab / Shift+Tab cycling trap within dialog.
+   - Dismisses cleanly via Escape, backdrop click, or Cmd+K toggle.
+   - Accurately restores keyboard focus to originating trigger across workspace surfaces (board, panels, inputs).
+
+2. **`palette: latest-ID targeting, edit/focus/complete handoff, and dynamic eligibility refresh`** (3.1s):
+   - Ephemeral task selection tracks latest active or clicked task ID.
+   - Dynamic task commands: `Edit task: "<title>"`, `Focus on: "<title>"`, `Mark task complete: "<title>"`.
+   - Disabled states with clear inline explanations (e.g., cannot start focus on future/backlog tasks or completed tasks).
+   - Seamless handoff to centered editor and focus screen.
+
+3. **`shortcuts: guarded A, F, /, and Cmd+K in workspace vs input/contenteditable, modals, and pending write`** (2.2s):
+   - Bare keys `A` (Quick-add), `F` (Focus view), and `/` (Global search) work in workspace root.
+   - Strictly suppressed during active text input, textarea typing, `contenteditable`, open modals, open popovers, and pending SQLite write states.
+   - Zero key leakage or unintended form closures.
+
+4. **`focus screen: single-task presentation, empty state, task navigation, explicit start/pause/resume/complete without auto-start, and ineligible task guards`** (4.2s):
+   - Presents one task at a time with full context metadata badges (date, project, deadline, repeat), notes, planned duration, and authoritative elapsed time (`data-testid="focus-elapsed"`).
+   - Empty state when no eligible tasks exist with "Add task" and "Return to workspace" actions.
+   - Prev/Next navigation cycles eligible tasks deterministically without auto-starting timer.
+   - Explicit Start, Pause, and Resume controls update timer state correctly in SQLite and native menu bar.
+   - Ineligible tasks (e.g. backlog or future) display disable guards and helpful guidance ("Assign this task to today before starting focus.").
+
+5. **`focus screen: edit round-trip, UTC elapsed time consistency with controlled clock, and preserved workspace state upon exit`** (4.0s):
+   - Editing task within Focus screen preserves drafts and updates displayed fields upon save.
+   - Elapsed timer reflects authoritative UTC time without drift or double-counting across controlled clock ticks.
+   - Exiting Focus restores exact previous workspace state: view mode (`board` / `day`), scroll position, filters, panel state, and calendar preferences.
+
+6. **`motion: computed styles under normal and reduced motion for palette and focus calendar opacity`** (2.6s):
+   - Palette and overlay transitions report `0s` transition duration under both normal and reduced motion.
+   - Calendar dock opacity transition reports `opacity 0.3s ease-in` under standard motion.
+   - Suppressed to `none` / `0s` under `prefers-reduced-motion: reduce`.
+
+7. **`screenshots: wide 1440x900 and narrow 860x680 of command palette, populated focus screen, and paused focus`** (4.4s):
+   - Captures verified evidence in full desktop (1440×900) and narrow laptop (860×680) viewports.
+
+---
+
+## Visual Evidence Receipts
+
+### Desktop Viewport (1440×900)
+
+| Surface | Screenshot |
+| --- | --- |
+| **Command Palette** | [Command Palette Wide](docs/screenshots/ui-phase4-command-palette.png) |
+| **Focus Screen (Active)** | [Focus Screen Wide](docs/screenshots/ui-phase4-focus-screen.png) |
+| **Focus Screen (Paused)** | [Focus Screen Paused Wide](docs/screenshots/ui-phase4-focus-paused.png) |
+
+### Narrow Laptop Viewport (860×680)
+
+| Surface | Screenshot |
+| --- | --- |
+| **Command Palette** | [Command Palette Narrow](docs/screenshots/ui-phase4-command-palette-narrow.png) |
+| **Focus Screen (Active)** | [Focus Screen Narrow](docs/screenshots/ui-phase4-focus-screen-narrow.png) |
+| **Focus Screen (Paused)** | [Focus Screen Paused Narrow](docs/screenshots/ui-phase4-focus-paused-narrow.png) |
+
+---
+
+## Readiness for Codex Independent Review
+
+UI Phase 4 is complete, fully tested, and passing all checks on the hosted macOS runner. It does not introduce any Phase 5 motion scope or unapproved data model changes. Ready for Codex's independent review.
