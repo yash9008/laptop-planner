@@ -64,7 +64,7 @@ export function CommandPalette({
   useEffect(() => {
     if (!isOpen) return;
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.defaultPrevented || event.isComposing) return;
+      if (event.defaultPrevented || event.isComposing || event.repeat) return;
 
       const isCmdK =
         (event.metaKey || event.ctrlKey) &&
@@ -98,6 +98,11 @@ export function CommandPalette({
       }
 
       if (event.key === 'Enter') {
+        const target = event.target as HTMLElement | null;
+        if (target && target.closest('button')) {
+          // Preserve native button activation (e.g. Close command palette or Clear query)
+          return;
+        }
         event.preventDefault();
         const activeItem = filteredCommands[selectedIndex];
         if (activeItem && !activeItem.disabled) {

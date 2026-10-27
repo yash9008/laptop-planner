@@ -1,0 +1,73 @@
+2026-10-27T10:47:15.8518370Z ℹ tests 78
+2026-10-27T10:47:15.8521120Z ℹ pass 78
+2026-10-27T10:47:15.8522190Z ℹ fail 0
+2026-10-27T10:47:16.1060920Z ℹ tests 78
+2026-10-27T10:47:16.1062140Z ℹ pass 78
+2026-10-27T10:47:16.1063740Z ℹ fail 0
+2026-10-27T10:47:17.7949070Z ℹ tests 63
+2026-10-27T10:47:17.7949960Z ℹ pass 63
+2026-10-27T10:47:17.7950460Z ℹ fail 0
+2026-10-27T10:50:19.5186350Z PHASE4_BOARD_ROUND_TRIP {
+2026-10-27T10:50:19.5310570Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:50:19.8199550Z   ✘   61 tests/app/phase4-independent-review.spec.ts:55:1 › independent phase4: Focus exit preserves a panned board and selected calendar date (2.1s)
+2026-10-27T10:50:31.4424870Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:50:31.7631760Z   ✘   62 tests/app/phase4-independent-review.spec.ts:71:1 › independent phase4: bare F uses the latest explicitly selected task (11.4s)
+2026-10-27T10:50:43.7311250Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:50:44.2347620Z   ✘   63 tests/app/phase4-independent-review.spec.ts:81:1 › independent phase4: palette navigation transfers keyboard focus into Focus (11.9s)
+2026-10-27T10:50:47.6801650Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:50:48.0306660Z   ✘   64 tests/app/phase4-independent-review.spec.ts:90:1 › independent phase4: invisible Focus dock is excluded from sequential keyboard navigation (3.1s)
+2026-10-27T10:51:00.3648650Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:51:01.4854270Z   ✘   65 tests/app/phase4-independent-review.spec.ts:102:1 › independent phase4: help dismissal restores the palette initiating control (12.9s)
+2026-10-27T10:51:13.5582000Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:51:14.1215730Z   ✘   66 tests/app/phase4-independent-review.spec.ts:113:1 › independent phase4: Enter on the palette close control does not execute Add task (12.0s)
+2026-10-27T10:51:26.6022220Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:51:27.1746290Z   ✘   67 tests/app/phase4-independent-review.spec.ts:124:1 › independent phase4: repeated Cmd K does not dismiss the palette (12.2s)
+2026-10-27T10:51:38.9315940Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:51:39.5694700Z   ✘   68 tests/app/phase4-independent-review.spec.ts:130:1 › independent phase4: palette to Search task editor preserves Search focus ownership (11.7s)
+2026-10-27T10:54:27.2034480Z   1) tests/app/phase4-independent-review.spec.ts:55:1 › independent phase4: Focus exit preserves a panned board and selected calendar date 
+2026-10-27T10:54:27.2108410Z     Error: expect(received).toEqual(expected) // deep equality
+2026-10-27T10:54:27.2184120Z       67 |   console.log('PHASE4_BOARD_ROUND_TRIP', { before, after });
+2026-10-27T10:54:27.2186080Z       71 | test('independent phase4: bare F uses the latest explicitly selected task', async () => {
+2026-10-27T10:54:27.2199990Z   2) tests/app/phase4-independent-review.spec.ts:71:1 › independent phase4: bare F uses the latest explicitly selected task 
+2026-10-27T10:54:27.2200640Z     Error: expect(locator).toHaveText(expected) failed
+2026-10-27T10:54:27.2201640Z     Expected: "Beta selected"
+2026-10-27T10:54:27.2201960Z     Received: "Alpha default"
+2026-10-27T10:54:27.2215190Z       81 | test('independent phase4: palette navigation transfers keyboard focus into Focus', async () => {
+2026-10-27T10:54:27.2220790Z   3) tests/app/phase4-independent-review.spec.ts:81:1 › independent phase4: palette navigation transfers keyboard focus into Focus 
+2026-10-27T10:54:27.2221840Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T10:54:27.2222380Z     Expected: true
+2026-10-27T10:54:27.2222750Z     Received: false
+2026-10-27T10:54:27.2227680Z       90 | test('independent phase4: invisible Focus dock is excluded from sequential keyboard navigation', async () => {
+2026-10-27T10:54:27.2231650Z   4) tests/app/phase4-independent-review.spec.ts:90:1 › independent phase4: invisible Focus dock is excluded from sequential keyboard navigation 
+2026-10-27T10:54:27.2232540Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T10:54:27.2233150Z     Expected: false
+2026-10-27T10:54:27.2233730Z     Received: true
+2026-10-27T10:54:27.2240640Z       102 | test('independent phase4: help dismissal restores the palette initiating control', async () => {
+2026-10-27T10:54:27.2250520Z   5) tests/app/phase4-independent-review.spec.ts:102:1 › independent phase4: help dismissal restores the palette initiating control 
+2026-10-27T10:54:27.2252310Z     Error: expect(locator).toBeFocused() failed
+2026-10-27T10:54:27.2254780Z     Expected: focused
+2026-10-27T10:54:27.2255740Z     Received: inactive
+2026-10-27T10:54:27.2273360Z       113 | test('independent phase4: Enter on the palette close control does not execute Add task', async () => {
+2026-10-27T10:54:27.2281750Z   6) tests/app/phase4-independent-review.spec.ts:113:1 › independent phase4: Enter on the palette close control does not execute Add task 
+2026-10-27T10:54:27.2282830Z     Error: expect(locator).toBeFocused() failed
+2026-10-27T10:54:27.2283690Z     Expected: focused
+2026-10-27T10:54:27.2283930Z     Received: inactive
+2026-10-27T10:54:27.2293440Z   7) tests/app/phase4-independent-review.spec.ts:124:1 › independent phase4: repeated Cmd K does not dismiss the palette 
+2026-10-27T10:54:27.2294160Z     Error: expect(locator).toBeVisible() failed
+2026-10-27T10:54:27.2294970Z     Expected: visible
+2026-10-27T10:54:27.2295510Z     Error: element(s) not found
+2026-10-27T10:54:27.2301510Z       130 | test('independent phase4: palette to Search task editor preserves Search focus ownership', async () => {
+2026-10-27T10:54:27.2305150Z   8) tests/app/phase4-independent-review.spec.ts:130:1 › independent phase4: palette to Search task editor preserves Search focus ownership 
+2026-10-27T10:54:27.2306440Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T10:54:27.2306860Z     Expected: true
+2026-10-27T10:54:27.2307140Z     Received: false
+2026-10-27T10:54:27.2313640Z   8 failed
+2026-10-27T10:54:27.2314360Z     tests/app/phase4-independent-review.spec.ts:55:1 › independent phase4: Focus exit preserves a panned board and selected calendar date 
+2026-10-27T10:54:27.2315410Z     tests/app/phase4-independent-review.spec.ts:71:1 › independent phase4: bare F uses the latest explicitly selected task 
+2026-10-27T10:54:27.2316350Z     tests/app/phase4-independent-review.spec.ts:81:1 › independent phase4: palette navigation transfers keyboard focus into Focus 
+2026-10-27T10:54:27.2318600Z     tests/app/phase4-independent-review.spec.ts:90:1 › independent phase4: invisible Focus dock is excluded from sequential keyboard navigation 
+2026-10-27T10:54:27.2319850Z     tests/app/phase4-independent-review.spec.ts:102:1 › independent phase4: help dismissal restores the palette initiating control 
+2026-10-27T10:54:27.2321260Z     tests/app/phase4-independent-review.spec.ts:113:1 › independent phase4: Enter on the palette close control does not execute Add task 
+2026-10-27T10:54:27.2322290Z     tests/app/phase4-independent-review.spec.ts:124:1 › independent phase4: repeated Cmd K does not dismiss the palette 
+2026-10-27T10:54:27.2323330Z     tests/app/phase4-independent-review.spec.ts:130:1 › independent phase4: palette to Search task editor preserves Search focus ownership 
+2026-10-27T10:54:27.2323890Z   102 passed (7.1m)

@@ -19,10 +19,11 @@ function rememberWidth(width: number | null) {
   } catch { /* A display preference must never prevent planning. */ }
 }
 
-export function CalendarDock({ width, onResize, children }: {
+export function CalendarDock({ width, onResize, children, inert }: {
   width: number | null;
   onResize(width: number | null): void;
   children: ReactNode;
+  inert?: boolean;
 }) {
   const dock = useRef<HTMLDivElement>(null);
   const handle = useRef<HTMLDivElement>(null);
@@ -68,7 +69,7 @@ export function CalendarDock({ width, onResize, children }: {
     return () => window.removeEventListener('keydown', cancel);
   });
 
-  return <div ref={dock} className={`calendar-dock${resizing ? ' is-resizing' : ''}`}>
+  return <div ref={dock} className={`calendar-dock${resizing ? ' is-resizing' : ''}`} inert={inert ? true : undefined} aria-hidden={inert ? 'true' : undefined}>
     <div ref={handle} className="calendar-divider" role="separator" tabIndex={0}
       aria-label="Resize calendar" aria-orientation="vertical" aria-controls="day-calendar-panel"
       aria-valuemin={MIN_WIDTH} aria-valuemax={Math.floor(maximum)} aria-valuenow={measuredWidth}

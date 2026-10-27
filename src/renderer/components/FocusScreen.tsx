@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { PlannerDay, PlannerTask } from '../../shared/contracts';
 import { dateLabel, formatDuration, formatElapsed } from '../../shared/task-input';
 import { Icon } from './Icon';
@@ -29,9 +30,23 @@ export function FocusScreen({
   onExit: () => void;
   onAddTask: () => void;
 }) {
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      const el = mainRef.current;
+      if (!el) return;
+      if (document.activeElement && el.contains(document.activeElement)) return;
+      const target = el.querySelector<HTMLElement>(
+        'button.focus-action-btn:not([disabled]), button.button.primary:not([disabled]), button.focus-exit-btn'
+      );
+      target?.focus({ preventScroll: true });
+    });
+  }, [task?.id]);
+
   if (!task) {
     return (
-      <main className="focus-screen is-empty" data-testid="focus-screen" aria-label="Focus view">
+      <main ref={mainRef} className="focus-screen is-empty" data-testid="focus-screen" aria-label="Focus view">
         <header className="focus-screen-header">
           <button
             className="button secondary focus-exit-btn"
@@ -91,6 +106,7 @@ export function FocusScreen({
 
   return (
     <main
+      ref={mainRef}
       className={`focus-screen ${isRunning ? 'is-running' : ''}`}
       data-testid="focus-screen"
       aria-label="Focus view"

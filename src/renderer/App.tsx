@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import type { PlannerDay, PlannerResult, PlannerTask, PlannerProject, PlannerEvent, SaveProjectInput, SaveEventInput, SaveSettingsInput, MoveTaskInput } from '../shared/contracts';
 import { dateLabel, formatDuration, formatTime, shiftDate, formatElapsed, parseDuration, WEEKDAYS } from '../shared/task-input';
 import { creationDraftKey, isDraftDirty, newCreationDraft, taskToDraft, reconcileTaskDraft, type TaskDraft } from './drafts';
@@ -49,6 +49,11 @@ export function App() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const selectedTaskIdRef = useRef<string | null>(null);
+  selectedTaskIdRef.current = selectedTaskId;
+  const savedBoardScrollRef = useRef<number | null>(null);
+  const savedBoardDateRef = useRef<string | null>(null);
+  const pendingHelpRestore = useRef(false);
   const [focusTaskId, setFocusTaskId] = useState<string | null>(null);
   const previousViewRef = useRef<'board' | 'day' | 'backlog' | 'project'>('board');
   const focusExitTriggerRef = useRef<HTMLElement | null>(null);
@@ -802,15 +807,29 @@ export function App() {
     if (view !== 'focus') {
       previousViewRef.current = view;
     }
-    focusExitTriggerRef.current = document.activeElement as HTMLElement | null;
+    if (view === 'board') {
+      savedBoardScrollRef.current = boardPanelRef.current?.scrollLeft ?? null;
+      savedBoardDateRef.current = boardCalendarDate;
+    }
+
+    if (originatingElement.current && originatingElement.current.isConnected && !originatingElement.current.closest('[role="dialog"]')) {
+      focusExitTriggerRef.current = originatingElement.current;
+    } else {
+      const active = document.activeElement as HTMLElement | null;
+      if (active && !active.closest('[role="dialog"]') && active !== document.body) {
+        focusExitTriggerRef.current = active;
+      }
+    }
+
+    const currentSelectedId = explicitTaskId ?? selectedTaskIdRef.current ?? selectedTaskId;
 
     let chosenId: string | null = null;
     if (explicitTaskId) {
       chosenId = explicitTaskId;
     } else if (day?.focus?.taskId) {
       chosenId = day.focus.taskId;
-    } else if (selectedTaskId && day?.allTasks.some((t) => t.id === selectedTaskId)) {
-      chosenId = selectedTaskId;
+    } else if (currentSelectedId && day?.allTasks.some((t) => t.id === currentSelectedId)) {
+      chosenId = currentSelectedId;
     } else if (day) {
       const todayIncomplete = day.allTasks.find((t) => !t.completed && t.plannedDate === day.today);
       chosenId = todayIncomplete ? todayIncomplete.id : null;
@@ -831,6 +850,40 @@ export function App() {
     }, 0);
   }
 
+  useLayoutEffect(() => {
+    if (view === 'board' && savedBoardScrollRef.current !== null) {
+      const scrollPos = savedBoardScrollRef.current;
+      const boardDate = savedBoardDateRef.current;
+      if (boardPanelRef.current) {
+        boardPanelRef.current.scrollLeft = scrollPos;
+      }
+      if (boardDate) {
+        setBoardCalendarDate(boardDate);
+      }
+      requestAnimationFrame(() => {
+        if (boardPanelRef.current) {
+          boardPanelRef.current.scrollLeft = scrollPos;
+        }
+      });
+      savedBoardScrollRef.current = null;
+      savedBoardDateRef.current = null;
+    }
+  }, [view]);
+
+  useEffect(() => {
+    if (view === 'focus') {
+      requestAnimationFrame(() => {
+        const screen = document.querySelector<HTMLElement>('[data-testid="focus-screen"]');
+        if (screen && (!document.activeElement || !screen.contains(document.activeElement))) {
+          const btn = screen.querySelector<HTMLElement>(
+            'button.focus-action-btn:not([disabled]), button.button.primary:not([disabled]), button.focus-exit-btn'
+          );
+          btn?.focus({ preventScroll: true });
+        }
+      });
+    }
+  }, [view]);
+
   const pendingPaletteRestore = useRef(false);
 
   function openCommandPalette(triggerEl?: HTMLElement) {
@@ -841,7 +894,7 @@ export function App() {
         : undefined);
     const cardEl = trigger?.closest<HTMLElement>('[data-task-id]');
     const taskIdFromEl = cardEl?.dataset.taskId;
-    const finalTaskId = taskIdFromEl ?? selectedTaskId;
+    const finalTaskId = taskIdFromEl ?? selectedTaskIdRef.current ?? selectedTaskId;
     if (finalTaskId) {
       setSelectedTaskId(finalTaskId);
     }
@@ -854,12 +907,24 @@ export function App() {
     setCommandPaletteOpen(false);
   }
 
+  function closeKeyboardHelp() {
+    pendingHelpRestore.current = true;
+    setKeyboardHelpOpen(false);
+  }
+
   useEffect(() => {
     if (!commandPaletteOpen && pendingPaletteRestore.current) {
       pendingPaletteRestore.current = false;
       restoreOriginatingFocus(originatingTaskId.current);
     }
   }, [commandPaletteOpen]);
+
+  useEffect(() => {
+    if (!keyboardHelpOpen && pendingHelpRestore.current) {
+      pendingHelpRestore.current = false;
+      restoreOriginatingFocus();
+    }
+  }, [keyboardHelpOpen]);
 
   const selectedTask = selectedTaskId && day ? day.allTasks.find((t) => t.id === selectedTaskId) : null;
 
@@ -873,9 +938,11 @@ export function App() {
       disabled: busy,
       disabledReason: busy ? 'Save in progress' : undefined,
       run: () => {
+        const savedTrigger = originatingElement.current ?? undefined;
+        const savedSurface = originatingSurface.current;
         setCommandPaletteOpen(false);
         setTimeout(() => {
-          openEditor(selectedTask);
+          openEditor(selectedTask, savedTrigger, savedSurface);
         }, 0);
       },
     });
@@ -967,6 +1034,12 @@ export function App() {
       run: () => {
         setCommandPaletteOpen(false);
         setView('board');
+        requestAnimationFrame(() => {
+          const target = document.querySelector<HTMLElement>(
+            '.planning-board, .view-switch button[aria-label="Board view"]'
+          );
+          target?.focus({ preventScroll: true });
+        });
       },
     },
     {
@@ -977,6 +1050,12 @@ export function App() {
         setCommandPaletteOpen(false);
         setView('day');
         goToDate();
+        requestAnimationFrame(() => {
+          const target = document.querySelector<HTMLElement>(
+            '.view-day .day-heading, .view-day .task-card, .view-switch button[aria-label="Today view"]'
+          );
+          target?.focus({ preventScroll: true });
+        });
       },
     },
     {
@@ -986,6 +1065,12 @@ export function App() {
       run: () => {
         setCommandPaletteOpen(false);
         setView('backlog');
+        requestAnimationFrame(() => {
+          const target = document.querySelector<HTMLElement>(
+            '.view-backlog .task-add-bar, .view-backlog'
+          );
+          target?.focus({ preventScroll: true });
+        });
       },
     },
     {
@@ -1171,6 +1256,7 @@ export function App() {
     view,
     boardCalendarDate,
     selectedProjectId,
+    selectedTaskId,
     isAnyModalActive,
     commandPaletteOpen,
     keyboardHelpOpen,
@@ -1745,7 +1831,7 @@ export function App() {
         )}
 
         <div className="workspace-body">
-          {view === 'focus' && day ? (
+          {view === 'focus' && day && (
             <FocusScreen
               day={day}
               task={currentFocusTask}
@@ -1780,8 +1866,13 @@ export function App() {
               onExit={exitFocusView}
               onAddTask={() => openNew(day.today)}
             />
-          ) : (
-            <main className={`planner-main view-${view}`}>
+          )}
+          <main
+            className={`planner-main view-${view === 'focus' ? (previousViewRef.current || 'board') : view}`}
+            style={view === 'focus' ? { display: 'none' } : undefined}
+            inert={view === 'focus' ? true : undefined}
+            aria-hidden={view === 'focus' ? 'true' : undefined}
+          >
             {error && (
               <div className="error-banner" role="alert">
                 <div>
@@ -1948,9 +2039,8 @@ export function App() {
               </>
             )}
           </main>
-        )}
           {isDockOpen && (
-            <CalendarDock width={calendarWidth} onResize={setCalendarWidth}>
+            <CalendarDock width={calendarWidth} onResize={setCalendarWidth} inert={view === 'focus'}>
               {activeUtilityPanel === 'backlog' ? (
                 <BacklogPanel
                   day={day}
@@ -2284,10 +2374,7 @@ export function App() {
 
       <KeyboardHelpDialog
         isOpen={keyboardHelpOpen}
-        onClose={() => {
-          setKeyboardHelpOpen(false);
-          restoreOriginatingFocus();
-        }}
+        onClose={closeKeyboardHelp}
       />
     </>
   );

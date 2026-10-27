@@ -29,7 +29,7 @@ This sequence follows the user's request to make the app feel closer to Sunsama,
 | 1 — Board and calendar workspace | Complete; awaiting user review | Neutral surfaces, quieter toolbar/sidebar, clearer task cards and current-day headings, workload totals above the board/day list, and a resizable calendar with keyboard controls and a remembered width |
 | 2 — Task editing and quick actions | Complete; R1–R8 independently rechecked; ready for Phase 3 | Quick-add composer, centered task detail editor, estimate popover and task menu; verified 50 ms checkbox and 200 ms card/control feedback, with component-specific motion evidence; preserve drafts and failed-save recovery |
 | 3 — Finding and organizing work | Complete; known R1–R8 findings resolved; ready for UI Phase 4 | Project/status filters, global search and backlog/search/recovery side panels; verified navigation opacity/icon feedback, plus trigger verification before adopting the 300 ms layout-margin rule; preserve date/scroll continuity |
-| 4 — Keyboard navigation and focused work | Complete; hosted checks passed; ready for Codex independent review | Command palette, shortcuts and a true single-task Focus screen; verify actual Focus/palette transitions, including the loaded 300 ms Focus-calendar opacity rule, with the existing elapsed-time timer |
+| 4 — Keyboard navigation and focused work | Implemented; independent review found acceptance gaps; fixes required | Command palette, shortcuts and a true single-task Focus screen; verify actual Focus/palette transitions, including the loaded 300 ms Focus-calendar opacity rule, with the existing elapsed-time timer |
 | 5 — Motion parity acceptance | Planned | Compare motion against controlled reference evidence; test normal/reduced motion, enter/exit, delays, interruption/reversal, cancellation, errors, focus, narrow windows and drag behavior; distinguish CSS definitions from observed elapsed spans and report unmatched effects |
 
 **Before UI Phase 2:** the user requested an interaction/animation audit. [The audit](docs/interaction-audit.md) distinguishes live controls, the earlier board recording, older public walkthrough frames and unmeasured motion. The earlier task-drawer proposal is not established as Sunsama's current editor. The revised recommendation above is proposed scope: verify the editor presentation and specify quick-add, popup, dismissal, focus and interrupted-transition behavior before implementation. No Phase 2 code was added during the audit.
@@ -143,6 +143,23 @@ The complete suite was verified on GitHub Actions hosted Apple Silicon macOS run
 - Visual evidence captured in wide 1440×900 and narrow 860×680 viewports. Details and receipts are in [docs/phase4-implementation-handoff.md](docs/phase4-implementation-handoff.md).
 
 Phase 4 is complete and stopped; ready for Codex's independent review. Phase 5 has not started.
+
+### UI Phase 4 independent review — October 27, 2026
+
+[Independent review](docs/phase4-implementation-review.md): **needs fixes before
+acceptance**. The submitted source `de3d6e9` passes its full hosted suite
+(102 Electron tests), but independent probes reproduce loss of board
+scroll/date on Focus exit, stale selection in the F shortcut, lost focus on
+palette navigation and help dismissal, invisible dock controls receiving Tab,
+and repeated Cmd+K dismissal. The refined probes also reproduce Enter on the
+palette Close control executing Add task, and palette-to-editor handoff
+returning focus to the board instead of Search. The final
+[full hosted run](https://github.com/yash9008/laptop-planner/actions/runs/40490966909)
+on `5ff04a0` passed type-check/build, scheduler 78/78 in each time zone, and
+database 63/63; Electron reported **102 passed, 8 failed**. All 102 existing
+tests passed, while all eight independent probes reproduced findings.
+Application source and existing tests are unchanged by the review; the
+original `ui-phase-4` checkout is restored. Phase 5 has not started.
 
 ## Previously recorded release verification
 

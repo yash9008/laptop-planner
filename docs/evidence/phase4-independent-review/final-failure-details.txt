@@ -1,0 +1,270 @@
+2026-10-27T10:50:19.5186350Z PHASE4_BOARD_ROUND_TRIP {
+2026-10-27T10:50:19.5276390Z   before: { scroll: 544, date: '2026-10-27' },
+2026-10-27T10:50:19.5309280Z   after: { scroll: 0, date: '2026-10-25' }
+2026-10-27T10:50:19.5309850Z }
+2026-10-27T10:50:19.5310570Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:50:19.5311500Z   tag: 'BUTTON',
+2026-10-27T10:50:19.5311880Z   label: 'Open focus view',
+2026-10-27T10:50:19.5312230Z   text: '',
+2026-10-27T10:50:19.5312540Z   inFocus: false,
+2026-10-27T10:50:19.5312780Z   inSearch: false,
+2026-10-27T10:50:19.5313020Z   inDock: false
+2026-10-27T10:50:19.5313250Z }
+2026-10-27T10:50:31.4424870Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:50:31.4425830Z   tag: 'BUTTON',
+2026-10-27T10:50:31.4426530Z   label: 'Open command palette',
+2026-10-27T10:50:31.4429500Z   text: 'Commands⌘K',
+2026-10-27T10:50:31.4430060Z   inFocus: false,
+2026-10-27T10:50:31.4430710Z   inSearch: false,
+2026-10-27T10:50:31.4431230Z   inDock: false
+2026-10-27T10:50:31.4431890Z }
+2026-10-27T10:50:43.7311250Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:50:43.7318990Z   tag: 'BODY',
+2026-10-27T10:50:43.7455440Z   label: null,
+2026-10-27T10:50:43.7600640Z   text: '\n' +
+2026-10-27T10:50:43.7702310Z     '    Laptop PlannerHomeTodayFocusYOUR PLANNINGBacklogPROJECTSAdd projectSettingsLocal storageOnly on',
+2026-10-27T10:50:43.7723900Z   inFocus: false,
+2026-10-27T10:50:43.7749580Z   inSearch: false,
+2026-10-27T10:50:43.7754290Z   inDock: false
+2026-10-27T10:50:43.7835550Z }
+2026-10-27T10:50:47.6801650Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:50:47.6908290Z   tag: 'DIV',
+2026-10-27T10:50:47.7010830Z   label: 'Resize calendar',
+2026-10-27T10:50:47.7085080Z   text: '',
+2026-10-27T10:50:47.7162510Z   inFocus: false,
+2026-10-27T10:50:47.7189020Z   inSearch: false,
+2026-10-27T10:50:47.7231950Z   inDock: true
+2026-10-27T10:50:47.7245920Z }
+2026-10-27T10:51:00.3648650Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:51:00.3783060Z   tag: 'BODY',
+2026-10-27T10:51:00.3801090Z   label: null,
+2026-10-27T10:51:00.3801640Z   text: '\n' +
+2026-10-27T10:51:00.3803290Z     '    Laptop PlannerHomeTodayFocusYOUR PLANNINGBacklogPROJECTSAdd projectSettingsLocal storageOnly on',
+2026-10-27T10:51:00.3805290Z   inFocus: false,
+2026-10-27T10:51:00.3805870Z   inSearch: false,
+2026-10-27T10:51:00.3806840Z   inDock: false
+2026-10-27T10:51:00.3807450Z }
+2026-10-27T10:51:13.5582000Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:51:13.5583890Z   tag: 'INPUT',
+2026-10-27T10:51:13.5585700Z   label: 'Task title',
+2026-10-27T10:51:13.5587010Z   text: '',
+2026-10-27T10:51:13.5587720Z   inFocus: false,
+2026-10-27T10:51:13.5588700Z   inSearch: false,
+2026-10-27T10:51:13.5589480Z   inDock: false
+2026-10-27T10:51:13.5590510Z }
+2026-10-27T10:51:26.6022220Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:51:26.6024250Z   tag: 'BUTTON',
+2026-10-27T10:51:26.6024840Z   label: 'Open command palette',
+2026-10-27T10:51:26.6031690Z   text: 'Commands⌘K',
+2026-10-27T10:51:26.6032950Z   inFocus: false,
+2026-10-27T10:51:26.6033430Z   inSearch: false,
+2026-10-27T10:51:26.6034190Z   inDock: false
+2026-10-27T10:51:26.6035440Z }
+2026-10-27T10:51:38.9315940Z PHASE4_REVIEW_FOCUS {
+2026-10-27T10:51:38.9316670Z   tag: 'BUTTON',
+2026-10-27T10:51:38.9316860Z   label: null,
+2026-10-27T10:51:38.9317140Z   text: 'Search target',
+2026-10-27T10:51:38.9317390Z   inFocus: false,
+2026-10-27T10:51:38.9317690Z   inSearch: false,
+2026-10-27T10:51:38.9317940Z   inDock: false
+2026-10-27T10:51:38.9318450Z }
+2026-10-27T10:54:27.2034480Z   1) tests/app/phase4-independent-review.spec.ts:55:1 › independent phase4: Focus exit preserves a panned board and selected calendar date 
+2026-10-27T10:54:27.2090110Z 
+2026-10-27T10:54:27.2108410Z     Error: expect(received).toEqual(expected) // deep equality
+2026-10-27T10:54:27.2116380Z 
+2026-10-27T10:54:27.2116720Z     - Expected  - 2
+2026-10-27T10:54:27.2118970Z     + Received  + 2
+2026-10-27T10:54:27.2120060Z 
+2026-10-27T10:54:27.2120330Z       Object {
+2026-10-27T10:54:27.2123230Z     -   "date": "2026-10-27",
+2026-10-27T10:54:27.2123620Z     -   "scroll": 544,
+2026-10-27T10:54:27.2124280Z     +   "date": "2026-10-25",
+2026-10-27T10:54:27.2127280Z     +   "scroll": 0,
+2026-10-27T10:54:27.2128760Z       }
+2026-10-27T10:54:27.2129060Z 
+2026-10-27T10:54:27.2129760Z       66 |   const after = { scroll: await board.evaluate(el => el.scrollLeft), date: await selected.getAttribute('data-date') };
+2026-10-27T10:54:27.2184120Z       67 |   console.log('PHASE4_BOARD_ROUND_TRIP', { before, after });
+2026-10-27T10:54:27.2184630Z     > 68 |   expect(after).toEqual(before);
+2026-10-27T10:54:27.2184890Z          |                 ^
+2026-10-27T10:54:27.2185280Z       69 | });
+2026-10-27T10:54:27.2185530Z       70 |
+2026-10-27T10:54:27.2186080Z       71 | test('independent phase4: bare F uses the latest explicitly selected task', async () => {
+2026-10-27T10:54:27.2186870Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-independent-review.spec.ts:68:17
+2026-10-27T10:54:27.2187410Z 
+2026-10-27T10:54:27.2197510Z     Error Context: test-results/phase4-independent-review--ec436--and-selected-calendar-date/error-context.md
+2026-10-27T10:54:27.2198090Z 
+2026-10-27T10:54:27.2199990Z   2) tests/app/phase4-independent-review.spec.ts:71:1 › independent phase4: bare F uses the latest explicitly selected task 
+2026-10-27T10:54:27.2200480Z 
+2026-10-27T10:54:27.2200640Z     Error: expect(locator).toHaveText(expected) failed
+2026-10-27T10:54:27.2200970Z 
+2026-10-27T10:54:27.2201220Z     Locator:  getByTestId('focus-title')
+2026-10-27T10:54:27.2201640Z     Expected: "Beta selected"
+2026-10-27T10:54:27.2201960Z     Received: "Alpha default"
+2026-10-27T10:54:27.2203070Z     Timeout:  10000ms
+2026-10-27T10:54:27.2203740Z 
+2026-10-27T10:54:27.2204080Z     Call log:
+2026-10-27T10:54:27.2204670Z       - Expect "toHaveText" getByTestId('focus-title') with timeout 10000ms
+2026-10-27T10:54:27.2205230Z       - waiting for getByTestId('focus-title')
+2026-10-27T10:54:27.2207370Z         24 × locator resolved to <h1 data-testid="focus-title" class="focus-screen-title">Alpha default</h1>
+2026-10-27T10:54:27.2209070Z            - unexpected value "Alpha default"
+2026-10-27T10:54:27.2209940Z 
+2026-10-27T10:54:27.2209950Z 
+2026-10-27T10:54:27.2210450Z       76 |   await page.getByRole('button', { name: 'Open command palette', exact: true }).focus();
+2026-10-27T10:54:27.2211650Z       77 |   await page.keyboard.press('f');
+2026-10-27T10:54:27.2212530Z     > 78 |   await expect(page.getByTestId('focus-title')).toHaveText('Beta selected');
+2026-10-27T10:54:27.2213890Z          |                                                 ^
+2026-10-27T10:54:27.2214310Z       79 | });
+2026-10-27T10:54:27.2214560Z       80 |
+2026-10-27T10:54:27.2215190Z       81 | test('independent phase4: palette navigation transfers keyboard focus into Focus', async () => {
+2026-10-27T10:54:27.2216190Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-independent-review.spec.ts:78:49
+2026-10-27T10:54:27.2217080Z 
+2026-10-27T10:54:27.2217520Z     Error Context: test-results/phase4-independent-review--87dfa-st-explicitly-selected-task/error-context.md
+2026-10-27T10:54:27.2218030Z 
+2026-10-27T10:54:27.2220790Z   3) tests/app/phase4-independent-review.spec.ts:81:1 › independent phase4: palette navigation transfers keyboard focus into Focus 
+2026-10-27T10:54:27.2221420Z 
+2026-10-27T10:54:27.2221840Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T10:54:27.2222270Z 
+2026-10-27T10:54:27.2222380Z     Expected: true
+2026-10-27T10:54:27.2222750Z     Received: false
+2026-10-27T10:54:27.2222950Z 
+2026-10-27T10:54:27.2223110Z     Call Log:
+2026-10-27T10:54:27.2223510Z     - Timeout 10000ms exceeded while waiting on the predicate
+2026-10-27T10:54:27.2223890Z 
+2026-10-27T10:54:27.2224200Z       85 |   const screen = page.getByTestId('focus-screen');
+2026-10-27T10:54:27.2224720Z       86 |   await expect(screen).toBeVisible();
+2026-10-27T10:54:27.2225570Z     > 87 |   await expect.poll(() => screen.evaluate(el => el.contains(document.activeElement))).toBe(true);
+2026-10-27T10:54:27.2226360Z          |                                                                                       ^
+2026-10-27T10:54:27.2226770Z       88 | });
+2026-10-27T10:54:27.2227060Z       89 |
+2026-10-27T10:54:27.2227680Z       90 | test('independent phase4: invisible Focus dock is excluded from sequential keyboard navigation', async () => {
+2026-10-27T10:54:27.2229370Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-independent-review.spec.ts:87:87
+2026-10-27T10:54:27.2229850Z 
+2026-10-27T10:54:27.2230330Z     Error Context: test-results/phase4-independent-review--41dc1-s-keyboard-focus-into-Focus/error-context.md
+2026-10-27T10:54:27.2230830Z 
+2026-10-27T10:54:27.2231650Z   4) tests/app/phase4-independent-review.spec.ts:90:1 › independent phase4: invisible Focus dock is excluded from sequential keyboard navigation 
+2026-10-27T10:54:27.2232250Z 
+2026-10-27T10:54:27.2232540Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T10:54:27.2232910Z 
+2026-10-27T10:54:27.2233150Z     Expected: false
+2026-10-27T10:54:27.2233730Z     Received: true
+2026-10-27T10:54:27.2233970Z 
+2026-10-27T10:54:27.2234520Z        97 |   await page.getByTestId('focus-screen').getByRole('button', { name: 'Edit task', exact: true }).focus();
+2026-10-27T10:54:27.2235170Z        98 |   await page.keyboard.press('Tab');
+2026-10-27T10:54:27.2235970Z     >  99 |   expect(await page.evaluate(() => Boolean(document.activeElement?.closest('.calendar-dock')))).toBe(false);
+2026-10-27T10:54:27.2236800Z           |                                                                                                 ^
+2026-10-27T10:54:27.2238520Z       100 | });
+2026-10-27T10:54:27.2239260Z       101 |
+2026-10-27T10:54:27.2240640Z       102 | test('independent phase4: help dismissal restores the palette initiating control', async () => {
+2026-10-27T10:54:27.2242860Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-independent-review.spec.ts:99:97
+2026-10-27T10:54:27.2246350Z 
+2026-10-27T10:54:27.2247620Z     Error Context: test-results/phase4-independent-review--18e52-uential-keyboard-navigation/error-context.md
+2026-10-27T10:54:27.2248860Z 
+2026-10-27T10:54:27.2250520Z   5) tests/app/phase4-independent-review.spec.ts:102:1 › independent phase4: help dismissal restores the palette initiating control 
+2026-10-27T10:54:27.2251780Z 
+2026-10-27T10:54:27.2252310Z     Error: expect(locator).toBeFocused() failed
+2026-10-27T10:54:27.2252960Z 
+2026-10-27T10:54:27.2253730Z     Locator:  getByRole('button', { name: 'Open command palette', exact: true })
+2026-10-27T10:54:27.2254780Z     Expected: focused
+2026-10-27T10:54:27.2255740Z     Received: inactive
+2026-10-27T10:54:27.2256450Z     Timeout:  10000ms
+2026-10-27T10:54:27.2256910Z 
+2026-10-27T10:54:27.2257210Z     Call log:
+2026-10-27T10:54:27.2258740Z       - Expect "toBeFocused" getByRole('button', { name: 'Open command palette', exact: true }) with timeout 10000ms
+2026-10-27T10:54:27.2260600Z       - waiting for getByRole('button', { name: 'Open command palette', exact: true })
+2026-10-27T10:54:27.2264240Z         24 × locator resolved to <button title="Command palette · ⌘K" aria-label="Open command palette" class="toolbar-button toolbar-palette-trigger">…</button>
+2026-10-27T10:54:27.2266200Z            - unexpected value "inactive"
+2026-10-27T10:54:27.2266620Z 
+2026-10-27T10:54:27.2266750Z 
+2026-10-27T10:54:27.2267170Z       108 |   await page.keyboard.press('Escape');
+2026-10-27T10:54:27.2268170Z       109 |   await expect(help).toHaveCount(0);
+2026-10-27T10:54:27.2269810Z     > 110 |   await expect(trigger).toBeFocused();
+2026-10-27T10:54:27.2270630Z           |                         ^
+2026-10-27T10:54:27.2271410Z       111 | });
+2026-10-27T10:54:27.2272050Z       112 |
+2026-10-27T10:54:27.2273360Z       113 | test('independent phase4: Enter on the palette close control does not execute Add task', async () => {
+2026-10-27T10:54:27.2275380Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-independent-review.spec.ts:110:25
+2026-10-27T10:54:27.2278040Z 
+2026-10-27T10:54:27.2279140Z     Error Context: test-results/phase4-independent-review--490cd--palette-initiating-control/error-context.md
+2026-10-27T10:54:27.2280350Z 
+2026-10-27T10:54:27.2281750Z   6) tests/app/phase4-independent-review.spec.ts:113:1 › independent phase4: Enter on the palette close control does not execute Add task 
+2026-10-27T10:54:27.2282620Z 
+2026-10-27T10:54:27.2282830Z     Error: expect(locator).toBeFocused() failed
+2026-10-27T10:54:27.2283000Z 
+2026-10-27T10:54:27.2283280Z     Locator:  getByRole('button', { name: 'Open command palette', exact: true })
+2026-10-27T10:54:27.2283690Z     Expected: focused
+2026-10-27T10:54:27.2283930Z     Received: inactive
+2026-10-27T10:54:27.2284190Z     Timeout:  10000ms
+2026-10-27T10:54:27.2284360Z 
+2026-10-27T10:54:27.2284520Z     Call log:
+2026-10-27T10:54:27.2285040Z       - Expect "toBeFocused" getByRole('button', { name: 'Open command palette', exact: true }) with timeout 10000ms
+2026-10-27T10:54:27.2285920Z       - waiting for getByRole('button', { name: 'Open command palette', exact: true })
+2026-10-27T10:54:27.2286920Z         24 × locator resolved to <button title="Command palette · ⌘K" aria-label="Open command palette" class="toolbar-button toolbar-palette-trigger">…</button>
+2026-10-27T10:54:27.2287580Z            - unexpected value "inactive"
+2026-10-27T10:54:27.2287780Z 
+2026-10-27T10:54:27.2287790Z 
+2026-10-27T10:54:27.2287970Z       118 |   await page.keyboard.press('Enter');
+2026-10-27T10:54:27.2288310Z       119 |   await expect(dialog).toHaveCount(0);
+2026-10-27T10:54:27.2288900Z     > 120 |   await expect(page.getByRole('button', { name: 'Open command palette', exact: true })).toBeFocused();
+2026-10-27T10:54:27.2289550Z           |                                                                                         ^
+2026-10-27T10:54:27.2290100Z       121 |   await expect(page.getByRole('dialog', { name: 'New task', exact: true })).toHaveCount(0);
+2026-10-27T10:54:27.2290640Z       122 | });
+2026-10-27T10:54:27.2290880Z       123 |
+2026-10-27T10:54:27.2291520Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-independent-review.spec.ts:120:89
+2026-10-27T10:54:27.2292000Z 
+2026-10-27T10:54:27.2292480Z     Error Context: test-results/phase4-independent-review--c8153-l-does-not-execute-Add-task/error-context.md
+2026-10-27T10:54:27.2292900Z 
+2026-10-27T10:54:27.2293440Z   7) tests/app/phase4-independent-review.spec.ts:124:1 › independent phase4: repeated Cmd K does not dismiss the palette 
+2026-10-27T10:54:27.2293910Z 
+2026-10-27T10:54:27.2294160Z     Error: expect(locator).toBeVisible() failed
+2026-10-27T10:54:27.2294380Z 
+2026-10-27T10:54:27.2294640Z     Locator: getByRole('dialog', { name: 'Command palette', exact: true })
+2026-10-27T10:54:27.2294970Z     Expected: visible
+2026-10-27T10:54:27.2295230Z     Timeout: 10000ms
+2026-10-27T10:54:27.2295510Z     Error: element(s) not found
+2026-10-27T10:54:27.2295680Z 
+2026-10-27T10:54:27.2295780Z     Call log:
+2026-10-27T10:54:27.2296530Z       - Expect "toBeVisible" getByRole('dialog', { name: 'Command palette', exact: true }) with timeout 10000ms
+2026-10-27T10:54:27.2297650Z       - waiting for getByRole('dialog', { name: 'Command palette', exact: true })
+2026-10-27T10:54:27.2298100Z 
+2026-10-27T10:54:27.2298110Z 
+2026-10-27T10:54:27.2298310Z       125 |   const dialog = await palette('');
+2026-10-27T10:54:27.2299240Z       126 |   await dialog.getByRole('combobox').evaluate(el => el.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, repeat: true, bubbles: true, cancelable: true })));
+2026-10-27T10:54:27.2300060Z     > 127 |   await expect(dialog).toBeVisible();
+2026-10-27T10:54:27.2300480Z           |                        ^
+2026-10-27T10:54:27.2300740Z       128 | });
+2026-10-27T10:54:27.2300990Z       129 |
+2026-10-27T10:54:27.2301510Z       130 | test('independent phase4: palette to Search task editor preserves Search focus ownership', async () => {
+2026-10-27T10:54:27.2302390Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-independent-review.spec.ts:127:24
+2026-10-27T10:54:27.2303470Z 
+2026-10-27T10:54:27.2304040Z     Error Context: test-results/phase4-independent-review--67ad6-oes-not-dismiss-the-palette/error-context.md
+2026-10-27T10:54:27.2304510Z 
+2026-10-27T10:54:27.2305150Z   8) tests/app/phase4-independent-review.spec.ts:130:1 › independent phase4: palette to Search task editor preserves Search focus ownership 
+2026-10-27T10:54:27.2306240Z 
+2026-10-27T10:54:27.2306440Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T10:54:27.2306730Z 
+2026-10-27T10:54:27.2306860Z     Expected: true
+2026-10-27T10:54:27.2307140Z     Received: false
+2026-10-27T10:54:27.2307490Z 
+2026-10-27T10:54:27.2307560Z     Call Log:
+2026-10-27T10:54:27.2308030Z     - Timeout 10000ms exceeded while waiting on the predicate
+2026-10-27T10:54:27.2308330Z 
+2026-10-27T10:54:27.2308690Z       142 |   await editor.getByRole('button', { name: 'Close dialog', exact: true }).click();
+2026-10-27T10:54:27.2309500Z       143 |   await expect(editor).toHaveCount(0);
+2026-10-27T10:54:27.2310170Z     > 144 |   await expect.poll(() => search.evaluate(el => el.contains(document.activeElement))).toBe(true);
+2026-10-27T10:54:27.2310850Z           |                                                                                       ^
+2026-10-27T10:54:27.2311200Z       145 | });
+2026-10-27T10:54:27.2311490Z       146 |
+2026-10-27T10:54:27.2312100Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-independent-review.spec.ts:144:87
+2026-10-27T10:54:27.2312550Z 
+2026-10-27T10:54:27.2313020Z     Error Context: test-results/phase4-independent-review--0a46d-rves-Search-focus-ownership/error-context.md
+2026-10-27T10:54:27.2313490Z 
+2026-10-27T10:54:27.2313640Z   8 failed
+2026-10-27T10:54:27.2314360Z     tests/app/phase4-independent-review.spec.ts:55:1 › independent phase4: Focus exit preserves a panned board and selected calendar date 
+2026-10-27T10:54:27.2315410Z     tests/app/phase4-independent-review.spec.ts:71:1 › independent phase4: bare F uses the latest explicitly selected task 
+2026-10-27T10:54:27.2316350Z     tests/app/phase4-independent-review.spec.ts:81:1 › independent phase4: palette navigation transfers keyboard focus into Focus 
+2026-10-27T10:54:27.2318600Z     tests/app/phase4-independent-review.spec.ts:90:1 › independent phase4: invisible Focus dock is excluded from sequential keyboard navigation 
+2026-10-27T10:54:27.2319850Z     tests/app/phase4-independent-review.spec.ts:102:1 › independent phase4: help dismissal restores the palette initiating control 
+2026-10-27T10:54:27.2321260Z     tests/app/phase4-independent-review.spec.ts:113:1 › independent phase4: Enter on the palette close control does not execute Add task 
+2026-10-27T10:54:27.2322290Z     tests/app/phase4-independent-review.spec.ts:124:1 › independent phase4: repeated Cmd K does not dismiss the palette 
+2026-10-27T10:54:27.2323330Z     tests/app/phase4-independent-review.spec.ts:130:1 › independent phase4: palette to Search task editor preserves Search focus ownership 
+2026-10-27T10:54:27.2323890Z   102 passed (7.1m)
