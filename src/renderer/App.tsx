@@ -21,6 +21,8 @@ import { SearchPanel } from './components/SearchPanel';
 import { BacklogPanel } from './components/BacklogPanel';
 import { RecoveryPanel } from './components/RecoveryPanel';
 
+type TaskSurface = 'board' | 'search' | 'backlog' | 'recovery' | 'calendar' | 'other';
+
 export function App() {
   const [day, setDay] = useState<PlannerDay | null>(null);
   const [view, setView] = useState<'day' | 'board' | 'backlog' | 'project' | 'focus'>('board');
@@ -57,7 +59,7 @@ export function App() {
   const [activeTaskMenu, setActiveTaskMenu] = useState<{ task: PlannerTask; anchor: HTMLElement } | null>(null);
   const originatingElement = useRef<HTMLElement | null>(null);
   const originatingTaskId = useRef<string | null>(null);
-  const originatingSurface = useRef<'board' | 'search' | 'backlog' | 'recovery' | 'calendar' | 'other'>('board');
+  const originatingSurface = useRef<TaskSurface>('board');
   const [activeSearchResultId, setActiveSearchResultId] = useState<string | null>(null);
   const prevActiveUtilityPanel = useRef<'backlog' | 'search' | 'recovery' | null>(null);
 
@@ -162,6 +164,22 @@ export function App() {
     prevActiveUtilityPanel.current = activeUtilityPanel;
   }, [activeUtilityPanel]);
 
+  function captureTaskOrigin(taskId: string | null, element?: HTMLElement, surface?: TaskSurface) {
+    const trigger = element ??
+      (document.activeElement instanceof HTMLElement && document.activeElement !== document.body
+        ? document.activeElement
+        : null);
+    originatingElement.current = trigger;
+    originatingTaskId.current = taskId;
+    originatingSurface.current = surface ??
+      (trigger?.closest('[data-testid="search-panel"]') ? 'search'
+        : trigger?.closest('[data-testid="backlog-panel"]') ? 'backlog'
+        : trigger?.closest('[data-testid="recovery-panel"]') ? 'recovery'
+        : trigger?.closest('.calendar-panel') ? 'calendar'
+        : 'board');
+    return originatingSurface.current;
+  }
+
   function restoreOriginatingFocus(taskId?: string | null) {
     const surface = originatingSurface.current;
 
@@ -215,7 +233,7 @@ export function App() {
           remaining.focus({ preventScroll: true });
           return;
         }
-        const closeBtn = backlogPanel.querySelector<HTMLElement>('.panel-close-btn');
+        const closeBtn = backlogPanel.querySelector<HTMLElement>('button[aria-label="Close backlog panel"]');
         if (closeBtn && closeBtn.isConnected) {
           closeBtn.focus({ preventScroll: true });
           return;
@@ -289,12 +307,7 @@ export function App() {
         : (view === 'backlog' || view === 'project'
         ? null
         : (view === 'board' ? boardCalendarDate : null) ?? day?.date ?? null);
-    originatingElement.current =
-      originatingEl ??
-      (document.activeElement instanceof HTMLElement && document.activeElement !== document.body
-        ? document.activeElement
-        : null);
-    originatingTaskId.current = null;
+    captureTaskOrigin(null, originatingEl);
     const projectId = view === 'project' ? selectedProjectId : '';
     const key = creationDraftKey(computedTargetDate, projectId);
 
@@ -319,24 +332,9 @@ export function App() {
   function openEditor(
     task: PlannerTask,
     originatingEl?: HTMLElement,
-    surface?: 'board' | 'search' | 'backlog' | 'recovery' | 'calendar' | 'other'
+    surface?: TaskSurface
   ) {
-    originatingElement.current =
-      originatingEl ??
-      (document.activeElement instanceof HTMLElement && document.activeElement !== document.body
-        ? document.activeElement
-        : null);
-    originatingTaskId.current = task.id;
-    const detectedSurface =
-      surface ??
-      (originatingEl?.closest('[data-testid="search-panel"]')
-        ? 'search'
-        : originatingEl?.closest('[data-testid="backlog-panel"]')
-        ? 'backlog'
-        : originatingEl?.closest('[data-testid="recovery-panel"]')
-        ? 'recovery'
-        : 'board');
-    originatingSurface.current = detectedSurface;
+    const detectedSurface = captureTaskOrigin(task.id, originatingEl, surface);
     if (detectedSurface === 'search') {
       setActiveSearchResultId(task.id);
     }
@@ -826,8 +824,7 @@ export function App() {
             title={`${formatDuration(task.plannedMinutes)} planned · ${formatElapsed(task.actualMinutes * 60000)} actual`}
             onClick={(e) => {
               e.stopPropagation();
-              originatingElement.current = e.currentTarget;
-              originatingTaskId.current = task.id;
+              captureTaskOrigin(task.id, e.currentTarget);
               setActiveEstimatePopover({ task, anchor: e.currentTarget });
             }}
             disabled={busy}
@@ -841,8 +838,6 @@ export function App() {
           <button
             className="task-title"
             onClick={(e) => {
-              originatingElement.current = e.currentTarget;
-              originatingTaskId.current = task.id;
               openEditor(task, e.currentTarget);
             }}
             disabled={busy}
@@ -957,8 +952,7 @@ export function App() {
               disabled={busy}
               onClick={(e) => {
                 e.stopPropagation();
-                originatingElement.current = e.currentTarget;
-                originatingTaskId.current = task.id;
+                captureTaskOrigin(task.id, e.currentTarget);
                 setActiveTaskMenu({ task, anchor: e.currentTarget });
               }}
             >
@@ -1472,15 +1466,11 @@ export function App() {
                   dndHandlers={dnd.handlers}
                   onOpenTask={(task, el) => openEditor(task, el, 'backlog')}
                   onEstimate={(task, anchor) => {
-                    originatingElement.current = anchor;
-                    originatingTaskId.current = task.id;
-                    originatingSurface.current = 'backlog';
+                    captureTaskOrigin(task.id, anchor, 'backlog');
                     setActiveEstimatePopover({ task, anchor });
                   }}
                   onOpenMenu={(task, anchor) => {
-                    originatingElement.current = anchor;
-                    originatingTaskId.current = task.id;
-                    originatingSurface.current = 'backlog';
+                    captureTaskOrigin(task.id, anchor, 'backlog');
                     setActiveTaskMenu({ task, anchor });
                   }}
                   onToggleComplete={(task) => {
@@ -1721,7 +1711,7 @@ export function App() {
           busy={busy}
           onEdit={(task) => {
             setActiveTaskMenu(null);
-            openEditor(task);
+            openEditor(task, activeTaskMenu.anchor);
           }}
           onMoveToBacklog={(task) => {
             setActiveTaskMenu(null);
