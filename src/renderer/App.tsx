@@ -885,8 +885,10 @@ export function App() {
   }, [view]);
 
   const pendingPaletteRestore = useRef(false);
+  const pendingPaletteAction = useRef<(() => void) | null>(null);
 
   function openCommandPalette(triggerEl?: HTMLElement) {
+    pendingPaletteAction.current = null;
     const trigger =
       triggerEl ??
       (document.activeElement instanceof HTMLElement && document.activeElement !== document.body
@@ -904,6 +906,7 @@ export function App() {
 
   function closeCommandPalette() {
     pendingPaletteRestore.current = true;
+    pendingPaletteAction.current = null;
     setCommandPaletteOpen(false);
   }
 
@@ -913,9 +916,17 @@ export function App() {
   }
 
   useEffect(() => {
-    if (!commandPaletteOpen && pendingPaletteRestore.current) {
-      pendingPaletteRestore.current = false;
-      restoreOriginatingFocus(originatingTaskId.current);
+    if (!commandPaletteOpen) {
+      if (pendingPaletteRestore.current) {
+        pendingPaletteRestore.current = false;
+        restoreOriginatingFocus(originatingTaskId.current);
+      } else if (pendingPaletteAction.current) {
+        const action = pendingPaletteAction.current;
+        pendingPaletteAction.current = null;
+        requestAnimationFrame(() => {
+          action();
+        });
+      }
     }
   }, [commandPaletteOpen]);
 
@@ -1019,6 +1030,7 @@ export function App() {
       category: 'Task',
       title: `Focus on: "${selectedTask.title}"`,
       run: () => {
+        focusExitTriggerRef.current = originatingElement.current ?? null;
         setCommandPaletteOpen(false);
         enterFocusView(selectedTask.id);
       },
@@ -1032,14 +1044,12 @@ export function App() {
       category: 'Navigation',
       title: 'Navigate to Board',
       run: () => {
+        pendingPaletteAction.current = () => {
+          const target = document.querySelector<HTMLElement>('.planning-board');
+          target?.focus({ preventScroll: true });
+        };
         setCommandPaletteOpen(false);
         setView('board');
-        requestAnimationFrame(() => {
-          const target = document.querySelector<HTMLElement>(
-            '.planning-board, .view-switch button[aria-label="Board view"]'
-          );
-          target?.focus({ preventScroll: true });
-        });
       },
     },
     {
@@ -1047,15 +1057,15 @@ export function App() {
       category: 'Navigation',
       title: 'Navigate to Today',
       run: () => {
+        pendingPaletteAction.current = () => {
+          const target = document.querySelector<HTMLElement>(
+            '.view-day .day-heading, .view-day .task-card, .view-day'
+          );
+          target?.focus({ preventScroll: true });
+        };
         setCommandPaletteOpen(false);
         setView('day');
         goToDate();
-        requestAnimationFrame(() => {
-          const target = document.querySelector<HTMLElement>(
-            '.view-day .day-heading, .view-day .task-card, .view-switch button[aria-label="Today view"]'
-          );
-          target?.focus({ preventScroll: true });
-        });
       },
     },
     {
@@ -1063,14 +1073,14 @@ export function App() {
       category: 'Navigation',
       title: 'Navigate to Backlog',
       run: () => {
-        setCommandPaletteOpen(false);
-        setView('backlog');
-        requestAnimationFrame(() => {
+        pendingPaletteAction.current = () => {
           const target = document.querySelector<HTMLElement>(
             '.view-backlog .task-add-bar, .view-backlog'
           );
           target?.focus({ preventScroll: true });
-        });
+        };
+        setCommandPaletteOpen(false);
+        setView('backlog');
       },
     },
     {
@@ -1079,6 +1089,7 @@ export function App() {
       title: 'Navigate to Focus',
       shortcut: 'F',
       run: () => {
+        focusExitTriggerRef.current = originatingElement.current ?? null;
         setCommandPaletteOpen(false);
         enterFocusView();
       },

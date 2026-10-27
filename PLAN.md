@@ -161,6 +161,21 @@ tests passed, while all eight independent probes reproduced findings.
 Application source and existing tests are unchanged by the review; the
 original `ui-phase-4` checkout is restored. Phase 5 has not started.
 
+### UI Phase 4 fix verification — October 27, 2026
+
+Findings R1–R8 from Codex's independent review were resolved:
+- **R1**: Retained planning board DOM hierarchy during Focus mode (`display: none`, `inert`, `aria-hidden`) and restored panned scroll offset and calendar date on exit.
+- **R2**: Synchronized `selectedTaskIdRef` on render and updated shortcut listener dependencies to eliminate stale closures on bare `F`.
+- **R3**: Preserved initiating workspace origin across palette navigation and transferred keyboard focus to the Focus screen primary action button upon entry.
+- **R4**: Set `inert` on the concealed calendar dock during Focus mode to exclude its divider and controls from sequential Tab navigation.
+- **R5**: Deferred focus restoration on keyboard help dialog dismissal until React removes shell `inertness`.
+- **R6**: Guarded palette Enter handler against native button targets to allow normal Enter activation on Close and Clear query buttons.
+- **R7**: Added `event.repeat` guard to CommandPalette window keydown listener to prevent repeated `Cmd+K` from immediately closing the palette.
+- **R8**: Carried task origin element and `'search'` surface ownership through the palette-to-editor handoff to restore focus to Search upon closing the editor.
+
+All eight independent probes from review revision `5ff04a0` were imported into `tests/app/phase4-independent-review.spec.ts` alongside four related regression tests.
+Receipts and details are recorded in [docs/phase4-fix-handoff.md](docs/phase4-fix-handoff.md). Ready for Codex re-review. Phase 5 has not started.
+
 ## Previously recorded release verification
 
 The last completed release verification recorded:
