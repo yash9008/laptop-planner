@@ -87,10 +87,10 @@ This document records the resolution of findings R1–R8 from Codex's independen
 
 ## Hosted Verification Receipts
 
-- **Commit**: `6c59c4a307c91350a41f6f8f7ba79fdfa4ea21c7` (on branch `ui-phase-4`)
+- **Commit**: `99080018799a5a42db5d2b2d3590f7fe1620e42b` (on branch `ui-phase-4`)
 - **Workflow**: `Planner checks` (`.github/workflows/check.yml`) triggered via push
-- **Hosted Run**: [Run 40495050654](https://github.com/yash9008/laptop-planner/actions/runs/40495050654)
-- **Job**: [Full checks on Apple Silicon macOS (ID 122158280126)](https://github.com/yash9008/laptop-planner/actions/runs/40495050654/job/122158280126)
+- **Hosted Run**: [Run 40497127060](https://github.com/yash9008/laptop-planner/actions/runs/40497127060)
+- **Job**: [Full checks on Apple Silicon macOS (ID 122165286408)](https://github.com/yash9008/laptop-planner/actions/runs/40497127060/job/122165286408)
 - **Commands & Counts**:
   - `npm run typecheck`: passed (0 errors)
   - `npm run build`: passed (0 errors)

@@ -174,6 +174,7 @@ Findings R1–R8 from Codex's independent review were resolved:
 - **R8**: Carried task origin element and `'search'` surface ownership through the palette-to-editor handoff to restore focus to Search upon closing the editor.
 
 All eight independent probes from review revision `5ff04a0` were imported into `tests/app/phase4-independent-review.spec.ts` alongside four related regression tests.
+The full check suite passed on the hosted Apple Silicon macOS runner ([run 40497127060](https://github.com/yash9008/laptop-planner/actions/runs/40497127060), job [122165286408](https://github.com/yash9008/laptop-planner/actions/runs/40497127060/job/122165286408)): typecheck (0 errors), build (0 errors), scheduler (78/78 in two time zones), database (63/63), and Electron interaction (114/114 passed, 0 failed).
 Receipts and details are recorded in [docs/phase4-fix-handoff.md](docs/phase4-fix-handoff.md). Ready for Codex re-review. Phase 5 has not started.
 
 ## Previously recorded release verification
