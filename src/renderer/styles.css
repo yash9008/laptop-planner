@@ -316,6 +316,7 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   .filter-segment { transition: background 150ms ease, color 150ms ease; }
   .search-result-item { transition: border-color 150ms ease, background 150ms ease; }
   .rail-button { transition: background 200ms ease, color 200ms ease, opacity 200ms ease; }
+  .nav-item svg { transition: transform 300ms ease-in-out; }
 }
 
 /* A paused session stays reachable without displacing the board's day headings. */
@@ -345,7 +346,15 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 .planning-board .board-column-heading, .planning-board .task-add-bar, .planning-board .task-tools, .planning-board .task-checkbox { cursor: default; }
 @media (prefers-reduced-motion: reduce) {
   .board-task-slot { scroll-behavior: auto; }
-  .rail-button, .filter-segment, .search-result-item { transition: none !important; }
+  button, .task-card, .task-checkbox, .task-tools, .task-add-bar,
+  .toolbar-button, .icon-button, .drag-handle, .menu-item,
+  .filter-segment, .search-result-item, .rail-button, .nav-item, .nav-item svg,
+  .quick-add-container, .task-editor-container, .dropdown-panel,
+  .filter-chooser-popover, .command-palette-dialog, .keyboard-help-dialog,
+  .calendar-dock {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 .settings-form { margin: 20px 0; }
 .settings-form h3, .backup-settings h3 { margin: 0 0 10px; font-size: 15px; }
@@ -1298,6 +1307,8 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   flex-direction: column;
   overflow: hidden;
   color: #dedee5;
+  animation: none;
+  transition: none;
 }
 
 .command-palette-header {
@@ -1430,6 +1441,8 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
   overflow: hidden;
   color: #dedee5;
+  animation: none;
+  transition: none;
 }
 
 .keyboard-help-header {
