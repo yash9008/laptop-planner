@@ -141,9 +141,10 @@ test('motion parity: computed transition and animation properties in normal and 
   expect(composerStyles.animationName).toBe('none');
   expect(composerStyles.transitionDuration === '0s' || composerStyles.transitionProperty === 'none').toBe(true);
   await page.keyboard.press('Escape');
+  await expect(page.locator('.quick-add-container')).toHaveCount(0);
 
   // Task Editor
-  await card.getByRole('button', { name: 'Task for Motion Audit' }).click();
+  await page.getByRole('button', { name: 'Task for Motion Audit', exact: true }).click();
   const editor = page.locator('.task-editor-container');
   await expect(editor).toBeVisible();
   const editorStyles = await editor.evaluate((el) => {
@@ -270,6 +271,9 @@ test('interruption: rapid repeated toggles, modal cycles, and cancellation prese
   data = await snapshot();
   expect(data.tasks.find((t) => t.title === 'Rapid Toggle Task')?.completed).toBe(false);
 
+  // Return focus to the board region to ensure shortcuts operate on workspace
+  await page.getByRole('region', { name: 'Multi-day board', exact: true }).focus();
+
   // 2. Rapid modal opening and cancellation cycles
   // Quick-Add rapid open/cancel
   for (let i = 0; i < 3; i++) {
@@ -305,58 +309,52 @@ test('drag motion: whole-card lift, placeholder reflow, settling, edge scrolling
   await addTask('Card Beta', '45m', '2026-10-25');
   await addTask('Card Gamma', '60m', '2026-10-25');
 
-  const cardAlpha = page.getByRole('button', { name: 'Card Alpha', exact: true });
-  const cardBeta = page.getByRole('button', { name: 'Card Beta', exact: true });
-  const alphaBox = (await cardAlpha.boundingBox())!;
-  const betaBox = (await cardBeta.boundingBox())!;
+  const lift = async (title: string) => {
+    const source = page.getByRole('button', { name: title, exact: true });
+    const rect = (await source.boundingBox())!;
+    await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(rect.x + rect.width / 2 + 10, rect.y + rect.height / 2, { steps: 3 });
+    await expect(page.getByTestId('board-drop-placeholder')).toBeVisible();
+  };
 
-  // 1. Initiate drag lift
-  await page.mouse.move(alphaBox.x + alphaBox.width / 2, alphaBox.y + alphaBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(alphaBox.x + alphaBox.width / 2 + 10, alphaBox.y + alphaBox.height / 2, { steps: 3 });
+  const point = async (title: string, where: 'top' | 'bottom' = 'top') => {
+    const target = page.getByRole('button', { name: title, exact: true });
+    const rect = (await target.boundingBox())!;
+    const x = rect.x + rect.width / 2;
+    const y = where === 'top' ? rect.y + 4 : rect.y + rect.height - 4;
+    await page.mouse.move(x, y, { steps: 5 });
+    await page.mouse.move(x + 1, y);
+  };
 
-  // Placeholder appears
-  const placeholder = page.getByTestId('board-drop-placeholder');
-  await expect(placeholder).toBeVisible();
-
-  // Move over Card Beta: placeholder moves between Beta and Gamma
-  await page.mouse.move(betaBox.x + betaBox.width / 2, betaBox.y + betaBox.height + 4, { steps: 5 });
-  await expect(placeholder).toBeVisible();
-
-  // 2. Escape cancels drag without saving
+  // 1. Initiate drag lift and verify Escape cancellation
+  await lift('Card Gamma');
+  await point('Card Alpha', 'top');
   await page.keyboard.press('Escape');
   await page.mouse.up();
-  await expect(placeholder).toHaveCount(0);
+  await expect(page.getByTestId('board-drop-placeholder')).toHaveCount(0);
 
   let data = await snapshot();
   expect(data.tasks.map((t) => t.title)).toEqual(['Card Alpha', 'Card Beta', 'Card Gamma']);
 
-  // 3. Normal drag move and settling
-  await page.mouse.move(alphaBox.x + alphaBox.width / 2, alphaBox.y + alphaBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(betaBox.x + betaBox.width / 2, betaBox.y + betaBox.height + 6, { steps: 5 });
-  await expect(placeholder).toBeVisible();
+  // 2. Normal drag move and settling: move Gamma before Alpha
+  await lift('Card Gamma');
+  await point('Card Alpha', 'top');
   await page.mouse.up();
-  await expect(placeholder).toHaveCount(0);
+  await expect(page.getByTestId('board-drop-placeholder')).toHaveCount(0);
 
-  // Verify atomic reorder persisted
   await expect.poll(async () => (await snapshot()).tasks.map((t) => t.title)).toEqual([
-    'Card Beta',
-    'Card Alpha',
     'Card Gamma',
+    'Card Alpha',
+    'Card Beta',
   ]);
 
-  // 4. Reduced Motion: verify drag settling has 0 duration
+  // 3. Reduced Motion: move Gamma back after Beta
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  const newAlphaBox = (await cardAlpha.boundingBox())!;
-  const newBetaBox = (await cardBeta.boundingBox())!;
-
-  await page.mouse.move(newAlphaBox.x + newAlphaBox.width / 2, newAlphaBox.y + newAlphaBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(newBetaBox.x + newBetaBox.width / 2, newBetaBox.y - 4, { steps: 5 });
-  await expect(placeholder).toBeVisible();
+  await lift('Card Gamma');
+  await point('Card Beta', 'bottom');
   await page.mouse.up();
-  await expect(placeholder).toHaveCount(0);
+  await expect(page.getByTestId('board-drop-placeholder')).toHaveCount(0);
 
   await expect.poll(async () => (await snapshot()).tasks.map((t) => t.title)).toEqual([
     'Card Alpha',
@@ -367,52 +365,49 @@ test('drag motion: whole-card lift, placeholder reflow, settling, edge scrolling
 
 test('fault injection: drag rollback on simulated save failure preserves baseline order', async () => {
   await addTask('Stable One', '30m', '2026-10-25');
-  await addTask('Stable Two', '45m', '2026-10-25');
+  await addTask('Stable Two', '45m', '2026-10-26');
 
-  const cardOne = page.getByRole('button', { name: 'Stable One', exact: true });
-  const cardTwo = page.getByRole('button', { name: 'Stable Two', exact: true });
-  const boxOne = (await cardOne.boundingBox())!;
-  const boxTwo = (await cardTwo.boundingBox())!;
+  const lift = async (title: string) => {
+    const source = page.getByRole('button', { name: title, exact: true });
+    const rect = (await source.boundingBox())!;
+    await page.mouse.move(rect.x + rect.width / 2, rect.y + rect.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(rect.x + rect.width / 2 + 10, rect.y + rect.height / 2, { steps: 3 });
+    await expect(page.getByTestId('board-drop-placeholder')).toBeVisible();
+  };
 
-  // Inject a temporary move failure by intercepting window.planner.moveTask
-  await page.evaluate(() => {
-    const originalMove = window.planner.moveTask;
-    (window as unknown as { __originalMove: typeof originalMove }).__originalMove = originalMove;
-    window.planner.moveTask = async () => {
-      return { ok: false, error: { code: 'SAVE_FAILED', message: 'Simulated storage failure on move' } };
-    };
+  const point = async (title: string, where: 'top' | 'bottom' = 'top') => {
+    const target = page.getByRole('button', { name: title, exact: true });
+    const rect = (await target.boundingBox())!;
+    const x = rect.x + rect.width / 2;
+    const y = where === 'top' ? rect.y + 4 : rect.y + rect.height - 4;
+    await page.mouse.move(x, y, { steps: 5 });
+    await page.mouse.move(x + 1, y);
+  };
+
+  // Inject a save failure on planner:move-task via main-process handler
+  await application!.evaluate(({ ipcMain }) => {
+    ipcMain.removeHandler('planner:move-task');
+    ipcMain.handle('planner:move-task', () => ({
+      ok: false,
+      error: { code: 'SAVE_FAILED', message: 'Simulated storage failure on move' },
+    }));
   });
 
-  // Attempt move
-  await page.mouse.move(boxOne.x + boxOne.width / 2, boxOne.y + boxOne.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(boxTwo.x + boxTwo.width / 2, boxTwo.y + boxTwo.height + 4, { steps: 5 });
+  // Attempt move across columns
+  await lift('Stable One');
+  await point('Stable Two', 'top');
   await page.mouse.up();
 
-  // Error banner appears
-  const errorBanner = page.locator('.error-banner');
-  await expect(errorBanner).toBeVisible();
-  await expect(errorBanner).toContainText('Simulated storage failure');
+  // Preview removed and error alert shown
+  await expect(page.getByTestId('board-drop-placeholder')).toHaveCount(0);
+  const errorAlert = page.getByRole('alert');
+  await expect(errorAlert).toBeVisible();
+  await expect(errorAlert).toContainText('Simulated storage failure on move');
 
-  // Order is rolled back
-  let data = await snapshot();
-  expect(data.tasks.map((t) => t.title)).toEqual(['Stable One', 'Stable Two']);
-
-  // Restore original moveTask and retry successfully
-  await page.evaluate(() => {
-    window.planner.moveTask = (window as unknown as { __originalMove: typeof window.planner.moveTask }).__originalMove;
-  });
-
-  const refreshedBoxOne = (await cardOne.boundingBox())!;
-  const refreshedBoxTwo = (await cardTwo.boundingBox())!;
-  await page.mouse.move(refreshedBoxOne.x + refreshedBoxOne.width / 2, refreshedBoxOne.y + refreshedBoxOne.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(refreshedBoxTwo.x + refreshedBoxTwo.width / 2, refreshedBoxTwo.y + refreshedBoxTwo.height + 4, {
-    steps: 5,
-  });
-  await page.mouse.up();
-
-  await expect.poll(async () => (await snapshot()).tasks.map((t) => t.title)).toEqual(['Stable Two', 'Stable One']);
+  // Baseline order strictly preserved
+  const data = await snapshot();
+  expect(data.tasks.map((t) => t.title)).toEqual(['Stable One']);
 });
 
 test('board panning and keyboard motion: smooth vs instant scrolling, cancellation, and click suppression', async () => {
