@@ -1248,3 +1248,476 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   background: #26262a;
   color: #ddd;
 }
+
+/* Phase 4: Command Palette, Keyboard Help, Task Selection & Focus Screen */
+
+.task-card.is-selected {
+  outline: 2px solid #a1b9ff;
+  outline-offset: 1px;
+}
+
+.toolbar-palette-trigger {
+  gap: 6px;
+  background: #202022;
+  border-color: #38383e;
+}
+.toolbar-palette-trigger:hover:not(:disabled) {
+  background: #2c2c31;
+}
+.shortcut-kbd {
+  font-size: 10px;
+  background: #2e2e34;
+  border: 1px solid #484852;
+  border-radius: 3px;
+  padding: 1px 4px;
+  color: #a4a4b0;
+  margin-left: 2px;
+}
+
+/* Command Palette */
+.command-palette-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.7);
+  backdrop-filter: blur(2px);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 80px 16px 20px;
+}
+
+.command-palette-dialog {
+  width: min(580px, calc(100vw - 32px));
+  max-height: calc(100vh - 120px);
+  background: #1e1e22;
+  border: 1px solid #38383f;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #dedee5;
+}
+
+.command-palette-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #33333a;
+  background: #232328;
+}
+
+.command-palette-header svg {
+  color: #92929c;
+}
+
+.command-palette-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: #eeeef5;
+  font-size: 14px;
+  outline: none;
+}
+
+.command-palette-input::placeholder {
+  color: #72727e;
+}
+
+.command-palette-results {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 380px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.command-palette-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: #888894;
+  font-size: 13px;
+}
+
+.command-palette-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  user-select: none;
+  background: transparent;
+  color: #d0d0d8;
+}
+
+.command-palette-item.is-selected {
+  background: #33333b;
+  color: #fff;
+}
+
+.command-palette-item.is-disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.command-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.command-item-category {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #7d7d8a;
+  background: #2a2a30;
+  padding: 2px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.command-item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-item-reason {
+  font-size: 11px;
+  color: #a4a4b2;
+  white-space: nowrap;
+}
+
+.command-item-shortcut {
+  font-size: 10px;
+  background: #2b2b32;
+  border: 1px solid #41414c;
+  border-radius: 3px;
+  padding: 2px 5px;
+  color: #9c9ca8;
+  flex-shrink: 0;
+}
+
+/* Keyboard Shortcuts Help Dialog */
+.keyboard-help-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.7);
+  backdrop-filter: blur(2px);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.keyboard-help-dialog {
+  width: min(480px, calc(100vw - 32px));
+  background: #1e1e22;
+  border: 1px solid #38383f;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  color: #dedee5;
+}
+
+.keyboard-help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #33333a;
+}
+
+.keyboard-help-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.keyboard-help-content {
+  padding: 16px 20px 24px;
+}
+
+.keyboard-help-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.keyboard-help-table tr {
+  border-bottom: 1px solid #28282e;
+}
+
+.keyboard-help-table tr:last-child {
+  border-bottom: 0;
+}
+
+.keyboard-help-key {
+  padding: 8px 12px 8px 0;
+  white-space: nowrap;
+  width: 140px;
+}
+
+.keyboard-help-key kbd {
+  font-size: 11px;
+  background: #2b2b32;
+  border: 1px solid #41414c;
+  border-radius: 3px;
+  padding: 2px 6px;
+  color: #b0b0bc;
+}
+
+.keyboard-help-desc {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #bababe;
+}
+
+/* Single-Task Focus Screen */
+.focus-screen {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  background: #141416;
+  color: #dedee5;
+  min-height: 0;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.focus-screen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid #242429;
+  background: #18181c;
+  flex-shrink: 0;
+}
+
+.focus-task-navigation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.focus-task-counter {
+  font-size: 12px;
+  color: #8f8f9c;
+}
+
+.focus-screen-container {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.focus-screen-tags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.focus-date-tag, .focus-project-tag, .focus-deadline-tag, .focus-repeat-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #24242b;
+  color: #a4a4b2;
+}
+
+.focus-deadline-tag.overdue {
+  background: #3c1e1e;
+  color: #e09292;
+}
+
+.focus-screen-title {
+  font-size: 26px;
+  font-weight: 650;
+  letter-spacing: -0.4px;
+  line-height: 1.3;
+  margin: 0;
+  color: #f2f2f8;
+  overflow-wrap: anywhere;
+}
+
+.focus-screen-notes {
+  background: #1c1c20;
+  border: 1px solid #2a2a30;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.focus-notes-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #c4c4ce;
+  white-space: pre-wrap;
+}
+
+.focus-notes-placeholder {
+  margin: 0;
+  font-size: 13px;
+  color: #686874;
+  font-style: italic;
+}
+
+.focus-screen-timer-card {
+  background: #1c201e;
+  border: 1px solid #2c3a32;
+  border-radius: 8px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.focus-screen.is-running .focus-screen-timer-card {
+  border-color: #4a755d;
+  background: #18261e;
+}
+
+.focus-timer-display-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.focus-time-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: #7e9488;
+  margin-bottom: 4px;
+}
+
+.focus-elapsed-value {
+  font-size: 38px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: #e8f5ee;
+}
+
+.focus-planned-value {
+  font-size: 14px;
+  color: #9cb2a6;
+}
+
+.focus-overrun-label {
+  color: #e3bf83;
+  font-weight: 500;
+}
+
+.focus-status-notice, .focus-running-notice {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #9cb0a5;
+  padding: 8px 12px;
+  background: #16221b;
+  border-radius: 4px;
+  border: 1px solid #283a2f;
+}
+
+.focus-screen-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 6px;
+}
+
+.focus-action-btn {
+  padding: 10px 18px;
+  font-size: 13px;
+}
+
+.focus-ineligible-hint {
+  font-size: 12px;
+  color: #dfaa6e;
+  line-height: 1.5;
+}
+
+.focus-screen-error {
+  padding: 12px 16px;
+  background: #3b1f1f;
+  border: 1px solid #5a2e2e;
+  border-radius: 6px;
+  color: #f0a8a8;
+  font-size: 13px;
+}
+
+.focus-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin: auto;
+  padding: 60px 24px;
+  color: #8c8c98;
+}
+
+.focus-empty-state svg {
+  color: #5c5c68;
+  margin-bottom: 16px;
+}
+
+.focus-empty-state h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #d6d6de;
+  margin: 0 0 8px;
+}
+
+.focus-empty-state p {
+  font-size: 13px;
+  margin: 0 0 24px;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.focus-empty-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Focus Calendar Opacity Transition (Loaded declaration from motion-timings) */
+.workspace.focus-view .calendar-dock {
+  opacity: 0;
+  transition: opacity 300ms ease-in;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace.focus-view .calendar-dock {
+    transition: none !important;
+  }
+  .command-palette-dialog, .keyboard-help-dialog {
+    transition: none !important;
+    animation: none !important;
+  }
+}

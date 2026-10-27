@@ -20,8 +20,11 @@ import { FilterChooser } from './components/FilterChooser';
 import { SearchPanel } from './components/SearchPanel';
 import { BacklogPanel } from './components/BacklogPanel';
 import { RecoveryPanel } from './components/RecoveryPanel';
+import { CommandPalette, type CommandItem } from './components/CommandPalette';
+import { KeyboardHelpDialog } from './components/KeyboardHelpDialog';
+import { FocusScreen } from './components/FocusScreen';
 
-type TaskSurface = 'board' | 'search' | 'backlog' | 'recovery' | 'calendar' | 'other';
+type TaskSurface = 'board' | 'search' | 'backlog' | 'recovery' | 'calendar' | 'focus' | 'other';
 
 export function App() {
   const [day, setDay] = useState<PlannerDay | null>(null);
@@ -41,6 +44,14 @@ export function App() {
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [projectEditor, setProjectEditor] = useState<PlannerProject | null | undefined>(undefined);
   const [eventEditor, setEventEditor] = useState<{ event: PlannerEvent | null; minute: number } | null>(null);
+
+  // Command Palette & Keyboard & Focus states
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [keyboardHelpOpen, setKeyboardHelpOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [focusTaskId, setFocusTaskId] = useState<string | null>(null);
+  const previousViewRef = useRef<'board' | 'day' | 'backlog' | 'project'>('board');
+  const focusExitTriggerRef = useRef<HTMLElement | null>(null);
 
   // Drafts & Task UI state
   const [creationDrafts, setCreationDrafts] = useState<Record<string, TaskDraft>>({});
@@ -176,12 +187,31 @@ export function App() {
         : trigger?.closest('[data-testid="backlog-panel"]') ? 'backlog'
         : trigger?.closest('[data-testid="recovery-panel"]') ? 'recovery'
         : trigger?.closest('.calendar-panel') ? 'calendar'
+        : trigger?.closest('.focus-screen') ? 'focus'
         : 'board');
     return originatingSurface.current;
   }
 
   function restoreOriginatingFocus(taskId?: string | null) {
     const surface = originatingSurface.current;
+
+    if (surface === 'focus') {
+      const focusScreen = document.querySelector<HTMLElement>('[data-testid="focus-screen"], .focus-screen');
+      if (focusScreen && focusScreen.isConnected) {
+        const el = originatingElement.current;
+        if (el && el.isConnected && focusScreen.contains(el)) {
+          el.focus({ preventScroll: true });
+          return;
+        }
+        const focusBtn = focusScreen.querySelector<HTMLElement>('button.button, button');
+        if (focusBtn && focusBtn.isConnected) {
+          focusBtn.focus({ preventScroll: true });
+          return;
+        }
+        focusScreen.focus({ preventScroll: true });
+        return;
+      }
+    }
 
     if (surface === 'search') {
       const searchPanel = document.querySelector<HTMLElement>('[data-testid="search-panel"]');
@@ -655,6 +685,9 @@ export function App() {
     }
     const message = await commit(() => window.planner.deleteTask({ id: task.id, viewDate: day.date }));
     if (!message) {
+      if (selectedTaskId === task.id) {
+        setSelectedTaskId(null);
+      }
       setExistingDrafts((prev) => {
         const next = { ...prev };
         delete next[task.id];
@@ -741,29 +774,390 @@ export function App() {
     filterOpen ||
     eventEditor !== null ||
     projectEditor !== undefined ||
-    storageOpen;
+    storageOpen ||
+    commandPaletteOpen ||
+    keyboardHelpOpen;
+
+  useEffect(() => {
+    if (selectedTaskId && day && !day.allTasks.some((t) => t.id === selectedTaskId)) {
+      setSelectedTaskId(null);
+    }
+  }, [day, selectedTaskId]);
+
+  useEffect(() => {
+    if (view === 'focus' && day) {
+      if (focusTaskId && !day.allTasks.some((t) => t.id === focusTaskId)) {
+        const nextIncomplete = day.tasks.find((t) => !t.completed && t.plannedDate === day.today);
+        setFocusTaskId(nextIncomplete?.id ?? day.tasks.find((t) => !t.completed)?.id ?? null);
+      }
+    }
+  }, [view, day, focusTaskId]);
+
+  function enterFocusView(explicitTaskId?: string) {
+    if (view !== 'focus') {
+      previousViewRef.current = view;
+    }
+    focusExitTriggerRef.current = document.activeElement as HTMLElement | null;
+
+    let chosenId: string | null = null;
+    if (explicitTaskId) {
+      chosenId = explicitTaskId;
+    } else if (day?.focus?.taskId) {
+      chosenId = day.focus.taskId;
+    } else if (selectedTaskId && day?.allTasks.some((t) => t.id === selectedTaskId)) {
+      chosenId = selectedTaskId;
+    } else if (day) {
+      const todayIncomplete = day.tasks.find((t) => !t.completed && t.plannedDate === day.today);
+      chosenId = todayIncomplete ? todayIncomplete.id : (day.tasks.find((t) => !t.completed)?.id ?? null);
+    }
+    setFocusTaskId(chosenId);
+    setView('focus');
+  }
+
+  function exitFocusView() {
+    setView(previousViewRef.current || 'board');
+    setTimeout(() => {
+      const trigger = focusExitTriggerRef.current;
+      if (trigger && trigger.isConnected) {
+        trigger.focus({ preventScroll: true });
+      } else {
+        restoreOriginatingFocus();
+      }
+    }, 0);
+  }
+
+  function openCommandPalette(triggerEl?: HTMLElement) {
+    captureTaskOrigin(selectedTaskId, triggerEl);
+    setCommandPaletteOpen(true);
+  }
+
+  function closeCommandPalette() {
+    setCommandPaletteOpen(false);
+    restoreOriginatingFocus(originatingTaskId.current);
+  }
+
+  const selectedTask = selectedTaskId && day ? day.allTasks.find((t) => t.id === selectedTaskId) : null;
+
+  const paletteCommands: CommandItem[] = [];
+
+  if (selectedTask) {
+    paletteCommands.push({
+      id: 'task-edit',
+      category: 'Task',
+      title: `Edit task: "${selectedTask.title}"`,
+      disabled: busy,
+      disabledReason: busy ? 'Save in progress' : undefined,
+      run: () => {
+        setCommandPaletteOpen(false);
+        setTimeout(() => {
+          openEditor(selectedTask);
+        }, 0);
+      },
+    });
+
+    if (day?.focus?.taskId === selectedTask.id && day.focus.running) {
+      paletteCommands.push({
+        id: 'task-pause-focus',
+        category: 'Task',
+        title: `Pause focus: "${selectedTask.title}"`,
+        disabled: busy,
+        disabledReason: busy ? 'Save in progress' : undefined,
+        run: () => {
+          setCommandPaletteOpen(false);
+          void commit(() => window.planner.pauseFocus({ id: selectedTask.id, viewDate: day.date }));
+        },
+      });
+    } else if (day?.focus?.taskId === selectedTask.id) {
+      paletteCommands.push({
+        id: 'task-resume-focus',
+        category: 'Task',
+        title: `Resume focus: "${selectedTask.title}"`,
+        disabled: busy,
+        disabledReason: busy ? 'Save in progress' : undefined,
+        run: () => {
+          setCommandPaletteOpen(false);
+          void commit(() => window.planner.startFocus({ id: selectedTask.id, viewDate: day.date }));
+        },
+      });
+    } else {
+      const canFocus = selectedTask.plannedDate === day?.today && !selectedTask.completed;
+      paletteCommands.push({
+        id: 'task-start-focus',
+        category: 'Task',
+        title: `Start focus: "${selectedTask.title}"`,
+        disabled: busy || !canFocus,
+        disabledReason: busy
+          ? 'Save in progress'
+          : !canFocus
+          ? selectedTask.completed
+            ? 'Completed task cannot be focused'
+            : 'Assign this task to today to focus'
+          : undefined,
+        run: () => {
+          setCommandPaletteOpen(false);
+          if (day) {
+            void commit(() => window.planner.startFocus({ id: selectedTask.id, viewDate: day.date }));
+          }
+        },
+      });
+    }
+
+    paletteCommands.push({
+      id: 'task-complete-toggle',
+      category: 'Task',
+      title: selectedTask.completed ? `Reopen: "${selectedTask.title}"` : `Complete: "${selectedTask.title}"`,
+      disabled: busy,
+      disabledReason: busy ? 'Save in progress' : undefined,
+      run: () => {
+        setCommandPaletteOpen(false);
+        if (day) {
+          void commit(() =>
+            window.planner.setTaskCompleted({
+              id: selectedTask.id,
+              completed: !selectedTask.completed,
+              viewDate: day.date,
+            })
+          );
+        }
+      },
+    });
+
+    paletteCommands.push({
+      id: 'task-focus-view',
+      category: 'Task',
+      title: `Focus on: "${selectedTask.title}"`,
+      run: () => {
+        setCommandPaletteOpen(false);
+        enterFocusView(selectedTask.id);
+      },
+    });
+  }
+
+  // Navigation commands
+  paletteCommands.push(
+    {
+      id: 'nav-board',
+      category: 'Navigation',
+      title: 'Navigate to Board',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setView('board');
+      },
+    },
+    {
+      id: 'nav-today',
+      category: 'Navigation',
+      title: 'Navigate to Today',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setView('day');
+        goToDate();
+      },
+    },
+    {
+      id: 'nav-backlog',
+      category: 'Navigation',
+      title: 'Navigate to Backlog',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setView('backlog');
+      },
+    },
+    {
+      id: 'nav-focus',
+      category: 'Navigation',
+      title: 'Navigate to Focus',
+      shortcut: 'F',
+      run: () => {
+        setCommandPaletteOpen(false);
+        enterFocusView();
+      },
+    }
+  );
+
+  // Actions
+  paletteCommands.push(
+    {
+      id: 'action-add-task',
+      category: 'Actions',
+      title: 'Add task',
+      shortcut: 'A',
+      disabled: !day || busy || loading,
+      disabledReason: busy ? 'Save in progress' : undefined,
+      run: () => {
+        setCommandPaletteOpen(false);
+        setTimeout(() => openNew(), 0);
+      },
+    },
+    {
+      id: 'action-shortcuts',
+      category: 'Actions',
+      title: 'Show keyboard shortcuts',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setTimeout(() => setKeyboardHelpOpen(true), 0);
+      },
+    }
+  );
+
+  // Panels & Calendar
+  paletteCommands.push(
+    {
+      id: 'panel-search',
+      category: 'Panels',
+      title: activeUtilityPanel === 'search' ? 'Close search panel' : 'Open search panel',
+      shortcut: '/',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setActiveUtilityPanel((prev) => (prev === 'search' ? null : 'search'));
+      },
+    },
+    {
+      id: 'panel-backlog',
+      category: 'Panels',
+      title: activeUtilityPanel === 'backlog' ? 'Close backlog panel' : 'Open backlog panel',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setActiveUtilityPanel((prev) => (prev === 'backlog' ? null : 'backlog'));
+      },
+    },
+    {
+      id: 'panel-recovery',
+      category: 'Panels',
+      title: activeUtilityPanel === 'recovery' ? 'Close recovery panel' : 'Open recovery panel',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setActiveUtilityPanel((prev) => (prev === 'recovery' ? null : 'recovery'));
+      },
+    },
+    {
+      id: 'calendar-toggle',
+      category: 'Panels',
+      title: calendarOpen ? 'Hide calendar' : 'Show calendar',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setCalendarOpen(!calendarOpen);
+      },
+    }
+  );
+
+  // Settings
+  paletteCommands.push({
+    id: 'settings-storage',
+    category: 'Settings',
+    title: 'Open storage settings',
+    run: () => {
+      setCommandPaletteOpen(false);
+      setTimeout(() => {
+        setStorageTitle('Local storage');
+        setStorageOpen(true);
+      }, 0);
+    },
+  });
 
   useEffect(() => {
     const shortcuts = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement;
-      if (
-        event.metaKey ||
-        event.ctrlKey ||
-        event.altKey ||
-        isAnyModalActive ||
-        target.closest('input,textarea,select,[contenteditable="true"],dialog,[role="dialog"]') ||
-        busy ||
-        !day
-      )
+      if (event.defaultPrevented || event.isComposing || event.repeat) return;
+      const target = event.target as HTMLElement | null;
+
+      const isCmdK =
+        (event.metaKey || event.ctrlKey) &&
+        !event.altKey &&
+        !event.shiftKey &&
+        event.key.toLowerCase() === 'k';
+
+      if (isCmdK) {
+        if (commandPaletteOpen) {
+          event.preventDefault();
+          closeCommandPalette();
+          return;
+        }
+        if (
+          isAnyModalActive ||
+          busy ||
+          dragging !== null
+        ) {
+          return;
+        }
+        event.preventDefault();
+        openCommandPalette(document.activeElement instanceof HTMLElement ? document.activeElement : undefined);
         return;
-      if (event.key.toLowerCase() === 'a') {
+      }
+
+      if (commandPaletteOpen || keyboardHelpOpen) return;
+
+      if (event.key === 'Escape') {
+        if (
+          activeEditorMode !== null ||
+          activeEstimatePopover !== null ||
+          activeTaskMenu !== null ||
+          filterOpen ||
+          eventEditor !== null ||
+          projectEditor !== undefined ||
+          storageOpen
+        ) {
+          return;
+        }
+        if (view === 'focus') {
+          event.preventDefault();
+          exitFocusView();
+          return;
+        }
+      }
+
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+      if (
+        isAnyModalActive ||
+        busy ||
+        dragging !== null ||
+        !day ||
+        (target && (
+          target.closest('input, textarea, select, [contenteditable="true"], dialog, [role="dialog"]') ||
+          target.isContentEditable
+        ))
+      ) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+      if (key === 'a') {
         event.preventDefault();
         openNew();
+      } else if (key === 'f') {
+        event.preventDefault();
+        enterFocusView();
+      } else if (event.key === '/') {
+        event.preventDefault();
+        setActiveUtilityPanel('search');
+        setTimeout(() => {
+          const input = document.querySelector<HTMLElement>(
+            '[data-testid="search-panel"] input[aria-label="Search all tasks"], [data-testid="search-panel"] input'
+          );
+          input?.focus();
+        }, 0);
       }
     };
     window.addEventListener('keydown', shortcuts);
     return () => window.removeEventListener('keydown', shortcuts);
-  }, [busy, day, view, boardCalendarDate, selectedProjectId, isAnyModalActive]);
+  }, [
+    busy,
+    day,
+    view,
+    boardCalendarDate,
+    selectedProjectId,
+    isAnyModalActive,
+    commandPaletteOpen,
+    keyboardHelpOpen,
+    activeEditorMode,
+    activeEstimatePopover,
+    activeTaskMenu,
+    filterOpen,
+    eventEditor,
+    projectEditor,
+    storageOpen,
+    dragging,
+  ]);
 
   function taskCard(task: PlannerTask, _index: number, board = false) {
     if (!day) return null;
@@ -783,12 +1177,22 @@ export function App() {
       <article
         className={`task-card ${board ? 'board-task' : ''} ${task.completed ? 'completed-task' : ''} ${
           dragging === task.id ? 'is-dragging' : ''
-        } ${focusing ? 'is-focusing' : ''}`}
+        } ${focusing ? 'is-focusing' : ''} ${selectedTaskId === task.id ? 'is-selected' : ''}`}
         key={task.id}
         data-testid={board ? 'board-task' : 'task-card'}
         data-task-id={task.id}
         data-completed={task.completed}
+        aria-selected={selectedTaskId === task.id}
         draggable={board && !busy}
+        onClick={(event) => {
+          const target = event.target as HTMLElement;
+          if (!target.closest('button, input, textarea, select, [role="button"], [role="checkbox"]')) {
+            setSelectedTaskId(task.id);
+          }
+        }}
+        onFocus={() => {
+          setSelectedTaskId(task.id);
+        }}
         onDragOver={(event) => {
           if (!busy && (board || (!task.completed && view === 'day')) && event.dataTransfer.types.includes('text/plain')) {
             event.preventDefault();
@@ -982,7 +1386,13 @@ export function App() {
     );
   }
 
-  const isModalOpen = activeEditorMode !== null;
+  const isModalOpen =
+    activeEditorMode !== null ||
+    commandPaletteOpen ||
+    keyboardHelpOpen ||
+    storageOpen ||
+    eventEditor !== null ||
+    projectEditor !== undefined;
 
   return (
     <>
@@ -1021,11 +1431,8 @@ export function App() {
           <button
             className={`nav-item ${view === 'focus' ? 'active' : ''}`}
             aria-label="Focus view"
-            title="Focus"
-            onClick={() => {
-              setView('focus');
-              goToDate();
-            }}
+            title="Focus · F"
+            onClick={() => enterFocusView()}
             disabled={busy}
           >
             <Icon name="focus" />
@@ -1142,10 +1549,20 @@ export function App() {
       </aside>
 
       {(() => {
-        const isDockOpen = Boolean(activeUtilityPanel || (calendarOpen && day));
+        const isDockOpen = Boolean(activeUtilityPanel || (calendarOpen && day && view !== 'focus'));
+        const currentFocusTask =
+          focusTaskId && day ? day.allTasks.find((t) => t.id === focusTaskId) ?? null : null;
+        const todayIncompleteTasks = day?.tasks.filter((t) => !t.completed) ?? [];
+        const eligibleFocusTasks =
+          currentFocusTask && !todayIncompleteTasks.some((t) => t.id === currentFocusTask.id)
+            ? [currentFocusTask, ...todayIncompleteTasks]
+            : todayIncompleteTasks;
+
         return (
           <div
-            className={`workspace ${isDockOpen ? 'has-calendar' : 'calendar-hidden'}`}
+            className={`workspace ${isDockOpen ? 'has-calendar' : 'calendar-hidden'} ${
+              view === 'focus' ? 'focus-view' : ''
+            }`}
             style={{ '--calendar-width': calendarWidth === null ? undefined : `${calendarWidth}px` } as CSSProperties}
           >
             <header className="workspace-topbar">
@@ -1257,6 +1674,17 @@ export function App() {
                   </button>
                 </div>
                 <button
+                  className="toolbar-button toolbar-palette-trigger"
+                  aria-label="Open command palette"
+                  title="Command palette · ⌘K"
+                  onClick={(e) => openCommandPalette(e.currentTarget)}
+                  disabled={!day || busy}
+                >
+                  <Icon name="search" size={15} />
+                  <span>Commands</span>
+                  <kbd className="shortcut-kbd">⌘K</kbd>
+                </button>
+                <button
                   className="button primary toolbar-add"
                   aria-label="Add task"
                   title="Add task · A"
@@ -1273,7 +1701,7 @@ export function App() {
               {displayDay && (view === 'day' || view === 'board') && <DailyWorkload day={displayDay} />}
             </div>
 
-        {day && (
+        {day && view !== 'focus' && (
           <FocusBar
             day={day}
             busy={busy}
@@ -1290,7 +1718,41 @@ export function App() {
         )}
 
         <div className="workspace-body">
-          <main className={`planner-main view-${view}`}>
+          {view === 'focus' && day ? (
+            <FocusScreen
+              day={day}
+              task={currentFocusTask}
+              busy={busy}
+              error={error}
+              eligibleTasks={eligibleFocusTasks}
+              onSelectTask={(id) => setFocusTaskId(id)}
+              onStart={(id) => {
+                void commit(() => window.planner.startFocus({ id, viewDate: day.date }));
+              }}
+              onPause={(id) => {
+                void commit(() => window.planner.pauseFocus({ id, viewDate: day.date }));
+              }}
+              onComplete={async (id, completed) => {
+                const res = await commit(() =>
+                  window.planner.setTaskCompleted({ id, completed, viewDate: day.date })
+                );
+                if (!res && completed) {
+                  const remaining = day.tasks.filter((t) => !t.completed && t.id !== id);
+                  if (remaining.length > 0 && remaining[0]) {
+                    setFocusTaskId(remaining[0].id);
+                  } else {
+                    setFocusTaskId(null);
+                  }
+                }
+              }}
+              onEdit={(task, el) => {
+                openEditor(task, el, 'focus');
+              }}
+              onExit={exitFocusView}
+              onAddTask={() => openNew(day.today)}
+            />
+          ) : (
+            <main className={`planner-main view-${view}`}>
             {error && (
               <div className="error-banner" role="alert">
                 <div>
@@ -1457,6 +1919,7 @@ export function App() {
               </>
             )}
           </main>
+        )}
           {isDockOpen && (
             <CalendarDock width={calendarWidth} onResize={setCalendarWidth}>
               {activeUtilityPanel === 'backlog' ? (
@@ -1597,11 +2060,8 @@ export function App() {
             <button
               className={`rail-button ${view === 'focus' ? 'active' : ''}`}
               aria-label="Open focus view"
-              title="Focus"
-              onClick={() => {
-                setView('focus');
-                goToDate();
-              }}
+              title="Focus · F"
+              onClick={() => enterFocusView()}
             >
               <Icon name="focus" size={20} />
             </button>
@@ -1784,6 +2244,20 @@ export function App() {
           </button>
         </div>
       )}
+
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={closeCommandPalette}
+        commands={paletteCommands}
+      />
+
+      <KeyboardHelpDialog
+        isOpen={keyboardHelpOpen}
+        onClose={() => {
+          setKeyboardHelpOpen(false);
+          restoreOriginatingFocus();
+        }}
+      />
     </>
   );
 }
