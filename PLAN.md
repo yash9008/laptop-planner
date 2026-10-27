@@ -29,7 +29,7 @@ This sequence follows the user's request to make the app feel closer to Sunsama,
 | 1 — Board and calendar workspace | Complete; awaiting user review | Neutral surfaces, quieter toolbar/sidebar, clearer task cards and current-day headings, workload totals above the board/day list, and a resizable calendar with keyboard controls and a remembered width |
 | 2 — Task editing and quick actions | Complete; R1–R8 independently rechecked; ready for Phase 3 | Quick-add composer, centered task detail editor, estimate popover and task menu; verified 50 ms checkbox and 200 ms card/control feedback, with component-specific motion evidence; preserve drafts and failed-save recovery |
 | 3 — Finding and organizing work | Complete; known R1–R8 findings resolved; ready for UI Phase 4 | Project/status filters, global search and backlog/search/recovery side panels; verified navigation opacity/icon feedback, plus trigger verification before adopting the 300 ms layout-margin rule; preserve date/scroll continuity |
-| 4 — Keyboard navigation and focused work | Implemented; independent review found acceptance gaps; fixes required | Command palette, shortcuts and a true single-task Focus screen; verify actual Focus/palette transitions, including the loaded 300 ms Focus-calendar opacity rule, with the existing elapsed-time timer |
+| 4 — Keyboard navigation and focused work | Complete; known R1–R11 regression paths pass; ready for UI Phase 5 | Command palette, shortcuts and a true single-task Focus screen; retain workspace and keyboard ownership, with full reference motion acceptance reserved for Phase 5 |
 | 5 — Motion parity acceptance | Planned | Compare motion against controlled reference evidence; test normal/reduced motion, enter/exit, delays, interruption/reversal, cancellation, errors, focus, narrow windows and drag behavior; distinguish CSS definitions from observed elapsed spans and report unmatched effects |
 
 **Before UI Phase 2:** the user requested an interaction/animation audit. [The audit](docs/interaction-audit.md) distinguishes live controls, the earlier board recording, older public walkthrough frames and unmeasured motion. The earlier task-drawer proposal is not established as Sunsama's current editor. The revised recommendation above is proposed scope: verify the editor presentation and specify quick-add, popup, dismissal, focus and interrupted-transition behavior before implementation. No Phase 2 code was added during the audit.
@@ -197,6 +197,27 @@ native-menu sleep/resume test, whose cause remains unresolved. The new
 Search/paused-timer continuity case passed. Application source and existing
 tests are unchanged by the review, and the `ui-phase-4` checkout is restored.
 Phase 5 has not started.
+
+### UI Phase 4 final fixes and verification — October 27, 2026
+
+[Final verification](docs/phase4-final-verification.md): known R1–R11 paths
+pass. Today/Backlog palette navigation focuses a usable control; Focus captures
+the actual entry origin and retains it across editor handoffs; the actual
+board subtree remains mounted, with hidden measurement suppressed. Horizontal
+and vertical scrolling, date, and board DOM identity survive Focus cycles.
+
+Source/test commit `d0f55c3` passed the exact push-triggered
+[full hosted run](https://github.com/yash9008/laptop-planner/actions/runs/40500807107):
+type-check/build, scheduler **78/78 in each time zone**, database **63/63**,
+Electron **122/122**. The native-menu sleep/restart case and a new five-cycle
+sleep/wake/native-resume case pass after observing committed resume before
+advancing the controlled clock. Production timer semantics are unchanged;
+the prior failure's root cause is not retrospectively claimed as proven.
+
+The user requested the fixes and a Gemini Phase 5 prompt. The prompt is
+[docs/phase5-gemini-implementation-prompt.md](docs/phase5-gemini-implementation-prompt.md).
+UI Phase 5 implementation and full reference motion acceptance have not
+started. No local GUI or packaged verification was run.
 
 ## Previously recorded release verification
 

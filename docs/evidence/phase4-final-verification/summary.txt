@@ -1,0 +1,36 @@
+2026-10-27T12:03:52.2841210Z ℹ tests 78
+2026-10-27T12:03:52.2842830Z ℹ pass 78
+2026-10-27T12:03:52.2843360Z ℹ fail 0
+2026-10-27T12:03:52.7320000Z ℹ tests 78
+2026-10-27T12:03:52.7320370Z ℹ pass 78
+2026-10-27T12:03:52.7320540Z ℹ fail 0
+2026-10-27T12:03:58.3274440Z ℹ tests 63
+2026-10-27T12:03:58.3286640Z ℹ pass 63
+2026-10-27T12:03:58.3402990Z ℹ fail 0
+2026-10-27T12:05:00.2048330Z   ✓   11 tests/app/menu-bar.spec.ts:47:1 › native timer updates in background; native menu pauses, resumes and reopens the planner (5.7s)
+2026-10-27T12:05:06.0037060Z   ✓   12 tests/app/menu-bar.spec.ts:60:1 › switching and editing focus updates the native menu; deleting the task removes it (5.8s)
+2026-10-27T12:05:12.8885200Z   ✓   13 tests/app/menu-bar.spec.ts:67:1 › sleep and clean restart keep a paused menu timer and exclude closed time (6.9s)
+2026-10-27T12:05:20.5253680Z   ✓   14 tests/app/menu-bar.spec.ts:82:1 › repeated sleep and explicit native resume preserve only the committed running intervals (7.6s)
+2026-10-27T12:05:25.8464380Z   ✓   15 tests/app/menu-bar.spec.ts:106:1 › menu timer retains the active task across midnight (5.3s)
+2026-10-27T12:05:28.5483120Z   ✓   16 tests/app/menu-bar.spec.ts:112:1 › failed native pause reports the error and keeps the saved running state (2.7s)
+2026-10-27T12:07:39.6177170Z   ✓   62 tests/app/phase4-fix-review.spec.ts:55:1 › fix review: Navigate to Today transfers focus to a usable destination (2.8s)
+2026-10-27T12:07:42.0000080Z   ✓   63 tests/app/phase4-fix-review.spec.ts:65:1 › fix review: Navigate to Backlog transfers focus to a usable destination (2.4s)
+2026-10-27T12:07:44.2194380Z   ✓   64 tests/app/phase4-fix-review.spec.ts:74:1 › fix review: direct Focus entry restores its actual trigger after an unrelated palette invocation (2.2s)
+2026-10-27T12:07:45.9186120Z PHASE4_VERTICAL_SCROLL { before: 300, after: 300 }
+2026-10-27T12:07:46.7658890Z   ✓   65 tests/app/phase4-fix-review.spec.ts:88:1 › fix review: Focus round trip preserves vertical task-list scroll in a board column (2.5s)
+2026-10-27T12:07:49.1994190Z   ✓   66 tests/app/phase4-fix-review.spec.ts:116:1 › fix review: Search state and persisted paused timer survive a Focus round trip (2.4s)
+2026-10-27T12:07:51.5976840Z   ✓   67 tests/app/phase4-fix-review.spec.ts:143:1 › Focus retains the actual board DOM through repeated entry and exit (2.4s)
+2026-10-27T12:07:54.1672870Z   ✓   68 tests/app/phase4-fix-review.spec.ts:162:1 › Focus preserves its Search entry owner through editing away the invoking result (2.6s)
+2026-10-27T12:07:56.7586790Z   ✓   69 tests/app/phase4-independent-review.spec.ts:55:1 › independent phase4: Focus exit preserves a panned board and selected calendar date (2.6s)
+2026-10-27T12:07:58.8466420Z   ✓   70 tests/app/phase4-independent-review.spec.ts:71:1 › independent phase4: bare F uses the latest explicitly selected task (2.1s)
+2026-10-27T12:08:01.6771140Z   ✓   71 tests/app/phase4-independent-review.spec.ts:81:1 › independent phase4: palette navigation transfers keyboard focus into Focus (2.8s)
+2026-10-27T12:08:04.3755300Z   ✓   72 tests/app/phase4-independent-review.spec.ts:90:1 › independent phase4: invisible Focus dock is excluded from sequential keyboard navigation (2.7s)
+2026-10-27T12:08:06.4372640Z   ✓   73 tests/app/phase4-independent-review.spec.ts:102:1 › independent phase4: help dismissal restores the palette initiating control (2.0s)
+2026-10-27T12:08:08.0585750Z   ✓   74 tests/app/phase4-independent-review.spec.ts:113:1 › independent phase4: Enter on the palette close control does not execute Add task (1.6s)
+2026-10-27T12:08:09.6602020Z   ✓   75 tests/app/phase4-independent-review.spec.ts:124:1 › independent phase4: repeated Cmd K does not dismiss the palette (1.6s)
+2026-10-27T12:08:12.3012920Z   ✓   76 tests/app/phase4-independent-review.spec.ts:130:1 › independent phase4: palette to Search task editor preserves Search focus ownership (2.6s)
+2026-10-27T12:08:14.4944670Z   ✓   77 tests/app/phase4-independent-review.spec.ts:147:1 › related phase4: palette navigation transfers keyboard focus to Board (2.2s)
+2026-10-27T12:08:16.0788590Z   ✓   78 tests/app/phase4-independent-review.spec.ts:155:1 › related phase4: Enter on Clear query button does not execute selected command (1.6s)
+2026-10-27T12:08:17.7787920Z   ✓   79 tests/app/phase4-independent-review.spec.ts:164:1 › related phase4: Focus exit via Escape preserves panned board scroll and selected date (1.7s)
+2026-10-27T12:08:20.9432820Z   ✓   80 tests/app/phase4-independent-review.spec.ts:178:1 › related phase4: palette to Backlog task editor preserves Backlog focus ownership (3.2s)
+2026-10-27T12:10:53.6240750Z   122 passed (6.9m)
