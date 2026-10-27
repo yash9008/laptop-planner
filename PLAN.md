@@ -28,8 +28,8 @@ This sequence follows the user's request to make the app feel closer to Sunsama,
 | --- | --- | --- |
 | 1 — Board and calendar workspace | Complete; awaiting user review | Neutral surfaces, quieter toolbar/sidebar, clearer task cards and current-day headings, workload totals above the board/day list, and a resizable calendar with keyboard controls and a remembered width |
 | 2 — Task editing and quick actions | Complete; R1–R8 independently rechecked; ready for Phase 3 | Quick-add composer, centered task detail editor, estimate popover and task menu; verified 50 ms checkbox and 200 ms card/control feedback, with component-specific motion evidence; preserve drafts and failed-save recovery |
-| 3 — Finding and organizing work | R1–R5 rechecked; R6–R8 focus fixes still required | Project/status filters, global search and backlog/search/recovery side panels; verified navigation opacity/icon feedback, plus trigger verification before adopting the 300 ms layout-margin rule; preserve date/scroll continuity |
-| 4 — Keyboard navigation and focused work | Planned | Command palette, shortcuts and a true single-task Focus screen; verify actual Focus/palette transitions, including the loaded 300 ms Focus-calendar opacity rule, with the existing elapsed-time timer |
+| 3 — Finding and organizing work | Complete; known R1–R8 findings resolved; ready for UI Phase 4 | Project/status filters, global search and backlog/search/recovery side panels; verified navigation opacity/icon feedback, plus trigger verification before adopting the 300 ms layout-margin rule; preserve date/scroll continuity |
+| 4 — Keyboard navigation and focused work | Prompt prepared for Gemini; implementation not started | Command palette, shortcuts and a true single-task Focus screen; verify actual Focus/palette transitions, including the loaded 300 ms Focus-calendar opacity rule, with the existing elapsed-time timer |
 | 5 — Motion parity acceptance | Planned | Compare motion against controlled reference evidence; test normal/reduced motion, enter/exit, delays, interruption/reversal, cancellation, errors, focus, narrow windows and drag behavior; distinguish CSS definitions from observed elapsed spans and report unmatched effects |
 
 **Before UI Phase 2:** the user requested an interaction/animation audit. [The audit](docs/interaction-audit.md) distinguishes live controls, the earlier board recording, older public walkthrough frames and unmeasured motion. The earlier task-drawer proposal is not established as Sunsama's current editor. The revised recommendation above is proposed scope: verify the editor presentation and specify quick-add, popup, dismissal, focus and interrupted-transition behavior before implementation. No Phase 2 code was added during the audit.
@@ -110,6 +110,21 @@ through its title leaves focus on BODY, and the menu route focuses the board.
 The independent full suite reported 89 passed and 3 failed. Phase 3 remains
 unaccepted pending these focus fixes and hosted re-verification. Application
 code was not changed by the review; Phase 4 has not been started.
+
+### UI Phase 3 final verification — October 27, 2026
+
+At the user's request, R6–R8 were fixed using shared task-origin capture,
+an actual empty-Backlog focus fallback, and explicit menu-anchor handoff.
+The [final verification](docs/phase3-final-review.md) records source `f61a836`
+and its successful full hosted run: 95 Electron tests, 63 database tests,
+and 78 scheduler tests in each of two time zones, plus type-check/build.
+All known R1–R8 findings are resolved. The original three failing probes
+are preserved unchanged and now pass alongside three added action/entry-point
+regressions. GUI execution remained hosted; no personal data was used.
+
+Phase 3 is ready to proceed. The user requested the
+[UI Phase 4 implementation prompt](docs/phase4-gemini-implementation-prompt.md)
+for Gemini. Phase 4 code and UI Phase 5 motion acceptance have not started.
 
 ## Previously recorded release verification
 

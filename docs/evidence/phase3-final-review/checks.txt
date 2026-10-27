@@ -1,0 +1,28 @@
+2026-10-27T08:21:29.4732970Z ℹ tests 78
+2026-10-27T08:21:29.4734580Z ℹ pass 78
+2026-10-27T08:21:29.4735230Z ℹ fail 0
+2026-10-27T08:21:29.7149520Z ℹ tests 78
+2026-10-27T08:21:29.7154570Z ℹ pass 78
+2026-10-27T08:21:29.7154890Z ℹ fail 0
+2026-10-27T08:21:31.8916640Z ℹ tests 63
+2026-10-27T08:21:31.8917440Z ℹ pass 63
+2026-10-27T08:21:31.8918710Z ℹ fail 0
+2026-10-27T08:24:03.4779750Z   ✓  34 tests/app/phase3-fix-review.spec.ts:48:1 › re-review: quick-add returns focus to its own trigger after editing a search result (3.7s)
+2026-10-27T08:24:07.2881450Z   ✓  35 tests/app/phase3-fix-review.spec.ts:70:3 › re-review: scheduling the last Backlog task preserves panel focus (title) (3.8s)
+2026-10-27T08:24:11.6719020Z   ✓  36 tests/app/phase3-fix-review.spec.ts:70:3 › re-review: scheduling the last Backlog task preserves panel focus (menu) (4.3s)
+2026-10-27T08:24:15.1946470Z   ✓  37 tests/app/phase3-fix-review.spec.ts:92:3 › regression: board estimate restores its trigger after Search editing (3.4s)
+2026-10-27T08:24:18.6167100Z   ✓  38 tests/app/phase3-fix-review.spec.ts:92:3 › regression: board menu restores its trigger after Search editing (3.4s)
+2026-10-27T08:24:22.1280070Z   ✓  39 tests/app/phase3-fix-review.spec.ts:117:1 › regression: Backlog quick-add and menu editing each retain their own trigger (3.5s)
+2026-10-27T08:24:24.8466780Z   ✓  40 tests/app/phase3-independent-review.spec.ts:48:1 › independent: a renamed search result that leaves the query restores focus inside Search (2.6s)
+2026-10-27T08:24:28.0451860Z   ✓  41 tests/app/phase3-independent-review.spec.ts:64:1 › independent: backlog panel native drop honors the hovered insertion point (3.2s)
+2026-10-27T08:24:31.8576000Z   ✓  42 tests/app/phase3-independent-review.spec.ts:86:1 › independent: status filtering keeps the underlying completion summary (3.8s)
+2026-10-27T08:24:34.6697340Z   ✓  43 tests/app/phase3-independent-review.spec.ts:102:1 › independent: reduced motion disables the new rail, filter, and search transitions (2.8s)
+2026-10-27T08:24:37.1880400Z   ✓  44 tests/app/phase3-independent-review.spec.ts:118:1 › independent: closing Search returns keyboard focus to its rail trigger (2.5s)
+2026-10-27T08:24:40.5294990Z   ✓  45 tests/app/phase3-independent-review.spec.ts:127:1 › independent: a failed search edit retains the draft and can be retried (3.3s)
+2026-10-27T08:24:44.2656160Z   ✓  46 tests/app/phase3-independent-review.spec.ts:156:1 › independent: Recovery and storage remain reachable with no day snapshot (3.7s)
+2026-10-27T08:24:47.7294230Z   ✓  47 tests/app/phase3-independent-review.spec.ts:170:1 › independent: panel switching preserves a hidden calendar and panned board (3.4s)
+2026-10-27T08:24:51.7424010Z   ✓  48 tests/app/phase3-independent-review.spec.ts:191:1 › independent: closing Backlog and Recovery panels restores focus to their respective rail triggers (4.0s)
+2026-10-27T08:24:55.1712080Z   ✓  49 tests/app/phase3-independent-review.spec.ts:207:1 › independent: search focus falls back to remaining search result when an edit removes a match (3.4s)
+2026-10-27T08:24:58.0132690Z   ✓  50 tests/app/phase3-independent-review.spec.ts:228:1 › independent: backlog panel drag cancellation via Escape restores original state without moving (2.8s)
+2026-10-27T08:25:01.5618280Z   ✓  51 tests/app/phase3-independent-review.spec.ts:254:1 › independent: panel-source insertion rolls back gracefully on simulated move failure (3.5s)
+2026-10-27T08:28:05.7072760Z   95 passed (6.5m)

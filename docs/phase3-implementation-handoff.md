@@ -1,5 +1,21 @@
 # UI Phase 3 implementation handoff — Finding and organizing work
 
+**Latest completion record — October 27, 2026:** all known R1–R8 findings are
+resolved. The [final verification](phase3-final-review.md) records source
+`f61a836d0ea8e3e7cc9baa99de5ece1add77a33c` and the successful
+[full hosted check](https://github.com/yash9008/laptop-planner/actions/runs/40472880141):
+95 UI tests, 63 database tests, and 78 scheduler tests in each of two time
+zones, plus type-check/build. The verification tables below retain the
+earlier implementation-stage 89-test results.
+
+R6–R8 follow-up uses one `captureTaskOrigin` path for current trigger, task ID,
+and surface. Quick-add and standalone board actions no longer inherit Search
+ownership; empty Backlog focus targets its actual Close button; menu editing
+carries its original anchor. The three unchanged failure reproductions and
+three additional quick-action/entry-point regressions all pass. Historical
+review evidence remains immutable. Phase 4 has a separate prompt and has not
+been implemented by this follow-up.
+
 ## State and ownership table
 
 The following table establishes explicit state ownership across the renderer lifecycle, non-modal utility panels, anchored filter chooser, and modal task overlays.

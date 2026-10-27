@@ -1,0 +1,39 @@
+{
+  "branch": "ui-phase-3",
+  "source_commit": "f61a836d0ea8e3e7cc9baa99de5ece1add77a33c",
+  "run": "https://github.com/yash9008/laptop-planner/actions/runs/40472880141",
+  "status": "completed",
+  "conclusion": "success",
+  "job": "Full checks on Apple Silicon macOS",
+  "job_id": 122083960473,
+  "typecheck": "pass",
+  "build": "pass",
+  "scheduler": {
+    "Asia/Kolkata": 78,
+    "America/Los_Angeles": 78
+  },
+  "database": {
+    "passed": 63,
+    "failed": 0
+  },
+  "electron": {
+    "passed": 95,
+    "failed": 0
+  },
+  "original_R6_R8_probes_preserved": true,
+  "task_focus_regressions": {
+    "passed": 6,
+    "failed": 0
+  },
+  "local_commands": [
+    "npm run typecheck",
+    "npm run build"
+  ],
+  "hosted_commands": [
+    "npm ci",
+    "npm run check"
+  ],
+  "local_gui_execution": false,
+  "personal_database_used": false,
+  "raw_log_sha256": "9332d6267b00c5d9f4d2172d788ef31ec2b921aa23fc798fc1d3049829546174"
+}
