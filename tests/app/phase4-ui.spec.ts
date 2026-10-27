@@ -324,12 +324,17 @@ test('focus screen: single-task presentation, empty state, task navigation, expl
   await expect(focusScreen).toHaveCount(0);
 
   // 6. Ineligible task test: task in backlog
-  const backlogTask = await addTask('Backlog Ineligible', '30m', null);
+  await addTask('Backlog Ineligible', '30m', null);
   await page.getByRole('button', { name: 'Open backlog panel', exact: true }).click();
-  const backlogCard = page.locator(`[data-testid="backlog-panel"] [data-task-id="${backlogTask.id}"] .task-title`);
-  await expect(backlogCard).toBeVisible();
-  await backlogCard.click();
+  const backlogPanel = page.getByTestId('backlog-panel');
+  await expect(backlogPanel).toBeVisible();
+  const backlogBtn = backlogPanel.getByRole('button', { name: 'Backlog Ineligible', exact: true });
+  await expect(backlogBtn).toBeVisible();
+  await backlogBtn.click();
+  const editor = page.getByRole('dialog', { name: 'Edit task', exact: true });
+  await expect(editor).toBeVisible();
   await page.keyboard.press('Escape'); // close editor
+  await expect(editor).toHaveCount(0);
   await page.keyboard.press('Meta+k');
   const palette = page.getByRole('dialog', { name: 'Command palette', exact: true });
   await expect(palette).toBeVisible();
@@ -409,16 +414,8 @@ test('motion: computed styles under normal and reduced motion for palette and fo
   const focusScreen = page.getByTestId('focus-screen');
   await expect(focusScreen).toBeVisible();
 
-  const calendarDockComputed = await page.locator('.calendar-dock').evaluate((el) => {
-    const style = getComputedStyle(el);
-    return {
-      opacity: style.opacity,
-      transitionDuration: style.transitionDuration,
-      transitionProperty: style.transitionProperty,
-    };
-  });
-  expect(calendarDockComputed.opacity).toBe('0');
-  expect(calendarDockComputed.transitionDuration).toBe('0.3s');
+  await expect(page.locator('.calendar-dock')).toHaveCSS('opacity', '0');
+  await expect(page.locator('.calendar-dock')).toHaveCSS('transition-duration', '0.3s');
 
   await page.keyboard.press('Escape');
 
