@@ -177,6 +177,27 @@ All eight independent probes from review revision `5ff04a0` were imported into `
 The full check suite passed on the hosted Apple Silicon macOS runner ([run 40497127060](https://github.com/yash9008/laptop-planner/actions/runs/40497127060), job [122165286408](https://github.com/yash9008/laptop-planner/actions/runs/40497127060/job/122165286408)): typecheck (0 errors), build (0 errors), scheduler (78/78 in two time zones), database (63/63), and Electron interaction (114/114 passed, 0 failed).
 Receipts and details are recorded in [docs/phase4-fix-handoff.md](docs/phase4-fix-handoff.md). Ready for Codex re-review. Phase 5 has not started.
 
+### UI Phase 4 independent fix review — October 27, 2026
+
+[Fix review](docs/phase4-fix-review.md): **needs fixes before acceptance**.
+All eight original probes pass unchanged, but four new probes reproduce
+three remaining gaps: Today/Backlog palette navigation leaves focus on BODY
+(R9), direct Focus entry reuses a stale opener (R10), and Focus exit loses
+vertical board-column scrolling (R11). The actual PlanningBoard still
+unmounts; only its outer main element is retained.
+
+The exact submitted head `9e1ea8f` passed its separate
+[full run](https://github.com/yash9008/laptop-planner/actions/runs/40498134033)
+with 114 Electron tests. The independent
+[full run](https://github.com/yash9008/laptop-planner/actions/runs/40498584153)
+on review commit `08ac98b` passed type-check/build, scheduler 78/78 in each
+time zone, and database 63/63; Electron reported **114 passed, 5 failed**.
+Four failures are the new reproduction cases; the fifth is an existing
+native-menu sleep/resume test, whose cause remains unresolved. The new
+Search/paused-timer continuity case passed. Application source and existing
+tests are unchanged by the review, and the `ui-phase-4` checkout is restored.
+Phase 5 has not started.
+
 ## Previously recorded release verification
 
 The last completed release verification recorded:

@@ -1,0 +1,152 @@
+2026-10-27T11:49:48.7095560Z PHASE4_REVIEW_FOCUS {
+2026-10-27T11:49:48.7096620Z   tag: 'BODY',
+2026-10-27T11:49:48.7096900Z   label: null,
+2026-10-27T11:49:48.7097190Z   text: '\n' +
+2026-10-27T11:49:48.7097690Z     '    Laptop PlannerHomeTodayFocusYOUR PLANNINGBacklogPROJECTSAdd projectSettingsLocal storageOnly on',
+2026-10-27T11:49:48.7098480Z   inFocus: false,
+2026-10-27T11:49:48.7098680Z   inSearch: false,
+2026-10-27T11:49:48.7099020Z   inDock: false
+2026-10-27T11:49:48.7099300Z }
+2026-10-27T11:50:01.4141810Z PHASE4_REVIEW_FOCUS {
+2026-10-27T11:50:01.4142270Z   tag: 'BODY',
+2026-10-27T11:50:01.4142520Z   label: null,
+2026-10-27T11:50:01.4142710Z   text: '\n' +
+2026-10-27T11:50:01.4143380Z     '    Laptop PlannerHomeTodayFocusYOUR PLANNINGBacklogPROJECTSAdd projectSettingsLocal storageOnly on',
+2026-10-27T11:50:01.4144040Z   inFocus: false,
+2026-10-27T11:50:01.4144240Z   inSearch: false,
+2026-10-27T11:50:01.4144850Z   inDock: false
+2026-10-27T11:50:01.4145340Z }
+2026-10-27T11:50:14.0485980Z PHASE4_REVIEW_FOCUS {
+2026-10-27T11:50:14.0486630Z   tag: 'BUTTON',
+2026-10-27T11:50:14.0486930Z   label: 'Open command palette',
+2026-10-27T11:50:14.0499200Z   text: 'Commands⌘K',
+2026-10-27T11:50:14.0499430Z   inFocus: false,
+2026-10-27T11:50:14.0499690Z   inSearch: false,
+2026-10-27T11:50:14.0499950Z   inDock: false
+2026-10-27T11:50:14.0500260Z }
+2026-10-27T11:50:16.3325480Z PHASE4_VERTICAL_SCROLL { before: 300, after: 0 }
+2026-10-27T11:50:16.3404720Z PHASE4_REVIEW_FOCUS {
+2026-10-27T11:50:16.3405160Z   tag: 'BODY',
+2026-10-27T11:50:16.3405760Z   label: null,
+2026-10-27T11:50:16.3406080Z   text: '\n' +
+2026-10-27T11:50:16.3419500Z     '    Laptop PlannerHomeTodayFocusYOUR PLANNINGBacklogPROJECTSAdd projectSettingsLocal storageOnly on',
+2026-10-27T11:50:16.3420360Z   inFocus: false,
+2026-10-27T11:50:16.3420670Z   inSearch: false,
+2026-10-27T11:50:16.3420960Z   inDock: false
+2026-10-27T11:50:16.3421280Z }
+2026-10-27T11:52:55.8877990Z       112 |   console.log('PHASE4_VERTICAL_SCROLL', { before, after });
+2026-10-27T11:52:55.8814920Z   1) tests/app/menu-bar.spec.ts:54:1 › sleep and clean restart keep a paused menu timer and exclude closed time 
+2026-10-27T11:52:55.8815770Z 
+2026-10-27T11:52:55.8816150Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T11:52:55.8816450Z 
+2026-10-27T11:52:55.8816570Z     Expected: "00:10"
+2026-10-27T11:52:55.8817050Z     Received: "Ⅱ 00:06"
+2026-10-27T11:52:55.8817270Z 
+2026-10-27T11:52:55.8817410Z     Call Log:
+2026-10-27T11:52:55.8817710Z     - Timeout 10000ms exceeded while waiting on the predicate
+2026-10-27T11:52:55.8818280Z 
+2026-10-27T11:52:55.8819240Z       56 |   await app.evaluate(({powerMonitor})=>powerMonitor.emit('suspend'));await expect.poll(title).toBe('Ⅱ 00:06');await expect.poll(()=>menuLabel('focus-state')).toBe('Paused for sleep');
+2026-10-27T11:52:55.8820440Z       57 |   await advance(3600000);await app.evaluate(({powerMonitor})=>powerMonitor.emit('resume'));expect(await title()).toBe('Ⅱ 00:06');
+2026-10-27T11:52:55.8821350Z     > 58 |   await clickMenu('focus-toggle');await advance(4000);await expect.poll(title).toBe('00:10');
+2026-10-27T11:52:55.8822020Z          |                                                                                ^
+2026-10-27T11:52:55.8822830Z       59 |   await app.close();clock+=3600000;await launch();await expect.poll(title).toBe('Ⅱ 00:10');
+2026-10-27T11:52:55.8823580Z       60 |   await expect(page.getByRole('button',{name:'Resume focus',exact:true})).toBeEnabled();
+2026-10-27T11:52:55.8824010Z       61 | });
+2026-10-27T11:52:55.8824460Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/menu-bar.spec.ts:58:80
+2026-10-27T11:52:55.8824890Z 
+2026-10-27T11:52:55.8825540Z     Error Context: test-results/menu-bar-sleep-and-clean-r-c7080-mer-and-exclude-closed-time/error-context.md
+2026-10-27T11:52:55.8826050Z 
+2026-10-27T11:52:55.8826710Z   2) tests/app/phase4-fix-review.spec.ts:55:1 › fix review: Navigate to Today transfers focus to a usable destination 
+2026-10-27T11:52:55.8828270Z 
+2026-10-27T11:52:55.8828580Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T11:52:55.8828910Z 
+2026-10-27T11:52:55.8829090Z     Expected: true
+2026-10-27T11:52:55.8829440Z     Received: false
+2026-10-27T11:52:55.8829660Z 
+2026-10-27T11:52:55.8829740Z     Call Log:
+2026-10-27T11:52:55.8830180Z     - Timeout 10000ms exceeded while waiting on the predicate
+2026-10-27T11:52:55.8830480Z 
+2026-10-27T11:52:55.8830670Z       60 |   await expect(main).toBeVisible();
+2026-10-27T11:52:55.8831370Z       61 |   await expect(main.getByRole('button', { name: 'Today destination', exact: true })).toBeVisible();
+2026-10-27T11:52:55.8832860Z     > 62 |   await expect.poll(() => main.evaluate(el => el.contains(document.activeElement))).toBe(true);
+2026-10-27T11:52:55.8833500Z          |                                                                                     ^
+2026-10-27T11:52:55.8833880Z       63 | });
+2026-10-27T11:52:55.8834120Z       64 |
+2026-10-27T11:52:55.8834770Z       65 | test('fix review: Navigate to Backlog transfers focus to a usable destination', async () => {
+2026-10-27T11:52:55.8835580Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-fix-review.spec.ts:62:85
+2026-10-27T11:52:55.8839410Z 
+2026-10-27T11:52:55.8839960Z     Error Context: test-results/phase4-fix-review-fix-revi-62d2a-cus-to-a-usable-destination/error-context.md
+2026-10-27T11:52:55.8840870Z 
+2026-10-27T11:52:55.8841630Z   3) tests/app/phase4-fix-review.spec.ts:65:1 › fix review: Navigate to Backlog transfers focus to a usable destination 
+2026-10-27T11:52:55.8842080Z 
+2026-10-27T11:52:55.8842440Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T11:52:55.8842700Z 
+2026-10-27T11:52:55.8842820Z     Expected: true
+2026-10-27T11:52:55.8843020Z     Received: false
+2026-10-27T11:52:55.8843180Z 
+2026-10-27T11:52:55.8843280Z     Call Log:
+2026-10-27T11:52:55.8843650Z     - Timeout 10000ms exceeded while waiting on the predicate
+2026-10-27T11:52:55.8843870Z 
+2026-10-27T11:52:55.8844040Z       69 |   await expect(main).toBeVisible();
+2026-10-27T11:52:55.8844780Z       70 |   await expect(main.getByRole('button', { name: 'Add task to selected view', exact: true })).toBeVisible();
+2026-10-27T11:52:55.8845980Z     > 71 |   await expect.poll(() => main.evaluate(el => el.contains(document.activeElement))).toBe(true);
+2026-10-27T11:52:55.8846970Z          |                                                                                     ^
+2026-10-27T11:52:55.8847610Z       72 | });
+2026-10-27T11:52:55.8847900Z       73 |
+2026-10-27T11:52:55.8848920Z       74 | test('fix review: direct Focus entry restores its actual trigger after an unrelated palette invocation', async () => {
+2026-10-27T11:52:55.8849890Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-fix-review.spec.ts:71:85
+2026-10-27T11:52:55.8850370Z 
+2026-10-27T11:52:55.8850860Z     Error Context: test-results/phase4-fix-review-fix-revi-0e4ba-cus-to-a-usable-destination/error-context.md
+2026-10-27T11:52:55.8851400Z 
+2026-10-27T11:52:55.8852090Z   4) tests/app/phase4-fix-review.spec.ts:74:1 › fix review: direct Focus entry restores its actual trigger after an unrelated palette invocation 
+2026-10-27T11:52:55.8852610Z 
+2026-10-27T11:52:55.8852750Z     Error: expect(locator).toBeFocused() failed
+2026-10-27T11:52:55.8853020Z 
+2026-10-27T11:52:55.8853340Z     Locator:  getByRole('button', { name: 'Open focus view', exact: true })
+2026-10-27T11:52:55.8853810Z     Expected: focused
+2026-10-27T11:52:55.8854030Z     Received: inactive
+2026-10-27T11:52:55.8854310Z     Timeout:  10000ms
+2026-10-27T11:52:55.8854470Z 
+2026-10-27T11:52:55.8854520Z     Call log:
+2026-10-27T11:52:55.8856160Z       - Expect "toBeFocused" getByRole('button', { name: 'Open focus view', exact: true }) with timeout 10000ms
+2026-10-27T11:52:55.8857520Z       - waiting for getByRole('button', { name: 'Open focus view', exact: true })
+2026-10-27T11:52:55.8859380Z         24 × locator resolved to <button title="Focus · F" class="rail-button " aria-label="Open focus view">…</button>
+2026-10-27T11:52:55.8860220Z            - unexpected value "inactive"
+2026-10-27T11:52:55.8860470Z 
+2026-10-27T11:52:55.8860480Z 
+2026-10-27T11:52:55.8862420Z       83 |   await screen.getByRole('button', { name: 'Exit Focus view', exact: true }).click();
+2026-10-27T11:52:55.8864310Z       84 |   await expect(screen).toHaveCount(0);
+2026-10-27T11:52:55.8864700Z     > 85 |   await expect(trigger).toBeFocused();
+2026-10-27T11:52:55.8865150Z          |                         ^
+2026-10-27T11:52:55.8865450Z       86 | });
+2026-10-27T11:52:55.8865690Z       87 |
+2026-10-27T11:52:55.8868750Z       88 | test('fix review: Focus round trip preserves vertical task-list scroll in a board column', async () => {
+2026-10-27T11:52:55.8872290Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-fix-review.spec.ts:85:25
+2026-10-27T11:52:55.8873110Z 
+2026-10-27T11:52:55.8873670Z     Error Context: test-results/phase4-fix-review-fix-revi-17e22-nrelated-palette-invocation/error-context.md
+2026-10-27T11:52:55.8874150Z 
+2026-10-27T11:52:55.8874840Z   5) tests/app/phase4-fix-review.spec.ts:88:1 › fix review: Focus round trip preserves vertical task-list scroll in a board column 
+2026-10-27T11:52:55.8875420Z 
+2026-10-27T11:52:55.8875750Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T11:52:55.8876460Z 
+2026-10-27T11:52:55.8876620Z     Expected: 300
+2026-10-27T11:52:55.8876920Z     Received: 0
+2026-10-27T11:52:55.8877090Z 
+2026-10-27T11:52:55.8877420Z       111 |   const after = await list.evaluate(el => el.scrollTop);
+2026-10-27T11:52:55.8877990Z       112 |   console.log('PHASE4_VERTICAL_SCROLL', { before, after });
+2026-10-27T11:52:55.8878430Z     > 113 |   expect(after).toBe(before);
+2026-10-27T11:52:55.8878810Z           |                 ^
+2026-10-27T11:52:55.8879100Z       114 | });
+2026-10-27T11:52:55.8879430Z       115 |
+2026-10-27T11:52:55.8879940Z       116 | test('fix review: Search state and persisted paused timer survive a Focus round trip', async () => {
+2026-10-27T11:52:55.8880740Z         at /Users/runner/work/laptop-planner/laptop-planner/tests/app/phase4-fix-review.spec.ts:113:17
+2026-10-27T11:52:55.8881180Z 
+2026-10-27T11:52:55.8881630Z     Error Context: test-results/phase4-fix-review-fix-revi-18935-st-scroll-in-a-board-column/error-context.md
+2026-10-27T11:52:55.8882070Z 
+2026-10-27T11:52:55.8882140Z   5 failed
+2026-10-27T11:52:55.8882760Z     tests/app/menu-bar.spec.ts:54:1 › sleep and clean restart keep a paused menu timer and exclude closed time 
+2026-10-27T11:52:55.8883700Z     tests/app/phase4-fix-review.spec.ts:55:1 › fix review: Navigate to Today transfers focus to a usable destination 
+2026-10-27T11:52:55.8884570Z     tests/app/phase4-fix-review.spec.ts:65:1 › fix review: Navigate to Backlog transfers focus to a usable destination 
+2026-10-27T11:52:55.8885620Z     tests/app/phase4-fix-review.spec.ts:74:1 › fix review: direct Focus entry restores its actual trigger after an unrelated palette invocation 
+2026-10-27T11:52:55.8887060Z     tests/app/phase4-fix-review.spec.ts:88:1 › fix review: Focus round trip preserves vertical task-list scroll in a board column 
+2026-10-27T11:52:55.8887720Z   114 passed (6.5m)

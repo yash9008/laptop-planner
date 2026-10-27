@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { PlannerDay, PlannerResult, PlannerTask, PlannerProject, PlannerEvent, SaveProjectInput, SaveEventInput, SaveSettingsInput, MoveTaskInput } from '../shared/contracts';
 import { dateLabel, formatDuration, formatTime, shiftDate, formatElapsed, parseDuration, WEEKDAYS } from '../shared/task-input';
 import { creationDraftKey, isDraftDirty, newCreationDraft, taskToDraft, reconcileTaskDraft, type TaskDraft } from './drafts';
@@ -25,6 +25,7 @@ import { KeyboardHelpDialog } from './components/KeyboardHelpDialog';
 import { FocusScreen } from './components/FocusScreen';
 
 type TaskSurface = 'board' | 'search' | 'backlog' | 'recovery' | 'calendar' | 'focus' | 'other';
+type TaskOrigin = { element: HTMLElement | null; taskId: string | null; surface: TaskSurface };
 
 export function App() {
   const [day, setDay] = useState<PlannerDay | null>(null);
@@ -51,12 +52,11 @@ export function App() {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const selectedTaskIdRef = useRef<string | null>(null);
   selectedTaskIdRef.current = selectedTaskId;
-  const savedBoardScrollRef = useRef<number | null>(null);
-  const savedBoardDateRef = useRef<string | null>(null);
   const pendingHelpRestore = useRef(false);
   const [focusTaskId, setFocusTaskId] = useState<string | null>(null);
   const previousViewRef = useRef<'board' | 'day' | 'backlog' | 'project'>('board');
-  const focusExitTriggerRef = useRef<HTMLElement | null>(null);
+  const focusExitOriginRef = useRef<TaskOrigin | null>(null);
+  const pendingFocusRestore = useRef(false);
 
   // Drafts & Task UI state
   const [creationDrafts, setCreationDrafts] = useState<Record<string, TaskDraft>>({});
@@ -197,13 +197,18 @@ export function App() {
     return originatingSurface.current;
   }
 
-  function restoreOriginatingFocus(taskId?: string | null) {
-    const surface = originatingSurface.current;
+  function snapshotTaskOrigin(): TaskOrigin {
+    return { element: originatingElement.current, taskId: originatingTaskId.current, surface: originatingSurface.current };
+  }
+
+  function restoreOriginatingFocus(taskId?: string | null, origin?: TaskOrigin) {
+    const surface = origin ? origin.surface : originatingSurface.current;
+    const originElement = origin ? origin.element : originatingElement.current;
 
     if (surface === 'focus') {
       const focusScreen = document.querySelector<HTMLElement>('[data-testid="focus-screen"], .focus-screen');
       if (focusScreen && focusScreen.isConnected) {
-        const el = originatingElement.current;
+        const el = originElement;
         if (el && el.isConnected && focusScreen.contains(el)) {
           el.focus({ preventScroll: true });
           return;
@@ -221,7 +226,7 @@ export function App() {
     if (surface === 'search') {
       const searchPanel = document.querySelector<HTMLElement>('[data-testid="search-panel"]');
       if (searchPanel && searchPanel.isConnected) {
-        const el = originatingElement.current;
+        const el = originElement;
         if (el && el.isConnected && searchPanel.contains(el)) {
           el.focus({ preventScroll: true });
           return;
@@ -251,7 +256,7 @@ export function App() {
     if (surface === 'backlog') {
       const backlogPanel = document.querySelector<HTMLElement>('[data-testid="backlog-panel"]');
       if (backlogPanel && backlogPanel.isConnected) {
-        const el = originatingElement.current;
+        const el = originElement;
         if (el && el.isConnected && backlogPanel.contains(el)) {
           el.focus({ preventScroll: true });
           return;
@@ -281,7 +286,7 @@ export function App() {
     if (surface === 'recovery') {
       const recoveryPanel = document.querySelector<HTMLElement>('[data-testid="recovery-panel"]');
       if (recoveryPanel && recoveryPanel.isConnected) {
-        const el = originatingElement.current;
+        const el = originElement;
         if (el && el.isConnected && recoveryPanel.contains(el)) {
           el.focus({ preventScroll: true });
           return;
@@ -296,7 +301,7 @@ export function App() {
       }
     }
 
-    const el = originatingElement.current;
+    const el = originElement;
     if (el && el.isConnected) {
       el.focus({ preventScroll: true });
       return;
@@ -720,7 +725,8 @@ export function App() {
     );
   }
 
-  const calendarColumn = view === 'board' ? day?.board.find((column) => column.date === boardCalendarDate) : undefined;
+  const workspaceView = view === 'focus' ? previousViewRef.current : view;
+  const calendarColumn = workspaceView === 'board' ? day?.board.find((column) => column.date === boardCalendarDate) : undefined;
   const displayDay =
     day && calendarColumn
       ? {
@@ -733,9 +739,9 @@ export function App() {
       : day;
   const selectedProject = day?.projects.find((project) => project.id === selectedProjectId);
   const visibleTasks =
-    view === 'backlog'
+    workspaceView === 'backlog'
       ? day?.backlog ?? []
-      : view === 'project'
+      : workspaceView === 'project'
       ? day?.allTasks.filter((task) => task.projectId === selectedProjectId) ?? []
       : day?.tasks ?? [];
   const matches = (task: PlannerTask) => {
@@ -803,22 +809,11 @@ export function App() {
     }
   }, [view, day, focusTaskId]);
 
-  function enterFocusView(explicitTaskId?: string) {
+  function enterFocusView(explicitTaskId?: string, origin?: TaskOrigin) {
     if (view !== 'focus') {
       previousViewRef.current = view;
-    }
-    if (view === 'board') {
-      savedBoardScrollRef.current = boardPanelRef.current?.scrollLeft ?? null;
-      savedBoardDateRef.current = boardCalendarDate;
-    }
-
-    if (originatingElement.current && originatingElement.current.isConnected && !originatingElement.current.closest('[role="dialog"]')) {
-      focusExitTriggerRef.current = originatingElement.current;
-    } else {
-      const active = document.activeElement as HTMLElement | null;
-      if (active && !active.closest('[role="dialog"]') && active !== document.body) {
-        focusExitTriggerRef.current = active;
-      }
+      if (!origin) captureTaskOrigin(explicitTaskId ?? selectedTaskIdRef.current);
+      focusExitOriginRef.current = origin ?? snapshotTaskOrigin();
     }
 
     const currentSelectedId = explicitTaskId ?? selectedTaskIdRef.current ?? selectedTaskId;
@@ -839,48 +834,15 @@ export function App() {
   }
 
   function exitFocusView() {
-    setView(previousViewRef.current || 'board');
-    setTimeout(() => {
-      const trigger = focusExitTriggerRef.current;
-      if (trigger && trigger.isConnected) {
-        trigger.focus({ preventScroll: true });
-      } else {
-        restoreOriginatingFocus();
-      }
-    }, 0);
+    pendingFocusRestore.current = true;
+    setView(previousViewRef.current);
   }
 
-  useLayoutEffect(() => {
-    if (view === 'board' && savedBoardScrollRef.current !== null) {
-      const scrollPos = savedBoardScrollRef.current;
-      const boardDate = savedBoardDateRef.current;
-      if (boardPanelRef.current) {
-        boardPanelRef.current.scrollLeft = scrollPos;
-      }
-      if (boardDate) {
-        setBoardCalendarDate(boardDate);
-      }
-      requestAnimationFrame(() => {
-        if (boardPanelRef.current) {
-          boardPanelRef.current.scrollLeft = scrollPos;
-        }
-      });
-      savedBoardScrollRef.current = null;
-      savedBoardDateRef.current = null;
-    }
-  }, [view]);
-
   useEffect(() => {
-    if (view === 'focus') {
-      requestAnimationFrame(() => {
-        const screen = document.querySelector<HTMLElement>('[data-testid="focus-screen"]');
-        if (screen && (!document.activeElement || !screen.contains(document.activeElement))) {
-          const btn = screen.querySelector<HTMLElement>(
-            'button.focus-action-btn:not([disabled]), button.button.primary:not([disabled]), button.focus-exit-btn'
-          );
-          btn?.focus({ preventScroll: true });
-        }
-      });
+    if (view !== 'focus' && pendingFocusRestore.current) {
+      pendingFocusRestore.current = false;
+      const origin = focusExitOriginRef.current;
+      restoreOriginatingFocus(origin?.taskId, origin ?? undefined);
     }
   }, [view]);
 
@@ -1030,9 +992,9 @@ export function App() {
       category: 'Task',
       title: `Focus on: "${selectedTask.title}"`,
       run: () => {
-        focusExitTriggerRef.current = originatingElement.current ?? null;
+        const origin = snapshotTaskOrigin();
         setCommandPaletteOpen(false);
-        enterFocusView(selectedTask.id);
+        enterFocusView(selectedTask.id, origin);
       },
     });
   }
@@ -1059,7 +1021,7 @@ export function App() {
       run: () => {
         pendingPaletteAction.current = () => {
           const target = document.querySelector<HTMLElement>(
-            '.view-day .day-heading, .view-day .task-card, .view-day'
+            '.view-day .task-add-bar:not([disabled])'
           );
           target?.focus({ preventScroll: true });
         };
@@ -1075,7 +1037,7 @@ export function App() {
       run: () => {
         pendingPaletteAction.current = () => {
           const target = document.querySelector<HTMLElement>(
-            '.view-backlog .task-add-bar, .view-backlog'
+            '.view-backlog .task-add-bar:not([disabled])'
           );
           target?.focus({ preventScroll: true });
         };
@@ -1089,9 +1051,9 @@ export function App() {
       title: 'Navigate to Focus',
       shortcut: 'F',
       run: () => {
-        focusExitTriggerRef.current = originatingElement.current ?? null;
+        const origin = snapshotTaskOrigin();
         setCommandPaletteOpen(false);
-        enterFocusView();
+        enterFocusView(undefined, origin);
       },
     }
   );
@@ -1554,7 +1516,7 @@ export function App() {
             className={`nav-item ${view === 'focus' ? 'active' : ''}`}
             aria-label="Focus view"
             title="Focus · F"
-            onClick={() => enterFocusView()}
+            onClick={(event) => enterFocusView(undefined, { element: event.currentTarget, taskId: selectedTaskIdRef.current, surface: 'board' })}
             disabled={busy}
           >
             <Icon name="focus" />
@@ -1879,7 +1841,7 @@ export function App() {
             />
           )}
           <main
-            className={`planner-main view-${view === 'focus' ? (previousViewRef.current || 'board') : view}`}
+            className={`planner-main view-${workspaceView}`}
             style={view === 'focus' ? { display: 'none' } : undefined}
             inert={view === 'focus' ? true : undefined}
             aria-hidden={view === 'focus' ? 'true' : undefined}
@@ -1904,10 +1866,11 @@ export function App() {
             {!day && !error && <div className="loading-state">Opening your local planner…</div>}
             {day && (
               <>
-                {view === 'board' ? (
+                {workspaceView === 'board' ? (
                   <>
                     <h1 className="sr-only">Your week</h1>
                     <PlanningBoard
+                      active={view !== 'focus'}
                       panelRef={boardPanelRef}
                       dnd={dnd}
                       day={day}
@@ -1932,19 +1895,19 @@ export function App() {
                   <>
                     <section className="day-header">
                       <div className="day-title">
-                        <h1 aria-label={heading}>{view === 'day' ? dateLabel(day.date, { weekday: 'long' }) : heading}</h1>
+                        <h1 aria-label={heading}>{workspaceView === 'day' ? dateLabel(day.date, { weekday: 'long' }) : heading}</h1>
                         <span>
-                          {view === 'backlog'
+                          {workspaceView === 'backlog'
                             ? 'Work for another day'
                             : view === 'focus'
                             ? 'One task. Your full attention.'
-                            : view === 'project'
+                            : workspaceView === 'project'
                             ? 'Project tasks'
                             : dateLabel(day.date, { month: 'long', day: 'numeric', year: 'numeric' })}
                         </span>
                       </div>
                     </section>
-                    {view === 'project' && selectedProject && (
+                    {workspaceView === 'project' && selectedProject && (
                       <section className="project-overview">
                         <div>
                           <p>{selectedProject.notes || 'All the work that belongs here.'}</p>
@@ -1964,13 +1927,13 @@ export function App() {
                         </button>
                       </section>
                     )}
-                    {view === 'backlog' && (
+                    {workspaceView === 'backlog' && (
                       <p className="view-intro">Keep future work here. Choose a day when you’re ready to schedule it.</p>
                     )}
                     <section className="task-panel" aria-label="Tasks">
                       <div className="task-panel-heading">
                         <h2 className="sr-only">
-                          {view === 'project' ? 'Project tasks' : view === 'backlog' ? 'Future tasks' : 'Your tasks'}
+                          {workspaceView === 'project' ? 'Project tasks' : workspaceView === 'backlog' ? 'Future tasks' : 'Your tasks'}
                         </h2>
                         <span className="completion-count">
                           {visibleTasks.filter((task) => task.completed).length} of {visibleTasks.length} done
@@ -2010,14 +1973,14 @@ export function App() {
                             <h3>
                               {isFilterActive
                                 ? 'No matching tasks'
-                                : view === 'backlog'
+                                : workspaceView === 'backlog'
                                 ? 'A little room for later'
                                 : 'What deserves your time?'}
                             </h3>
                             <p>
                               {isFilterActive
                                 ? 'Try another word, or clear your filters.'
-                                : view === 'backlog'
+                                : workspaceView === 'backlog'
                                 ? 'Capture an idea now. Give it a day later.'
                                 : 'Add a task, give it an estimate, and make space for it.'}
                             </p>
@@ -2193,7 +2156,7 @@ export function App() {
               className={`rail-button ${view === 'focus' ? 'active' : ''}`}
               aria-label="Open focus view"
               title="Focus · F"
-              onClick={() => enterFocusView()}
+              onClick={(event) => enterFocusView(undefined, { element: event.currentTarget, taskId: selectedTaskIdRef.current, surface: 'board' })}
             >
               <Icon name="focus" size={20} />
             </button>

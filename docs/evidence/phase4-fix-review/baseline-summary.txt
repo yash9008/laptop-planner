@@ -1,0 +1,22 @@
+2026-10-27T11:34:37.7104150Z ℹ tests 78
+2026-10-27T11:34:37.7301420Z ℹ pass 78
+2026-10-27T11:34:37.7403750Z ℹ fail 0
+2026-10-27T11:34:38.0547060Z ℹ tests 78
+2026-10-27T11:34:38.0547780Z ℹ pass 78
+2026-10-27T11:34:38.0548610Z ℹ fail 0
+2026-10-27T11:34:39.7133420Z ℹ tests 63
+2026-10-27T11:34:39.7135230Z ℹ pass 63
+2026-10-27T11:34:39.7135660Z ℹ fail 0
+2026-10-27T11:37:23.0115160Z   ✓   61 tests/app/phase4-independent-review.spec.ts:55:1 › independent phase4: Focus exit preserves a panned board and selected calendar date (1.8s)
+2026-10-27T11:37:24.2216320Z   ✓   62 tests/app/phase4-independent-review.spec.ts:71:1 › independent phase4: bare F uses the latest explicitly selected task (1.2s)
+2026-10-27T11:37:26.3360490Z   ✓   63 tests/app/phase4-independent-review.spec.ts:81:1 › independent phase4: palette navigation transfers keyboard focus into Focus (2.1s)
+2026-10-27T11:37:28.8089290Z   ✓   64 tests/app/phase4-independent-review.spec.ts:90:1 › independent phase4: invisible Focus dock is excluded from sequential keyboard navigation (2.5s)
+2026-10-27T11:37:31.0199840Z   ✓   65 tests/app/phase4-independent-review.spec.ts:102:1 › independent phase4: help dismissal restores the palette initiating control (2.2s)
+2026-10-27T11:37:32.2675400Z   ✓   66 tests/app/phase4-independent-review.spec.ts:113:1 › independent phase4: Enter on the palette close control does not execute Add task (1.2s)
+2026-10-27T11:37:33.4831890Z   ✓   67 tests/app/phase4-independent-review.spec.ts:124:1 › independent phase4: repeated Cmd K does not dismiss the palette (1.2s)
+2026-10-27T11:37:35.2448720Z   ✓   68 tests/app/phase4-independent-review.spec.ts:130:1 › independent phase4: palette to Search task editor preserves Search focus ownership (1.7s)
+2026-10-27T11:37:37.2241880Z   ✓   69 tests/app/phase4-independent-review.spec.ts:147:1 › related phase4: palette navigation transfers keyboard focus to Board (2.0s)
+2026-10-27T11:37:38.4436730Z   ✓   70 tests/app/phase4-independent-review.spec.ts:155:1 › related phase4: Enter on Clear query button does not execute selected command (1.2s)
+2026-10-27T11:37:39.6887610Z   ✓   71 tests/app/phase4-independent-review.spec.ts:164:1 › related phase4: Focus exit via Escape preserves panned board scroll and selected date (1.2s)
+2026-10-27T11:37:41.6507380Z   ✓   72 tests/app/phase4-independent-review.spec.ts:178:1 › related phase4: palette to Backlog task editor preserves Backlog focus ownership (1.9s)
+2026-10-27T11:40:23.7693180Z   114 passed (5.7m)

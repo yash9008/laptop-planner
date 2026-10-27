@@ -29,7 +29,20 @@ async function add(title='Practice'){
 }
 async function start(title='Practice'){await page.getByRole('button',{name:`Start focus ${title}`,exact:true}).click();await expect.poll(()=>menuLabel('focus-task')).toBe(title);}
 test.beforeEach(async()=>{directory=await mkdtemp(join(tmpdir(),'laptop-planner-menu-bar-'));clock=Date.parse('2026-10-25T07:30:00.000Z');await launch();});
-test.afterEach(async()=>{await app?.close();await rm(directory,{recursive:true,force:true});});
+test.afterEach(async({},info)=>{
+  if(info.status!==info.expectedStatus) {
+    console.log('NATIVE_MENU_FAILURE_STATE',await app.evaluate(()=>({
+      errors:globalThis.menuBarTest?.errors,
+      title:globalThis.menuBarTest?.tray?.getTitle(),
+      toggle:globalThis.menuBarTest?.menu?.getMenuItemById('focus-toggle')?.label,
+      state:globalThis.menuBarTest?.menu?.getMenuItemById('focus-state')?.label,
+    })).catch(()=>null));
+    console.log('NATIVE_MENU_FAILURE_FOCUS',await page.evaluate(async()=>{
+      const result=await window.planner.getDay();return result.ok?result.value.focus:result.error;
+    }).catch(()=>null));
+  }
+  await app?.close();await rm(directory,{recursive:true,force:true});
+});
 
 test('native timer updates in background; native menu pauses, resumes and reopens the planner',async()=>{
   expect(await title()).toBeNull();await add();await start();await expect.poll(title).toBe('00:00');
@@ -55,9 +68,39 @@ test('sleep and clean restart keep a paused menu timer and exclude closed time',
   await add();await start();await advance(6000);await expect.poll(title).toBe('00:06');
   await app.evaluate(({powerMonitor})=>powerMonitor.emit('suspend'));await expect.poll(title).toBe('Ⅱ 00:06');await expect.poll(()=>menuLabel('focus-state')).toBe('Paused for sleep');
   await advance(3600000);await app.evaluate(({powerMonitor})=>powerMonitor.emit('resume'));expect(await title()).toBe('Ⅱ 00:06');
-  await clickMenu('focus-toggle');await advance(4000);await expect.poll(title).toBe('00:10');
+  await clickMenu('focus-toggle');
+  await expect.poll(()=>menuLabel('focus-toggle')).toBe('Pause timer');
+  expect(await app.evaluate(()=>globalThis.menuBarTest?.errors)).toEqual([]);
+  await expect.poll(()=>page.evaluate(async()=>{
+    const result=await window.planner.getDay();return result.ok?result.value.focus?.running:false;
+  })).toBe(true);
+  await advance(4000);await expect.poll(title).toBe('00:10');
   await app.close();clock+=3600000;await launch();await expect.poll(title).toBe('Ⅱ 00:10');
   await expect(page.getByRole('button',{name:'Resume focus',exact:true})).toBeEnabled();
+});
+
+test('repeated sleep and explicit native resume preserve only the committed running intervals',async()=>{
+  await add();await start();
+  for(let cycle=1;cycle<=5;cycle++) {
+    await advance(2000);await expect.poll(title).toBe(`00:${String(cycle*2).padStart(2,'0')}`);
+    await app.evaluate(({powerMonitor})=>powerMonitor.emit('suspend'));
+    await expect.poll(()=>menuLabel('focus-state')).toBe('Paused for sleep');
+    await expect.poll(title).toBe(`Ⅱ 00:${String(cycle*2).padStart(2,'0')}`);
+    await advance(3600000);
+    await app.evaluate(({powerMonitor})=>powerMonitor.emit('resume'));
+    expect(await title()).toBe(`Ⅱ 00:${String(cycle*2).padStart(2,'0')}`);
+    await clickMenu('focus-toggle');
+    await expect.poll(()=>menuLabel('focus-toggle')).toBe('Pause timer');
+    expect(await app.evaluate(()=>globalThis.menuBarTest?.errors)).toEqual([]);
+    await expect.poll(()=>page.evaluate(async()=>{
+      const result=await window.planner.getDay();return result.ok?result.value.focus?.running:false;
+    })).toBe(true);
+  }
+  await clickMenu('focus-toggle');await expect.poll(title).toBe('Ⅱ 00:10');
+  const focus=await page.evaluate(async()=>{
+    const result=await window.planner.getDay();if(!result.ok)throw new Error(result.error.message);return result.value.focus;
+  });
+  expect(focus?.running).toBe(false);expect(focus?.actualMilliseconds).toBe(10000);
 });
 
 test('menu timer retains the active task across midnight',async()=>{

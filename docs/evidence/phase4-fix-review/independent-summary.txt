@@ -1,0 +1,45 @@
+2026-10-27T11:46:25.9635160Z ℹ tests 78
+2026-10-27T11:46:25.9636050Z ℹ pass 78
+2026-10-27T11:46:25.9636340Z ℹ fail 0
+2026-10-27T11:46:26.1526490Z ℹ tests 78
+2026-10-27T11:46:26.1528540Z ℹ pass 78
+2026-10-27T11:46:26.1528990Z ℹ fail 0
+2026-10-27T11:46:27.6446640Z ℹ tests 63
+2026-10-27T11:46:27.6650410Z ℹ pass 63
+2026-10-27T11:46:27.6751530Z ℹ fail 0
+2026-10-27T11:49:49.1699740Z   ✘   61 tests/app/phase4-fix-review.spec.ts:55:1 › fix review: Navigate to Today transfers focus to a usable destination (11.6s)
+2026-10-27T11:50:01.9126090Z   ✘   62 tests/app/phase4-fix-review.spec.ts:65:1 › fix review: Navigate to Backlog transfers focus to a usable destination (12.0s)
+2026-10-27T11:50:14.5390130Z   ✘   63 tests/app/phase4-fix-review.spec.ts:74:1 › fix review: direct Focus entry restores its actual trigger after an unrelated palette invocation (12.1s)
+2026-10-27T11:50:16.3325480Z PHASE4_VERTICAL_SCROLL { before: 300, after: 0 }
+2026-10-27T11:50:16.8620340Z   ✘   64 tests/app/phase4-fix-review.spec.ts:88:1 › fix review: Focus round trip preserves vertical task-list scroll in a board column (1.9s)
+2026-10-27T11:50:19.2634420Z   ✓   65 tests/app/phase4-fix-review.spec.ts:116:1 › fix review: Search state and persisted paused timer survive a Focus round trip (1.8s)
+2026-10-27T11:52:55.8816150Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T11:52:55.8816570Z     Expected: "00:10"
+2026-10-27T11:52:55.8817050Z     Received: "Ⅱ 00:06"
+2026-10-27T11:52:55.8826710Z   2) tests/app/phase4-fix-review.spec.ts:55:1 › fix review: Navigate to Today transfers focus to a usable destination 
+2026-10-27T11:52:55.8828580Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T11:52:55.8829090Z     Expected: true
+2026-10-27T11:52:55.8829440Z     Received: false
+2026-10-27T11:52:55.8834770Z       65 | test('fix review: Navigate to Backlog transfers focus to a usable destination', async () => {
+2026-10-27T11:52:55.8841630Z   3) tests/app/phase4-fix-review.spec.ts:65:1 › fix review: Navigate to Backlog transfers focus to a usable destination 
+2026-10-27T11:52:55.8842440Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T11:52:55.8842820Z     Expected: true
+2026-10-27T11:52:55.8843020Z     Received: false
+2026-10-27T11:52:55.8848920Z       74 | test('fix review: direct Focus entry restores its actual trigger after an unrelated palette invocation', async () => {
+2026-10-27T11:52:55.8852090Z   4) tests/app/phase4-fix-review.spec.ts:74:1 › fix review: direct Focus entry restores its actual trigger after an unrelated palette invocation 
+2026-10-27T11:52:55.8852750Z     Error: expect(locator).toBeFocused() failed
+2026-10-27T11:52:55.8853810Z     Expected: focused
+2026-10-27T11:52:55.8854030Z     Received: inactive
+2026-10-27T11:52:55.8868750Z       88 | test('fix review: Focus round trip preserves vertical task-list scroll in a board column', async () => {
+2026-10-27T11:52:55.8874840Z   5) tests/app/phase4-fix-review.spec.ts:88:1 › fix review: Focus round trip preserves vertical task-list scroll in a board column 
+2026-10-27T11:52:55.8875750Z     Error: expect(received).toBe(expected) // Object.is equality
+2026-10-27T11:52:55.8876620Z     Expected: 300
+2026-10-27T11:52:55.8876920Z     Received: 0
+2026-10-27T11:52:55.8877990Z       112 |   console.log('PHASE4_VERTICAL_SCROLL', { before, after });
+2026-10-27T11:52:55.8879940Z       116 | test('fix review: Search state and persisted paused timer survive a Focus round trip', async () => {
+2026-10-27T11:52:55.8882140Z   5 failed
+2026-10-27T11:52:55.8883700Z     tests/app/phase4-fix-review.spec.ts:55:1 › fix review: Navigate to Today transfers focus to a usable destination 
+2026-10-27T11:52:55.8884570Z     tests/app/phase4-fix-review.spec.ts:65:1 › fix review: Navigate to Backlog transfers focus to a usable destination 
+2026-10-27T11:52:55.8885620Z     tests/app/phase4-fix-review.spec.ts:74:1 › fix review: direct Focus entry restores its actual trigger after an unrelated palette invocation 
+2026-10-27T11:52:55.8887060Z     tests/app/phase4-fix-review.spec.ts:88:1 › fix review: Focus round trip preserves vertical task-list scroll in a board column 
+2026-10-27T11:52:55.8887720Z   114 passed (6.5m)

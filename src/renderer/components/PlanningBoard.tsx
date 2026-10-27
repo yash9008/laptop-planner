@@ -4,7 +4,8 @@ import { dateLabel,formatDuration } from '../../shared/task-input';
 import { Icon } from './Icon';
 import { useBoardDrag } from './BoardDrag';
 
-export function PlanningBoard({panelRef: externalPanelRef,dnd: externalDnd,day,selectedDate,busy,navigationKey,onMove,onAdd,onOpenDay,onActiveDay,renderTask,matches}:{
+export function PlanningBoard({active=true,panelRef: externalPanelRef,dnd: externalDnd,day,selectedDate,busy,navigationKey,onMove,onAdd,onOpenDay,onActiveDay,renderTask,matches}:{
+  active?: boolean;
   panelRef?: React.RefObject<HTMLElement | null>;
   dnd?: ReturnType<typeof useBoardDrag>;
   day:PlannerDay;selectedDate:string;busy:boolean;navigationKey:number;onMove(input:MoveTaskInput):Promise<string|null>;onAdd(date:string|null):void;
@@ -17,12 +18,14 @@ export function PlanningBoard({panelRef: externalPanelRef,dnd: externalDnd,day,s
   const animation=useRef<number|null>(null);const velocity=useRef(0);
   const scrollFrame=useRef<number|null>(null);
   const activeDate=useRef('');
+  const activeRef=useRef(active);activeRef.current=active;
   const activeCallback=useRef(onActiveDay);activeCallback.current=onActiveDay;
   const pan=useRef<{pointerId:number;button:number;x:number;scroll:number;active:boolean}|null>(null);
   const [panning,setPanning]=useState(false);
   const swallowClick=useRef(false);
   const stopScroll=()=>{velocity.current=0;if(animation.current!==null)cancelAnimationFrame(animation.current);animation.current=null;};
   function selectNearestDay() {
+    if(!activeRef.current)return;
     const host=panel.current;if(!host)return;
     const edge=host.getBoundingClientRect().left+(parseFloat(getComputedStyle(host).paddingLeft)||0);
     const columns=[...host.querySelectorAll<HTMLElement>('[data-testid="board-day"]')];
@@ -32,10 +35,12 @@ export function PlanningBoard({panelRef: externalPanelRef,dnd: externalDnd,day,s
     if(date && date!==activeDate.current){activeDate.current=date;activeCallback.current(date);}
   }
   function queueSelection() {
+    if(!activeRef.current)return;
     if(scrollFrame.current!==null)return;
     scrollFrame.current=requestAnimationFrame(()=>{scrollFrame.current=null;selectNearestDay();});
   }
   useLayoutEffect(()=>{if(panel.current)panel.current.scrollLeft=0;activeDate.current='';queueSelection();},[day.board[0]?.date,navigationKey]);
+  useLayoutEffect(()=>{if(active)queueSelection();},[active]);
   useEffect(()=>{
     const observer=new ResizeObserver(queueSelection);if(panel.current)observer.observe(panel.current);
     return()=>{observer.disconnect();stopScroll();if(scrollFrame.current!==null)cancelAnimationFrame(scrollFrame.current);};
