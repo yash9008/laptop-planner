@@ -67,6 +67,7 @@ async function addTask(title: string, estimate = '45m', plannedDate: string | nu
         viewDate: day.value.date,
       });
       if (!res.ok) throw new Error(res.error.message);
+      window.dispatchEvent(new Event('focus'));
       return res.value.allTasks.find((t) => t.title === title)!;
     },
     { title, estimate, plannedDate }
