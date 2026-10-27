@@ -139,7 +139,7 @@ test('independent phase4: palette to Search task editor preserves Search focus o
   const editor = page.getByRole('dialog', { name: 'Edit task', exact: true });
   await expect(editor).toBeVisible();
   await expect(editor.getByLabel('Task title', { exact: true })).toBeFocused();
-  await page.keyboard.press('Escape');
+  await editor.getByRole('button', { name: 'Close dialog', exact: true }).click();
   await expect(editor).toHaveCount(0);
   await expect.poll(() => search.evaluate(el => el.contains(document.activeElement))).toBe(true);
 });
