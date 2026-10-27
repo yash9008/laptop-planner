@@ -117,7 +117,7 @@ test('independent phase4: Enter on the palette close control does not execute Ad
   await expect(dialog.getByRole('button', { name: 'Close command palette', exact: true })).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(dialog).toHaveCount(0);
-  await expect(page.getByRole('dialog', { name: 'Quick add task', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('dialog', { name: 'New task', exact: true })).toHaveCount(0);
 });
 
 test('independent phase4: repeated Cmd K does not dismiss the palette', async () => {
