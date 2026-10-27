@@ -82,3 +82,23 @@ Every interaction below is categorized under one of the mandatory authority clas
 4. **Reference Account Access Limitations**:
    - In accordance with AGENTS.md rule 4 and prompt rule 2, no private user accounts, personal tasks, or cloud integrations were accessed.
    - Synthetic reference observations from October 26, 2026 (`sunsama-phase2-reference.json`, `sunsama-motion-rules.json`, `sunsama-motion-computed.json`) represent the authoritative limits of reference evidence.
+
+---
+
+## Hosted Verification and Test Receipts
+
+- **Commit**: `4548a8ae77ac413713569ef20f84cc772513756e`
+- **Hosted Workflow Run**: [Planner checks #40509013630](https://github.com/yash9008/laptop-planner/actions/runs/40509013630)
+- **Hosted Job**: [Full checks on Apple Silicon macOS #122205669501](https://github.com/yash9008/laptop-planner/actions/runs/40509013630/job/122205669501)
+- **Conclusion**: **Success** (clean zero-failure pass)
+- **Suite Results**:
+  - **Scheduler Tests**: 78 / 78 passed in Asia/Kolkata; 78 / 78 passed in America/Los_Angeles
+  - **Database Tests**: 63 / 63 passed under native Electron runtime
+  - **Electron UI Tests**: 128 / 128 passed (including all 6 Phase 5 motion specifications)
+- **Screenshot Evidence**:
+  - Extracted from hosted run logs and verified with PNG signature and exact dimensions:
+    - `ui-phase5-board-wide.png`: 1440x900 (SHA-256: `2fa6dabfb19ea8b48363738d28f7b6dc6a0d04093ee15d7ec4d4a3362df756a3`)
+    - `ui-phase5-editor-popover-wide.png`: 1440x900 (SHA-256: `5c7df57d2bb5a79fc4a597a7dc804b2f8d6149f7c5c45c2f82f11f9bf187c6f4`)
+    - `ui-phase5-focus-wide.png`: 1440x900 (SHA-256: `c10b1c05ea148056be2c2e16068602249218ad1843d06a0ec849da3db96bc3e6`)
+    - `ui-phase5-board-narrow-reduced.png`: 860x680 (SHA-256: `de3229b8baad2300299ff5c6bdbf809a4f647f78b340bb2c7638ba744c032414`)
+    - `ui-phase5-palette-narrow-reduced.png`: 860x680 (SHA-256: `acff408c0e71f03f0b6c6ab5b4947f652691446000f65771227b7d1ca4d062e0`)

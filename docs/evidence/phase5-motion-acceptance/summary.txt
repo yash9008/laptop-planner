@@ -1,0 +1,22 @@
+2026-10-27T13:05:59.4255290Z ℹ tests 78
+2026-10-27T13:05:59.4261340Z ℹ pass 78
+2026-10-27T13:05:59.4261750Z ℹ fail 0
+2026-10-27T13:05:59.6668990Z ℹ tests 78
+2026-10-27T13:05:59.6669670Z ℹ pass 78
+2026-10-27T13:05:59.6669990Z ℹ fail 0
+2026-10-27T13:06:01.4144680Z ℹ tests 63
+2026-10-27T13:06:01.4146190Z ℹ pass 63
+2026-10-27T13:06:01.4146690Z ℹ fail 0
+2026-10-27T13:07:01.7020330Z   ✓   11 tests/app/menu-bar.spec.ts:47:1 › native timer updates in background; native menu pauses, resumes and reopens the planner (5.6s)
+2026-10-27T13:07:05.6970380Z   ✓   12 tests/app/menu-bar.spec.ts:60:1 › switching and editing focus updates the native menu; deleting the task removes it (4.0s)
+2026-10-27T13:07:12.3898770Z   ✓   13 tests/app/menu-bar.spec.ts:67:1 › sleep and clean restart keep a paused menu timer and exclude closed time (6.7s)
+2026-10-27T13:07:20.1333180Z   ✓   14 tests/app/menu-bar.spec.ts:87:1 › repeated sleep and explicit native resume preserve only the committed running intervals (7.7s)
+2026-10-27T13:07:24.0875930Z   ✓   15 tests/app/menu-bar.spec.ts:114:1 › menu timer retains the active task across midnight (3.9s)
+2026-10-27T13:07:28.1388410Z   ✓   16 tests/app/menu-bar.spec.ts:120:1 › failed native pause reports the error and keeps the saved running state (4.0s)
+2026-10-27T13:11:07.8725220Z   ✓   94 tests/app/phase5-ui.spec.ts:69:1 › motion parity: computed transition and animation properties in normal and reduced motion across all surfaces (3.1s)
+2026-10-27T13:11:10.1666860Z   ✓   95 tests/app/phase5-ui.spec.ts:253:1 › interruption: rapid repeated toggles, modal cycles, and cancellation preserve state and focus (2.3s)
+2026-10-27T13:11:12.5306070Z   ✓   96 tests/app/phase5-ui.spec.ts:307:1 › drag motion: whole-card lift, placeholder reflow, settling, edge scrolling, and Escape cancellation (2.4s)
+2026-10-27T13:11:14.9044910Z   ✓   97 tests/app/phase5-ui.spec.ts:366:1 › fault injection: drag rollback on simulated save failure preserves baseline order (2.4s)
+2026-10-27T13:11:17.7091210Z   ✓   98 tests/app/phase5-ui.spec.ts:413:1 › board panning and keyboard motion: smooth vs instant scrolling, cancellation, and click suppression (2.8s)
+2026-10-27T13:11:20.6267940Z   ✓   99 tests/app/phase5-ui.spec.ts:454:1 › visual evidence: wide 1440x900 and narrow 860x680 captures of normal and reduced motion states (2.9s)
+2026-10-27T13:12:52.2294780Z   128 passed (6.8m)
