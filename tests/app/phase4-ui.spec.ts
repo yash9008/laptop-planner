@@ -165,7 +165,7 @@ test('palette: latest-ID targeting, edit/focus/complete handoff, and dynamic eli
   // Select task on board
   const card = page.locator(`[data-testid="board-task"][data-task-id="${task.id}"]`);
   await expect(card).toBeVisible();
-  await card.click();
+  await card.click({ position: { x: 10, y: 10 } });
   await expect(card).toHaveClass(/is-selected/);
 
   // Open command palette
@@ -190,14 +190,14 @@ test('palette: latest-ID targeting, edit/focus/complete handoff, and dynamic eli
   await expect(editor).toHaveCount(0);
 
   // Complete task via palette
-  await card.click();
+  await card.click({ position: { x: 10, y: 10 } });
   await page.keyboard.press('Meta+k');
   await palette.getByText(`Complete: "Dynamic Target"`).click();
   await expect(palette).toHaveCount(0);
   expect((await snapshot()).tasks.find((t) => t.id === task.id)?.completed).toBe(true);
 
   // Open palette again: task now offers Reopen, and Start focus is disabled because task is completed
-  await card.click();
+  await card.click({ position: { x: 10, y: 10 } });
   await page.keyboard.press('Meta+k');
   await expect(palette.getByText(`Reopen: "Dynamic Target"`)).toBeVisible();
   const startFocusItem = palette.locator('.command-palette-item', { hasText: 'Start focus' });
@@ -246,11 +246,11 @@ test('shortcuts: guarded A, F, /, and Cmd+K in workspace vs input/contenteditabl
 
   // 6. Bare F in workspace enters Focus view
   await addTask('Task for F shortcut');
-  await expect(page.getByText('Task for F shortcut')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Task for F shortcut', exact: true })).toBeVisible();
   await page.keyboard.press('f');
   const focusScreen = page.getByTestId('focus-screen');
   await expect(focusScreen).toBeVisible();
-  await expect(focusScreen.getByText('Task for F shortcut')).toBeVisible();
+  await expect(focusScreen.getByTestId('focus-title')).toHaveText('Task for F shortcut');
 
   // Exit Focus with Escape
   await page.keyboard.press('Escape');
@@ -272,13 +272,13 @@ test('focus screen: single-task presentation, empty state, task navigation, expl
   // 2. Add two tasks for today
   await addTask('Focus Task Alpha', '30m');
   await addTask('Focus Task Beta', '45m');
-  await expect(page.getByText('Focus Task Alpha')).toBeVisible();
-  await expect(page.getByText('Focus Task Beta')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Focus Task Alpha', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Focus Task Beta', exact: true })).toBeVisible();
 
   // Enter Focus screen
   await page.keyboard.press('f');
   await expect(focusScreen).toBeVisible();
-  await expect(focusScreen.getByText('Focus Task Alpha')).toBeVisible();
+  await expect(focusScreen.getByTestId('focus-title')).toHaveText('Focus Task Alpha');
   await expect(focusScreen.locator('[data-testid="focus-elapsed"]')).toHaveText('00:00');
 
   // Assert timer did NOT auto-start merely from entering Focus
@@ -287,13 +287,13 @@ test('focus screen: single-task presentation, empty state, task navigation, expl
   // 3. Task navigation
   const nextBtn = focusScreen.getByRole('button', { name: 'Next focus task', exact: true });
   await nextBtn.click();
-  await expect(focusScreen.getByText('Focus Task Beta')).toBeVisible();
+  await expect(focusScreen.getByTestId('focus-title')).toHaveText('Focus Task Beta');
   // Navigating did NOT start timer
   expect((await snapshot()).focus?.running ?? false).toBe(false);
 
   const prevBtn = focusScreen.getByRole('button', { name: 'Previous focus task', exact: true });
   await prevBtn.click();
-  await expect(focusScreen.getByText('Focus Task Alpha')).toBeVisible();
+  await expect(focusScreen.getByTestId('focus-title')).toHaveText('Focus Task Alpha');
 
   // 4. Explicit Start / Pause / Resume
   const startBtn = focusScreen.getByRole('button', { name: 'Start focus', exact: true });
@@ -312,7 +312,7 @@ test('focus screen: single-task presentation, empty state, task navigation, expl
 
   // 5. Complete task deterministically advances to next incomplete task without auto-start
   await focusScreen.getByRole('button', { name: 'Complete task', exact: true }).click();
-  await expect(focusScreen.getByText('Focus Task Beta')).toBeVisible();
+  await expect(focusScreen.getByTestId('focus-title')).toHaveText('Focus Task Beta');
   // Timer is NOT running on Beta
   expect((await snapshot()).focus?.running ?? false).toBe(false);
 
@@ -336,7 +336,7 @@ test('focus screen: single-task presentation, empty state, task navigation, expl
   await palette.getByText(`Focus on: "Backlog Ineligible"`).click();
 
   await expect(focusScreen).toBeVisible();
-  await expect(focusScreen.getByText('Backlog Ineligible')).toBeVisible();
+  await expect(focusScreen.getByTestId('focus-title')).toHaveText('Backlog Ineligible');
   const ineligibleStartBtn = focusScreen.getByRole('button', { name: 'Start focus', exact: true });
   await expect(ineligibleStartBtn).toBeDisabled();
   await expect(focusScreen.getByText('Assign this task to today before starting focus.')).toBeVisible();
@@ -346,7 +346,7 @@ test('focus screen: single-task presentation, empty state, task navigation, expl
 
 test('focus screen: edit round-trip, UTC elapsed time consistency with controlled clock, and preserved workspace state upon exit', async () => {
   await addTask('Edit Target In Focus', '45m');
-  await expect(page.getByText('Edit Target In Focus')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Edit Target In Focus', exact: true })).toBeVisible();
 
   // Set filter on board and open Focus screen
   await page.keyboard.press('f');
@@ -363,7 +363,7 @@ test('focus screen: edit round-trip, UTC elapsed time consistency with controlle
   await expect(editor).toHaveCount(0);
 
   // Focus screen reflects edited title and focus is restored to Edit task button
-  await expect(focusScreen.getByText('Edit Target Renamed')).toBeVisible();
+  await expect(focusScreen.getByTestId('focus-title')).toHaveText('Edit Target Renamed');
   await expect(editBtn).toBeFocused();
 
   // 2. Controlled-clock UTC elapsed time
@@ -404,7 +404,7 @@ test('motion: computed styles under normal and reduced motion for palette and fo
 
   // Focus calendar opacity transition in normal motion
   await addTask('Motion Test Task');
-  await expect(page.getByText('Motion Test Task')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Motion Test Task', exact: true })).toBeVisible();
   await page.keyboard.press('f');
   const focusScreen = page.getByTestId('focus-screen');
   await expect(focusScreen).toBeVisible();
@@ -440,7 +440,7 @@ test('motion: computed styles under normal and reduced motion for palette and fo
 
 test('screenshots: wide 1440x900 and narrow 860x680 of command palette, populated focus screen, and paused focus', async () => {
   await addTask('Design UI Phase 4', '1h 30m');
-  await expect(page.getByText('Design UI Phase 4')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Design UI Phase 4', exact: true })).toBeVisible();
 
   // --- WIDE 1440x900 ---
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -457,7 +457,7 @@ test('screenshots: wide 1440x900 and narrow 860x680 of command palette, populate
   await page.keyboard.press('f');
   const focusScreen = page.getByTestId('focus-screen');
   await expect(focusScreen).toBeVisible();
-  await expect(focusScreen.getByText('Design UI Phase 4')).toBeVisible();
+  await expect(focusScreen.getByTestId('focus-title')).toHaveText('Design UI Phase 4');
   const focusWideBuf = await page.screenshot();
   console.log('=== SCREENSHOT: ui-phase4-focus-screen.png ===\n' + focusWideBuf.toString('base64') + '\n=== END SCREENSHOT ===');
 
