@@ -56,7 +56,13 @@ async function addTask(title: string, estimate = '45m', plannedDate: string | nu
     async ({ title, estimate, plannedDate }) => {
       const day = await window.planner.getDay();
       if (!day.ok) throw new Error(day.error.message);
-      const minutes = estimate.endsWith('h') ? parseInt(estimate, 10) * 60 : parseInt(estimate, 10);
+      // Parse both "90m" and "1h 30m" forms; parseInt alone reads "1h 30m" as 1.
+      const hours = /(\d+)\s*h/.exec(estimate)?.[1];
+      const mins = /(\d+)\s*m/.exec(estimate)?.[1];
+      const minutes =
+        hours || mins
+          ? (hours ? parseInt(hours, 10) * 60 : 0) + (mins ? parseInt(mins, 10) : 0)
+          : parseInt(estimate, 10);
       const res = await window.planner.saveTask({
         id: crypto.randomUUID(),
         create: true,

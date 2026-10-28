@@ -66,7 +66,7 @@ async function addTask(title: string, estimate = '45m', plannedDate: string | nu
   );
 }
 
-test('motion parity: computed transition and animation properties in normal and reduced motion across all surfaces', async () => {
+test('motion parity: declared transitions, applied nav-icon transform, and zero-duration overlays in normal and reduced motion', async () => {
   await addTask('Task for Motion Audit', '30m');
   const card = page.locator('.task-card').first();
   await expect(card).toBeVisible();
@@ -124,6 +124,14 @@ test('motion parity: computed transition and animation properties in normal and 
   });
   expect(normalNavIconStyles.transitionProperty).toContain('transform');
   expect(normalNavIconStyles.transitionDuration).toContain('0.3s');
+
+  // The transition must animate an applied transform, not sit on an inert
+  // declaration: hover the item and require a real matrix.
+  await page.locator('.nav-item').first().hover();
+  await expect
+    .poll(async () => navIcon.evaluate((el) => getComputedStyle(el).transform))
+    .not.toBe('none');
+  await page.mouse.move(0, 0);
 
   // Check Overlays under Normal Motion: must report 0s duration and no animation
   // Quick Add
@@ -250,7 +258,7 @@ test('motion parity: computed transition and animation properties in normal and 
   await expect(focusScreen).toHaveCount(0);
 });
 
-test('rapid repeated toggles and modal cycles preserve state and focus', async () => {
+test('rapid repeated checkbox toggles and modal open/cancel cycles preserve board state', async () => {
   await addTask('Rapid Toggle Task', '45m');
   const checkbox = page.locator('.task-checkbox').first();
   await expect(checkbox).toBeVisible();
@@ -304,7 +312,7 @@ test('rapid repeated toggles and modal cycles preserve state and focus', async (
   expect(data.tasks).toHaveLength(1);
 });
 
-test('drag motion: whole-card lift, placeholder reflow, settling, and Escape cancellation', async () => {
+test('drag motion: placeholder reflow, cross-column reorder, and Escape cancellation', async () => {
   await addTask('Card Alpha', '30m', '2026-10-25');
   await addTask('Card Beta', '45m', '2026-10-25');
   await addTask('Card Gamma', '60m', '2026-10-25');
