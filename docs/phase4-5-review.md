@@ -17,6 +17,7 @@ documentation and test-description edits on that branch.
 | `git diff --check` | pass |
 | Phase 4 hosted receipt, `d0f55c3`, run `40500807107` | recorded 122/122 Electron |
 | Phase 5 hosted receipt, `4548a8a`, run `40509013630` | recorded 128/128 |
+| Fix branch `d90367a`, run [40651868997](https://github.com/yash9008/laptop-planner/actions/runs/40651868997) | scheduler 78/78 in both time zones, database 63/63, Electron 132/132 |
 | Evidence screenshot SHA-256 against files on disk | match |
 
 Two limits apply. The receipts cover `d0f55c3` and `4548a8a`, not the current
@@ -166,4 +167,9 @@ All findings above are addressed on branch `fix/phase4-5-review`.
 - The wide Focus screenshot caption matches the captured `00:00` state.
 
 The hosted run for this branch is the evidence for these changes; the receipts
-recorded above cover the earlier revisions.
+recorded above cover the earlier revisions. Run `40651868997` passed on
+`d90367a`, which is the revision carrying every fix in this list. An earlier
+run of the same branch, `40650880415` on `57548e6`, failed only on two of the
+new probes added here: the `?` shortcut had no captured origin to restore, and
+one probe waited for a "Today" button that does not exist in the board view.
+Both were corrected before the passing run.
