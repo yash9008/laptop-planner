@@ -1221,6 +1221,13 @@ export function App() {
 
       if (event.key === '?') {
         event.preventDefault();
+        // Keep the control the user was on so closing help returns there.
+        captureTaskOrigin(
+          selectedTaskIdRef.current ?? selectedTaskId,
+          document.activeElement instanceof HTMLElement && document.activeElement !== document.body
+            ? document.activeElement
+            : undefined
+        );
         setKeyboardHelpOpen(true);
         return;
       }

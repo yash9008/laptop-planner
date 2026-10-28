@@ -117,7 +117,7 @@ test('calendar command releases a docked utility panel', async () => {
 test('backlog panel focuses the top backlog task when opened', async () => {
   await addTask('Backlog First', '30m', null);
   await addTask('Backlog Second', '30m', null);
-  await expect(page.getByRole('button', { name: 'Today', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Open backlog panel', exact: true })).toBeVisible();
 
   await page.getByRole('button', { name: 'Open backlog panel', exact: true }).click();
   const panel = page.getByTestId('backlog-panel');
