@@ -250,7 +250,7 @@ test('motion parity: computed transition and animation properties in normal and 
   await expect(focusScreen).toHaveCount(0);
 });
 
-test('interruption: rapid repeated toggles, modal cycles, and cancellation preserve state and focus', async () => {
+test('rapid repeated toggles and modal cycles preserve state and focus', async () => {
   await addTask('Rapid Toggle Task', '45m');
   const checkbox = page.locator('.task-checkbox').first();
   await expect(checkbox).toBeVisible();
@@ -304,7 +304,7 @@ test('interruption: rapid repeated toggles, modal cycles, and cancellation prese
   expect(data.tasks).toHaveLength(1);
 });
 
-test('drag motion: whole-card lift, placeholder reflow, settling, edge scrolling, and Escape cancellation', async () => {
+test('drag motion: whole-card lift, placeholder reflow, settling, and Escape cancellation', async () => {
   await addTask('Card Alpha', '30m', '2026-10-25');
   await addTask('Card Beta', '45m', '2026-10-25');
   await addTask('Card Gamma', '60m', '2026-10-25');
@@ -410,7 +410,7 @@ test('fault injection: drag rollback on simulated save failure preserves baselin
   expect(data.tasks.map((t) => t.title)).toEqual(['Stable One']);
 });
 
-test('board panning and keyboard motion: smooth vs instant scrolling, cancellation, and click suppression', async () => {
+test('board panning and keyboard navigation preserve scroll position and support Escape cancellation', async () => {
   await addTask('Pan Motion Task', '60m', '2026-10-25');
   const board = page.getByRole('region', { name: 'Multi-day board', exact: true });
   await expect(board).toBeVisible();

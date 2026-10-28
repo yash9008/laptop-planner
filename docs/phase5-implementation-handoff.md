@@ -14,7 +14,7 @@
 - **Scope**:
   - Authored comprehensive 26-surface motion acceptance matrix across all interactive controls, overlays, panels, drag gestures, and views ([docs/phase5-motion-acceptance.md](docs/phase5-motion-acceptance.md)).
   - Harmonized application styles ([src/renderer/styles.css](src/renderer/styles.css)) to enforce verified normal-motion transitions (50 ms checkbox, 200 ms opacity, 120 ms card background/border, 150 ms menu actions, 300 ms nav icon transform, 300 ms focus-calendar opacity) and comprehensive `@media (prefers-reduced-motion: reduce)` cancellation across all interactive controls and overlays.
-  - Implemented Phase 5 UI test specification suite ([tests/app/phase5-ui.spec.ts](tests/app/phase5-ui.spec.ts)) containing 6 comprehensive test specifications (computed style audit, interruption handling, whole-card drag physics, main-process fault injection rollback, board panning/keyboard navigation, and visual evidence logging).
+  - Implemented six Phase 5 UI test specifications ([tests/app/phase5-ui.spec.ts](tests/app/phase5-ui.spec.ts)): selected computed-style checks, repeated actions/modal cancellation, drag outcomes, main-process fault-injection rollback, board panning/keyboard scroll outcomes, and visual evidence capture. They do not measure all motion spans or cover every matrix row.
   - Settled main-process event loop timing in native menu tests ([tests/app/menu-bar.spec.ts](tests/app/menu-bar.spec.ts)) to eliminate intermittent race conditions after simulated sleep/wake cycles.
   - Extracted, verified, and digested all 5 wide (1440×900) and narrow (860×680) visual receipts in [docs/evidence/phase5-motion-acceptance/](docs/evidence/phase5-motion-acceptance/).
 - **Changed Files**:
@@ -111,13 +111,13 @@ In accordance with prompt instructions, motion parity acceptance is classified a
    - Laptop Planner adopted the 300 ms ease-in calendar opacity transition where the selector matches intent (`.workspace.focus-view .calendar-dock`), while avoiding manufactured transitions on unrelated utility panels.
 
 3. **Drag & Drop Physics**:
-   - Whole-card lift, live insertion slot, 170 ms FLIP reflow, and 180 ms ghost settling are fully verified locally and completely nullified under reduced motion.
+   - Whole-card lift, insertion, move/cancel outcomes are exercised. The 170 ms FLIP and 180 ms ghost values are implementation declarations; Phase 5 does not measure their visible spans. Reduced-motion drag behavior is exercised for a move, but not every drag animation or interruption path.
    - The exact cubic-bezier curves and momentum physics of Sunsama's drag system remain unverified in the absence of frame-level coordinate traces.
 
 ---
 
 ## 6. Review Readiness
 
-All Phase 5 acceptance criteria, component styling, test specifications, hosted validation, screenshot extraction, and matrix documentation are complete.
+The original hosted run passed, and its source and assertions remain intact. Codex review found that several matrix claims were not exercised by the Phase 5 tests: edge auto-scroll, panning click suppression/pointer cancellation, and normal/reduced keyboard-scroll behavior. The Phase 5 test names and matrix now describe the assertions accurately. These remaining probes are listed in [phase5-review.md](phase5-review.md), so motion acceptance is partial.
 
-**Ready for Codex review.**
+**Codex review: partial; follow-up acceptance evidence remains.**
