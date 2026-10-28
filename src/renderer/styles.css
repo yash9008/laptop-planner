@@ -45,7 +45,7 @@ button svg { flex-shrink: 0; }
 .sidebar-collapsed .projects-heading { justify-content: center; margin-left: 0; margin-right: 0; }
 .sidebar-collapsed .sidebar-footer { justify-content: center; padding-left: 0; padding-right: 0; }
 .sidebar-collapsed .add-project-row { justify-content: center; border-left: 0; }
-.workspace { --rail-width: 44px; flex: 1; min-width: 0; min-height: 0; display: grid; grid-template-columns: minmax(0,1fr) min(var(--calendar-width,clamp(260px,24vw,340px)),max(240px,calc(100% - 280px - var(--rail-width)))) var(--rail-width); grid-template-rows: 48px auto auto minmax(0,1fr) auto; margin-top: 28px; background: var(--canvas); border: 1px solid #303030; border-bottom: 0; border-right: 0; border-radius: 7px 0 0 0; overflow: hidden; }
+.workspace { --rail-width: 50px; flex: 1; min-width: 0; min-height: 0; display: grid; grid-template-columns: minmax(0,1fr) min(var(--calendar-width,272px),max(240px,calc(100% - 280px - var(--rail-width)))) var(--rail-width); grid-template-rows: 48px auto auto minmax(0,1fr) auto; margin-top: 28px; background: var(--canvas); border: 1px solid #303030; border-bottom: 0; border-right: 0; border-radius: 7px 0 0 0; overflow: hidden; }
 .workspace.calendar-hidden { grid-template-columns: minmax(0,1fr) 0 var(--rail-width); }
 .workspace-topbar { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 14px; border-bottom: 1px solid var(--border); -webkit-app-region: drag; min-width: 0; }
 .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -2012,14 +2012,25 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 .calendar-hour>i { background: #1e1e1e; }
 .calendar-footer { display: none; }
 
-/* Calendar blocks: project tint, soft hatch, readable type */
+/* Calendar blocks: light project-tinted paper with a soft hatch */
 .calendar-block {
+  --block-fill: color-mix(in srgb, var(--block-color, #c9a15e) 58%, #ece3cc);
   border-radius: 4px; padding: 4px 7px;
-  background-image: repeating-linear-gradient(135deg, #ffffff0f 0 1px, transparent 1px 5px);
-  border-color: #ffffff26; border-left-width: 2px;
+  background-color: var(--block-fill);
+  background-image: repeating-linear-gradient(135deg, #00000010 0 1px, transparent 1px 5px);
+  border-color: color-mix(in srgb, var(--block-color, #c9a15e) 72%, #6a6252);
+  border-left-width: 2px;
+  border-left-color: color-mix(in srgb, var(--block-color, #c9a15e) 82%, #3d3526);
+  color: #25221a;
 }
 .calendar-block > strong { font-size: 11px; font-weight: 600; }
-.calendar-block > span { font-size: 9px; opacity: .75; }
+.calendar-block > span { font-size: 9px; color: #3b362a; opacity: .8; }
+.calendar-block.is-completed {
+  background-color: var(--block-fill);
+  background-image: repeating-linear-gradient(135deg, #00000010 0 1px, transparent 1px 5px);
+  border-color: color-mix(in srgb, var(--block-color, #c9a15e) 60%, #6a6252);
+  color: #25221a; opacity: .55;
+}
 
 /* Cards: raised, project-colored footer, no note preview on the board */
 .planning-board .task-notes { display: none; }

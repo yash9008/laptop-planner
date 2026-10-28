@@ -495,7 +495,15 @@ test('visual evidence: wide 1440x900 and narrow 860x680 captures of normal and r
   await addTask('Review Motion Parity', '1h', '2026-10-25', studies);
   await addTask('Audit Transition Curves', '30m', '2026-10-25', webDev);
   await addTask('Read chapter 4', '45m', '2026-10-25', aerospace);
-  await addTask('Outline the handoff notes', '30m', '2026-10-25', studies);
+  const handoff = await addTask('Outline the handoff notes', '30m', '2026-10-25', studies);
+  await page.evaluate(
+    async ({ id }) => {
+      const res = await window.planner.setTaskCompleted({ id, completed: true, viewDate: '2026-10-25' });
+      if (!res.ok) throw new Error(res.error.message);
+      window.dispatchEvent(new Event('focus'));
+    },
+    { id: handoff.id }
+  );
   await addTask('Measure the rail breakpoint', '45m', '2026-10-26', webDev);
   await addTask('Sketch the calendar header', '30m', '2026-10-26', aerospace);
   await addTask('Plan next week', '1h', '2026-10-27', studies);

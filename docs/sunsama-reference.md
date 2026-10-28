@@ -3,8 +3,9 @@
 The Home screen's visual language was taken from Sunsama 3.4.15 running on this
 machine (Electron 44.4.5), not from a screenshot. Sunsama's renderer is a remote
 web app, so nothing useful ships in `app.asar`; the numbers below were read from
-the live page through the Chrome DevTools Protocol at a 1710x1072 viewport,
-2x scale.
+the live page through the Chrome DevTools Protocol at 952x640, 1280x800 and
+1710x1072 viewports. The 952px pass is what reveals the 60px icon rail; the
+wider passes show the 200px sidebar.
 
 Only layout and paint values were read. No Sunsama task, project, calendar or
 account data was read, changed or imported, and no Sunsama branding is copied.
@@ -29,15 +30,47 @@ account data was read, changed or imported, and no Sunsama branding is copied.
 | Card title | 14px/500 `#e6e6e6` |
 | Estimate pill | 10px/600, `#a0a0a0` on `#3c3c3c`, 4px radius, 2px 4px padding |
 | Checkbox | 16px circle, green `#4dcd7d` when complete |
-| Calendar dock | 272px wide, day label 55px tall with a 20px/600 weekday, 24px per half-hour event slot |
+| Calendar dock | 272px wide, day label 80px tall below the toolbar with a 20px/600 weekday, 24px per half-hour event slot |
+| Sidebar rail | 60px wide below ~1024px; 24px icon over a 10px label, 45x59 selected tile `#1c1c1d` |
+| Calendar hour gutter | 45px, continuous 1px rule, hour label 10px `#7c7c7c` |
+| Calendar block | light project-tinted fill with a diagonal hatch, 4px radius, 2px project-colored left border |
 | Font | `Avenir, Arial, "Helvetica Neue", Helvetica, sans-serif`, body 14px/500 |
 
 ## What was applied
 
-`src/renderer/styles.css` ends with a single block, "Visual language:
-Sunsama-measured home screen". It applies the values above to the app shell,
-sidebar, toolbar, board columns, day labels, progress track, add-task row and
-cards.
+`src/renderer/styles.css` ends with two blocks: "Visual language:
+Sunsama-measured home screen" for the shell, sidebar, toolbar, columns and
+cards, and "Home screen pass C" for the icon rail, full-width toolbar, compact
+calendar header and colored cards.
+
+Pass C applies the measured home-screen silhouette:
+
+- **Sidebar rail.** Below 1024px the 200px sidebar becomes a 60px icon rail:
+  icon over a 10px label, a 45x59 selected tile, a short section divider and
+  project hashes. The measured breakpoint is between 1000 and 1050px, so 1024
+  is the midpoint.
+- **One toolbar row.** The toolbar spans the whole panel instead of stopping at
+  the calendar, and the 1px divider under it is gone. `Board | Day`, the command
+  palette icon and `Add task` stay at the right; the save state moved to the
+  sidebar footer.
+- **Compact calendar header.** The old `Calendar` title plus a second dates row
+  are replaced by one `WED / 28` header, with the zoom stack in a 45px gutter.
+  It is 64px tall so the hour grid starts level with the board's first row.
+  Sunsama measures 80px here; the 16px is given up deliberately so the two
+  halves of the home screen share a baseline.
+- **Quiet columns.** The `7h 30m free / 0 of 2 done` footers and the
+  "Drop a task here" placeholder are gone. Completion is exposed on the
+  progress track (`role="progressbar"`, `aria-valuetext="N of M done"`);
+  overflow remains as the only footer, and only when a day does not fit.
+- **Color.** Project tags use the whole project color rather than just the `#`,
+  cards keep their 1px top highlight, and calendar blocks are light
+  project-tinted chips with the diagonal hatch and a project-colored left edge,
+  as Sunsama's are. Card note previews are hidden on the board; notes remain in
+  the editor.
+
+The calendar dock's default width is 272px, matching the measured dock (it was
+`clamp(260px, 24vw, 340px)`, which made the calendar about 70px too wide at
+1440). The existing drag handle still overrides it.
 
 Two deliberate departures:
 
@@ -45,6 +78,12 @@ Two deliberate departures:
 - **Feature rows.** Sunsama's Daily/Weekly ritual rows and its "Invite someone"
   entry have no counterpart here, so they are omitted rather than shown as dead
   controls.
+
+Three smaller departures: the board keeps fixed 272px columns instead of
+widening them to fill the panel, so the column pitch and the existing
+`scrollBy({left: 272})` step stay in agreement; there is no `Calendars` pill or
+account avatar in the toolbar; and the right rail keeps this app's panels rather
+than Sunsama's target/briefcase/moon entries.
 
 Day totals moved from the strip above the board into each column's add-task row,
 matching Sunsama. The board's own summary strip is gone; the Today view keeps

@@ -20,6 +20,10 @@ async function add(title:string,estimate='45m',repeat=false){
   if(title==='Read a chapter')await form.getByLabel('Project',{exact:true}).selectOption({label:'Learning'});
   await form.getByRole('button',{name:'Add to day',exact:true}).click();await expect(form).not.toBeVisible();
 }
+async function resizeWindow(width:number,height:number){
+  await application!.evaluate(({BrowserWindow},size)=>{BrowserWindow.getAllWindows()[0]!.setContentSize(size.width,size.height);},{width,height});
+  await page.setViewportSize({width,height});
+}
 test('Home opens with day columns and a docked calendar, and board checkboxes update real tasks',async()=>{
   await page.setViewportSize({width:1710,height:1072});
   await expect(page.getByRole('region',{name:'Multi-day board',exact:true})).toBeVisible();await expect(page.getByTestId('board-day')).toHaveCount(7);
@@ -47,11 +51,12 @@ test('calendar zoom, panel toggles, sidebar collapse and keyboard task creation 
   const enlarged=await page.getByTestId('calendar-block').boundingBox();expect(enlarged!.height).toBeCloseTo(original!.height*1.25,0);
   await page.getByRole('button',{name:'Hide calendar',exact:true}).click();await expect(page.locator('.calendar-dock')).toHaveCount(0);
   // Below 1024px the sidebar is already a 60px icon rail, so the manual toggle is exercised at a wide size.
+  await resizeWindow(860,680);
   await expect(page.locator('.sidebar')).toHaveCSS('width','60px');
-  await page.setViewportSize({width:1440,height:900});
+  await resizeWindow(1440,900);
   await page.getByRole('button',{name:'Collapse sidebar',exact:true}).click();await expect(page.locator('.sidebar')).toHaveCSS('width','60px');
   await page.getByRole('button',{name:'Expand sidebar',exact:true}).click();await expect(page.locator('.sidebar')).toHaveCSS('width','200px');
-  await page.setViewportSize({width:860,height:680});
+  await resizeWindow(860,680);
   await page.getByRole('button',{name:'Show calendar',exact:true}).click();
   await expect(page.locator('.calendar-dock')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
   await page.keyboard.press('a');const form=page.getByRole('dialog',{name:'New task',exact:true});await expect(form).toBeVisible();

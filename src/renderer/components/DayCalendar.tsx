@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type PointerEvent, type KeyboardEvent, type CSSProperties } from 'react';
 import type { PlannerDay, PlannerTask, PlannerEvent } from '../../shared/contracts';
 import { dayNumber, minuteRelativeTo } from '../../scheduler/time';
 import { dateLabel, formatDuration, formatTime, shiftLocalTime } from '../../shared/task-input';
@@ -84,7 +84,7 @@ export function DayCalendar({ day, busy, onEdit, onAddEvent, onEditEvent, onChan
         const task = tasks.get(block.taskId); const project = day.projects.find((project) => project.id === task?.projectId);
         const title = task?.title ?? day.calendarTitles[block.taskId] ?? 'Completed task';
         return <button key={block.id} className={`calendar-block ${block.completed ? 'is-completed' : ''} ${block.recorded?'is-recorded':''} ${block.endMinute - block.startMinute < 35 ? 'is-short' : ''}`}
-          style={{ top: block.startMinute * scale, height: (block.endMinute - block.startMinute) * scale, borderLeftColor: project?.color, backgroundColor: project ? `${project.color}48` : undefined }} data-testid={block.recorded?'recorded-block':'calendar-block'} data-task-id={block.taskId} data-completed={block.completed}
+          style={{ top: block.startMinute * scale, height: (block.endMinute - block.startMinute) * scale, '--block-color': project?.color ?? '#c9a15e' } as CSSProperties} data-testid={block.recorded?'recorded-block':'calendar-block'} data-task-id={block.taskId} data-completed={block.completed}
           aria-label={`${title}, ${formatTime(block.startMinute)} to ${formatTime(block.endMinute)}${block.recorded?', actual focus time':block.completed ? ', completed' : ''}`}
           title={`${title} · ${formatTime(block.startMinute)} – ${formatTime(block.endMinute)} · ${formatDuration(block.endMinute - block.startMinute)}`}
           onClick={() => { if (task) onEdit(task); }} disabled={!task || busy}><strong>{block.completed && <Icon name="check" size={12} />}{title}</strong><span>{formatTime(block.startMinute)} – {formatTime(block.endMinute)}</span></button>;
