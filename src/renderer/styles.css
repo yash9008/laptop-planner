@@ -1738,8 +1738,13 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 }
 
 /* ------------------------------------------------------------------
-   Visual language: denser Sunsama-style surfaces (UI refinement A).
-   Tokens first, then shell, sidebar, toolbar, board, cards.
+   Visual language: Sunsama-measured home screen (UI refinement B).
+
+   Numbers below come from Sunsama 3.4.15's live DOM at 1710x1072, not from
+   a screenshot: 200px sidebar, 272px columns with no gutter, 64px day label,
+   8px progress track, 34px add-task row, 252px cards, Avenir 14px/500.
+   Avenir ships with macOS, so it is used first and Inter (bundled below)
+   remains the fallback for anything without it.
    ------------------------------------------------------------------ */
 @font-face {
   font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap;
@@ -1759,104 +1764,145 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 }
 
 :root {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #0b0b0b;
-  --canvas: #101010;
-  --card: #232323;
-  --card-hover: #272727;
-  --border: #2e2e2e;
-  --muted: #8b8b88;
-  --green: #7dc4a3;
+  font-family: Avenir, 'Avenir Next', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #08090a;
+  --canvas: #131314;
+  --card: #212123;
+  --card-hover: #26262a;
+  --border: #1e1e1e;
+  --muted: #a0a0a0;
+  --green: #4dcd7d;
   --amber: #e3bf83;
-  --surface: #1c1c1c;
-  --text-primary: #e9e7e2;
-  --text-secondary: #8b8984;
+  --surface: #212123;
+  --text-primary: #e6e6e6;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: #7c7c7c;
 }
 
-/* Shell */
-.planner-shell { background: #0b0b0b; }
+/* Shell: dark page, one raised panel inset by 8px */
+.planner-shell { background: #08090a; }
+.workspace {
+  margin: 28px 8px 8px;
+  grid-template-rows: 44px auto auto minmax(0,1fr) auto;
+  background: #131314;
+  border: 1px solid #1e1e1e;
+  border-radius: 4px;
+  box-shadow: 0 3px 5px #000000fc;
+}
 
-/* Sidebar */
-.sidebar { width: 214px; background: #080808; padding: 50px 10px 10px; }
-.sidebar-brand { margin: 0 8px 20px; }
-.sidebar-brand strong { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #dedcd6; }
+/* Sidebar: 200px, 28px rows on a 4px radius */
+.sidebar { width: 200px; padding: 0 12px 8px; background: #08090a; }
+.sidebar-brand { height: 31px; margin: 28px 0 8px; gap: 8px; }
+.sidebar-brand strong { font-size: 16px; font-weight: 600; letter-spacing: 0; color: #c9c9c9; }
 .nav-item {
-  height: 33px; gap: 11px; padding: 0 8px; margin-bottom: 2px;
-  border-radius: 6px; font-size: 13px; font-weight: 450; color: #a5a3a0;
+  height: 28px; gap: 9px; padding: 0 6px; margin: 2px 0;
+  border-radius: 4px; font-size: 14px; font-weight: 500; color: #a0a0a0;
 }
-.nav-item svg { color: #85837f; }
-.nav-item.active { background: #1f1f1f; color: #f2f0ec; }
-.nav-item.active svg { color: #dedbd5; }
-.nav-item:hover:not(:disabled) { background: #161616; color: #d6d4cf; }
+.nav-item svg { width: 15px; height: 15px; color: #a0a0a0; }
+.nav-item.active { background: #282828; color: #e6e6e6; }
+.nav-item.active svg { color: #e6e6e6; }
+.nav-item:hover:not(:disabled) { background: #1c1c1d; color: #d6d6d6; }
 .sidebar-section-label, .projects-heading {
-  font-size: 10px; font-weight: 600; letter-spacing: 1.1px;
-  color: #63615c; margin: 26px 8px 8px;
+  font-size: 10px; font-weight: 600; letter-spacing: .9px;
+  color: #787878; margin: 26px 6px 6px;
 }
-.sidebar-bottom { padding-top: 10px; border-top: 1px solid #141414; }
-.sidebar-bottom .nav-item { font-size: 13px; color: #8f8d88; }
+.sidebar-projects .nav-item, .sidebar-bottom .nav-item { font-size: 14px; }
+.sidebar-bottom { padding-top: 8px; border-top: 1px solid #1a1a1b; }
+.add-project-row { padding: 6px; border-left: 0; color: #7c7c7c; font-size: 14px; }
+.add-project-row:hover { color: #e6e6e6; }
+.sidebar-footer { padding: 4px 6px; }
 
-/* Toolbar: soft pills instead of flat text buttons */
+/* Toolbar: 24px pills, 12px/600 labels */
+.workspace-topbar { padding: 0 10px; border-bottom: 1px solid #1e1e1e; container-type: inline-size; }
 .toolbar-button, .view-switch button {
-  height: 30px; min-height: 30px; padding: 0 10px; gap: 7px;
-  border: 1px solid #2b2b2b; border-radius: 8px;
-  background: #1a1a1a; color: #c4c2bd; font-size: 12px; font-weight: 500;
+  height: 24px; min-height: 24px; padding: 0 6px; gap: 6px;
+  border: 1px solid #323232; border-radius: 4px;
+  background: #212123; color: #a0a0a0; font-size: 12px; font-weight: 600;
 }
-.toolbar-button:hover:not(:disabled) { background: #232323; border-color: #3a3a3a; color: #f0eeea; }
-.toolbar-button.selected { background: #2b2b2b; border-color: #414141; color: #ffffff; }
-.toolbar-button.has-active-filter { border-color: #4a5a4f; color: #cfe6d8; }
+.toolbar-button:hover:not(:disabled) { background: #29292c; border-color: #3a3a3a; color: #e6e6e6; }
+.toolbar-button.selected { background: #2e2e31; border-color: #444444; color: #e6e6e6; }
+.toolbar-button.has-active-filter { border-color: #3f5c48; color: #cfe6d8; }
 .toolbar-add.button {
-  height: 30px; padding: 0 12px; border-radius: 8px;
-  background: #232323; border: 1px solid #343434; color: #e6e3dc; font-size: 12px;
+  height: 24px; padding: 0 8px; border-radius: 4px;
+  background: #212123; border: 1px solid #323232; color: #a0a0a0;
+  font-size: 12px; font-weight: 600;
 }
-.toolbar-add.button:hover:not(:disabled) { background: #2c2c2c; border-color: #434343; }
+.toolbar-add.button:hover:not(:disabled) { background: #29292c; border-color: #3a3a3a; color: #e6e6e6; }
+.view-switch { border: 1px solid #323232; border-radius: 4px; background: #212123; }
+.view-switch button { border: 0; background: transparent; border-radius: 3px; }
+.view-switch button[aria-pressed='true'] { background: #343437; color: #e6e6e6; }
+.date-picker input { font-size: 12px; color: #a0a0a0; }
+.save-status { font-size: 10px; color: #787878; }
 
-/* Board columns */
-.planning-board { gap: 14px; padding: 16px 12px 8px; }
-.board-column { width: 292px; min-width: 292px; }
-.board-column-heading { height: 92px; padding: 0 4px 10px; align-items: flex-start; }
+/* Keep the toolbar inside its column when the calendar makes it narrow */
+@container (max-width: 760px) { .save-status { display: none; } }
+@container (max-width: 620px) {
+  .toolbar-button>span, .toolbar-add>span, .view-switch button>span { display: none; }
+  .toolbar-button[aria-label="Go to today"] { font-size: 0; gap: 0; }
+  .toolbar-left, .toolbar-right { gap: 5px; }
+  .toolbar-palette-trigger kbd { display: none; }
+  .date-picker input { width: 84px; }
+}
+@container (max-width: 480px) {
+  .view-switch { display: none; }
+  .toolbar-left, .toolbar-right { gap: 4px; }
+}
+
+/* Board: 272px columns, no gutter, flush with the panel edge */
+.planning-board { gap: 0; padding: 0; }
+.board-column { width: 272px; min-width: 272px; }
+.board-column-heading { height: 64px; padding: 16px 20px 0; align-items: flex-start; }
 .board-column-heading strong, .board-column-heading h2 {
-  font-size: 26px; font-weight: 700; letter-spacing: -0.6px; color: #ecebe7;
+  font-size: 20px; font-weight: 600; letter-spacing: 0; color: #e6e6e6;
 }
-.board-column-heading span, .board-column-heading p { font-size: 15px; color: #85837e; margin-top: 3px; }
+.board-column-heading span, .board-column-heading p {
+  font-size: 14px; font-weight: 500; color: #a0a0a0; margin: 5px 0 0;
+}
 .board-column-heading .today-label {
-  background: #ffffff08; border: 1px solid #ffffff12; color: #b9b6af;
-  font-size: 9px; padding: 2px 6px; letter-spacing: 0.4px;
+  background: transparent; border: 1px solid #323232; border-radius: 4px;
+  color: #a0a0a0; font-size: 11px; font-weight: 600; letter-spacing: 0;
+  padding: 1px 5px; margin-top: 0;
 }
-.completion-track { height: 3px; margin: 0 4px 12px; background: #1c1c1c; border-radius: 2px; }
-.board-today>.completion-track { background: #232323; }
-.board-selected>.completion-track { background: #2b2b2b; }
+.board-selected .board-column-heading strong { color: #ffffff; }
+.completion-track { height: 8px; margin: 4px 12px 16px; background: #1f1f1e; border-radius: 4px; }
+.completion-track>div { background: #4dcd7d; border-radius: 4px; }
+.board-today>.completion-track, .board-selected>.completion-track { background: #1f1f1e; }
 
-/* Add-task row carries the day's remaining work */
+/* Add-task row: 34px, flat surface, day total on the right */
 .task-add-bar {
-  height: 34px; gap: 8px; padding: 0 10px; margin-bottom: 9px;
-  border: 1px solid #242424; border-radius: 6px; background: #191919;
-  box-shadow: none; color: #8f8d88; font-size: 13px;
+  height: 34px; gap: 8px; padding: 0 12px; margin: 0 8px 8px;
+  background: #212123; border: 1px solid #212123; border-radius: 4px;
+  box-shadow: none; color: #a0a0a0; font-size: 14px; font-weight: 500;
 }
-.task-add-bar:hover:not(:disabled) { background: #202020; border-color: #2f2f2f; color: #d6d4cf; }
+.task-add-bar:hover:not(:disabled) { background: #29292c; border-color: #29292c; color: #e6e6e6; }
 .task-add-bar strong {
-  margin-left: auto; background: transparent; padding: 0;
-  font-size: 11px; font-weight: 500; color: #807e79;
+  margin-left: auto; padding: 0; background: transparent;
+  font-size: 12px; font-weight: 500; color: #7c7c7c; font-variant-numeric: tabular-nums;
 }
+.task-panel .task-add-bar { margin-left: 0; margin-right: 0; }
+.board-task-list { padding: 0 6px; }
+.board-empty { font-size: 13px; color: #7c7c7c; padding: 18px 0; }
+.board-capacity { padding: 6px 12px 10px; font-size: 11px; color: #7c7c7c; border-top: 0; }
+.board-capacity>span { color: #787878; }
 
-/* Cards: tighter, flatter, closer to the reference */
+/* Cards: 252px, 12px padding, 14px/500 titles, quiet estimate pill */
 .task-card {
-  padding: 10px 12px 8px; margin-bottom: 8px;
-  background: var(--card); border: 1px solid #2d2d2d; border-radius: 6px;
-  box-shadow: none;
+  padding: 12px; margin: 0 2px 8px;
+  background: #212123; border: 1px solid #212123; border-radius: 4px;
+  box-shadow: 0 1px 2px #000000e6;
 }
-.task-card:hover { background: var(--card-hover); border-color: #3a3a3a; }
-.card-topline { min-height: 16px; margin-bottom: 3px; }
-.task-time { font-size: 11px; font-weight: 500; color: #8b8984; }
+.task-card:hover { background: #26262a; border-color: #26262a; }
+.card-topline { min-height: 20px; margin-bottom: 2px; }
+.task-time { font-size: 12px; font-weight: 500; color: #a0a0a0; }
 .duration-badge {
-  background: #2e2e2e; color: #b3b0aa; padding: 2px 5px;
-  border-radius: 4px; font-size: 11px; font-weight: 500;
+  background: #3c3c3c; color: #a0a0a0; padding: 2px 4px;
+  border-radius: 4px; font-size: 10px; font-weight: 600;
 }
-.task-title { font-size: 14px; line-height: 1.45; font-weight: 600; color: #e9e7e2; }
-.task-notes { font-size: 12px; line-height: 1.5; color: #7e7c77; margin: 4px 0 0; }
-.card-footer { gap: 6px; min-height: 20px; margin-top: 7px; }
-.task-checkbox { width: 15px; height: 15px; border-color: #6d6b66; }
-.task-checkbox::after { left: 3.5px; top: 3.5px; }
-.project-tag { font-size: 11px; color: #8d8a83; }
-.project-tag i { font-size: 14px; }
-.board-capacity { padding: 10px 4px; font-size: 11px; color: #6d6b66; border-top: 1px solid #191919; }
-.board-empty { font-size: 12px; color: #63615c; }
+.task-title { font-size: 14px; line-height: 1.45; font-weight: 500; color: #e6e6e6; }
+.task-notes { font-size: 12px; line-height: 1.5; color: #7c7c7c; margin: 4px 0 0; }
+.card-footer { gap: 6px; min-height: 20px; margin-top: 6px; }
+.task-checkbox { width: 16px; height: 16px; border-color: #7c7c7c; }
+.task-checkbox:checked { background: #4dcd7d; border-color: #4dcd7d; }
+.task-checkbox:checked::after { border-color: #0b2b17; }
+.project-tag { font-size: 12px; color: #7c7c7c; }
+.project-tag i { font-size: 15px; }

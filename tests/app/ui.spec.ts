@@ -97,7 +97,7 @@ test('calendar divider supports pointer resize, cancellation, keyboard bounds an
   expect(await page.evaluate(()=>window.planner.getDay())).toEqual(before);
 });
 
-test('workload stays above the board, exposes overflow and follows the selected column at wide and laptop sizes',async()=>{
+test('day totals live in each column, overflow is exposed there, and the Today view keeps the summary',async()=>{
   await page.setViewportSize({width:1440,height:900});
   await page.evaluate(async()=>{
     for(const [title,plannedMinutes,plannedDate] of [
@@ -110,16 +110,22 @@ test('workload stays above the board, exposes overflow and follows the selected 
     }
   });
   await page.getByRole('button',{name:'Go to today',exact:true}).click();
-  const summary=page.getByRole('region',{name:'Daily summary',exact:true});
-  await expect(summary).toHaveClass(/is-over-capacity/);
-  const totals=(await summary.boundingBox())!;const board=(await page.getByRole('region',{name:'Multi-day board',exact:true}).boundingBox())!;
-  expect(totals.y+totals.height).toBeLessThanOrEqual(board.y);
-  await expect(page.getByTestId('planned-total')).toHaveText('19h 15m');
+  const today=page.locator('[data-testid="board-day"][data-date="2026-10-25"]');
+  await expect(today.locator('.task-add-bar strong')).toHaveText('19h 15m');
+  await expect(today.locator('.board-capacity')).toContainText('won’t fit');
+  // The board itself has no separate workload strip above the columns.
+  await expect(page.getByRole('region',{name:'Daily summary',exact:true})).toHaveCount(0);
   await page.screenshot({path:'test-results/planner-ui-phase1-wide.png'});
   await page.getByRole('region',{name:'Multi-day board',exact:true}).focus();await page.keyboard.press('ArrowRight');
   await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-26');
-  await expect(page.getByTestId('planned-total')).toHaveText('30m');
-  await expect(summary).not.toHaveClass(/is-over-capacity/);
+  const tomorrow=page.locator('[data-testid="board-day"][data-date="2026-10-26"]');
+  await expect(tomorrow.locator('.task-add-bar strong')).toHaveText('30m');
+  await expect(tomorrow.locator('.board-capacity')).not.toContainText('won’t fit');
+  // The full workload summary is kept on the Today view.
+  await page.getByRole('button',{name:'Daily planner',exact:true}).click();
+  const summary=page.getByRole('region',{name:'Daily summary',exact:true});
+  await expect(summary).toHaveClass(/is-over-capacity/);
+  await expect(page.getByTestId('planned-total')).toHaveText('19h 15m');
   await page.setViewportSize({width:860,height:680});
   await page.screenshot({path:'test-results/planner-ui-phase1-laptop.png'});
 });

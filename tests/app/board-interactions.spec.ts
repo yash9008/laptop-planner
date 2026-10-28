@@ -78,7 +78,9 @@ test('right-drag pans continuously, nearest left column selects calendar, saves 
   await seed();const before=(await data()).allTasks;
   await page.getByRole('button',{name:'Monday work',exact:true}).hover();await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-25');
   await panBy(200);await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-26');
-  await expect(page.locator('.calendar-day-number')).toHaveText('26');await expect(page.getByTestId('planned-total')).toHaveText('1h 30m');
+  await expect(page.locator('.calendar-day-number')).toHaveText('26');
+  // Day totals live in each column's add-task row; the board no longer has a summary strip.
+  await expect(column('2026-10-26').locator('.task-add-bar strong')).toHaveText('1h 30m');
   await expect(page.getByTestId('calendar-block')).toHaveAccessibleName('Monday work, 6:00 AM to 7:30 AM');
   expect(await board().evaluate((host)=>host.scrollLeft)).toBeCloseTo(200,0);
   await panBy(272);await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-27');await expect(page.locator('.calendar-day-number')).toHaveText('27');
