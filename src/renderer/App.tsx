@@ -35,6 +35,13 @@ export function App() {
   const [calendarOpen, setCalendarOpen] = useState(true);
   const [calendarWidth, setCalendarWidth] = useState(readCalendarWidth);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [narrowSidebar, setNarrowSidebar] = useState(() => window.matchMedia('(max-width: 1024px)').matches);
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 1024px)');
+    const sync = () => setNarrowSidebar(query.matches);
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterAnchor, setFilterAnchor] = useState<HTMLElement | null>(null);
   const [filterQuery, setFilterQuery] = useState('');
@@ -1477,8 +1484,8 @@ export function App() {
             </button>
           </div>
           {project && (
-            <span className="project-tag" title={project.title}>
-              <i style={{ color: project.color }}>#</i>
+            <span className="project-tag" title={project.title} style={{ color: project.color }}>
+              <i>#</i>
               {project.title}
             </span>
           )}
@@ -1509,7 +1516,7 @@ export function App() {
 
   return (
     <>
-      <div className={`planner-shell ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`} inert={isModalOpen ? true : undefined}>
+      <div className={`planner-shell ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${sidebarCollapsed || narrowSidebar ? 'sidebar-rail' : ''} ${narrowSidebar ? 'sidebar-auto' : ''}`} inert={isModalOpen ? true : undefined}>
       <aside className="sidebar">
         <div className="sidebar-brand">
           <span className="brand-symbol">
@@ -1645,9 +1652,9 @@ export function App() {
             <span>Local storage</span>
           </button>
           <div className="sidebar-footer">
-            <span className="local-indicator">
-              <span className="status-dot" />
-              Only on this Mac
+            <span className={`local-indicator save-status ${error ? 'has-error' : ''}`} role="status">
+              <span className={`status-dot ${error ? 'warning' : ''}`} />
+              {busy ? 'Saving…' : error ? 'Needs attention' : 'Saved locally'}
             </span>
             <button
               className="icon-button"
@@ -1759,10 +1766,6 @@ export function App() {
                 )}
               </div>
               <div className="toolbar-right">
-                <span className={`save-status ${error ? 'has-error' : ''}`} role="status">
-                  <span className={`status-dot ${error ? 'warning' : ''}`} />
-                  {busy ? 'Saving…' : error ? 'Needs attention' : 'Saved locally'}
-                </span>
                 <div className="view-switch" aria-label="Planner view">
                   <button
                     aria-label="Board view"

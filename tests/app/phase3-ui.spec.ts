@@ -134,7 +134,7 @@ test('combined project, status, and text filters affect view presentation only w
   // Column header done summary should reflect 1 of 3 done
   const todayColumn = page.locator('[data-testid="board-day"][data-date="2026-10-25"]');
   await expect(todayColumn.getByTestId('board-task')).toHaveCount(3);
-  await expect(todayColumn.locator('.board-capacity')).toContainText('1 of 3 done');
+  await expect(todayColumn.getByRole('progressbar')).toHaveAttribute('aria-valuetext','1 of 3 done');
 
   // Open Filter Chooser
   const filterBtn = page.getByRole('button', { name: 'Filter tasks', exact: true });
@@ -153,8 +153,8 @@ test('combined project, status, and text filters affect view presentation only w
   await expect(todayColumn.getByTestId('board-task')).toHaveCount(1);
   await expect(todayColumn.getByRole('button', { name: 'Alpha Report', exact: true })).toBeVisible();
 
-  // Capacity summary still calculates from underlying data, not filtered rows
-  await expect(todayColumn.locator('.board-capacity')).toContainText('1 of 3 done');
+  // Completion progress still calculates from underlying data, not filtered rows
+  await expect(todayColumn.getByRole('progressbar')).toHaveAttribute('aria-valuetext','1 of 3 done');
 
   // Test project filter
   const projSelect = chooser.getByLabel('Filter by project', { exact: true });

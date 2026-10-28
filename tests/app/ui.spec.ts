@@ -46,8 +46,13 @@ test('calendar zoom, panel toggles, sidebar collapse and keyboard task creation 
   const original=await page.getByTestId('calendar-block').boundingBox();await page.getByRole('button',{name:'Zoom calendar in',exact:true}).click();
   const enlarged=await page.getByTestId('calendar-block').boundingBox();expect(enlarged!.height).toBeCloseTo(original!.height*1.25,0);
   await page.getByRole('button',{name:'Hide calendar',exact:true}).click();await expect(page.locator('.calendar-dock')).toHaveCount(0);
-  await page.getByRole('button',{name:'Collapse sidebar',exact:true}).click();await expect(page.locator('.sidebar')).toHaveCSS('width','64px');
-  await page.getByRole('button',{name:'Expand sidebar',exact:true}).click();await page.getByRole('button',{name:'Show calendar',exact:true}).click();
+  // Below 1024px the sidebar is already a 60px icon rail, so the manual toggle is exercised at a wide size.
+  await expect(page.locator('.sidebar')).toHaveCSS('width','60px');
+  await page.setViewportSize({width:1440,height:900});
+  await page.getByRole('button',{name:'Collapse sidebar',exact:true}).click();await expect(page.locator('.sidebar')).toHaveCSS('width','60px');
+  await page.getByRole('button',{name:'Expand sidebar',exact:true}).click();await expect(page.locator('.sidebar')).toHaveCSS('width','200px');
+  await page.setViewportSize({width:860,height:680});
+  await page.getByRole('button',{name:'Show calendar',exact:true}).click();
   await expect(page.locator('.calendar-dock')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
   await page.keyboard.press('a');const form=page.getByRole('dialog',{name:'New task',exact:true});await expect(form).toBeVisible();
   await form.getByLabel('Task title',{exact:true}).fill('A safe draft');await expect(page.getByRole('dialog')).toHaveCount(1);
@@ -120,7 +125,7 @@ test('day totals live in each column, overflow is exposed there, and the Today v
   await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-26');
   const tomorrow=page.locator('[data-testid="board-day"][data-date="2026-10-26"]');
   await expect(tomorrow.locator('.task-add-bar strong')).toHaveText('30m');
-  await expect(tomorrow.locator('.board-capacity')).not.toContainText('won’t fit');
+  await expect(tomorrow.locator('.board-capacity')).toHaveCount(0);
   // The full workload summary is kept on the Today view.
   await page.getByRole('button',{name:'Daily planner',exact:true}).click();
   const summary=page.getByRole('region',{name:'Daily summary',exact:true});

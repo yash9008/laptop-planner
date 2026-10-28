@@ -67,8 +67,11 @@ export function DayCalendar({ day, busy, onEdit, onAddEvent, onEditEvent, onChan
   }
   finishGroup();
   return <aside className="calendar-panel" aria-label="Day calendar">
-    <div className="calendar-heading"><div><Icon name="calendar" size={17} /><h2>Calendar</h2></div><button className="icon-button" aria-label="Add fixed event" title="Add fixed event" onClick={() => onAddEvent()} disabled={busy}><Icon name="plus" size={17} /></button></div>
-    <div className="calendar-date"><div className="calendar-zoom"><button className="icon-button" aria-label="Zoom calendar in" title="Zoom in" disabled={zoom>=2} onClick={()=>setZoom(Math.min(2,zoom+.25))}><Icon name="plus" size={15}/></button><span>{zoom}x</span><button className="icon-button" aria-label="Zoom calendar out" title="Zoom out" disabled={zoom<=.5} onClick={()=>setZoom(Math.max(.5,zoom-.25))}><span aria-hidden="true">−</span></button></div><span className="calendar-day-number">{dateLabel(day.date, { day: '2-digit' })}</span><div><strong>{dateLabel(day.date, { weekday: 'long' })}</strong><span>{dateLabel(day.date, { month: 'long', year: 'numeric' })}</span></div><span className="calendar-auto"><span className="status-dot" />Auto-planned</span></div>
+    <div className="calendar-heading">
+      <div className="calendar-zoom"><button className="icon-button" aria-label="Zoom calendar in" title="Zoom in" disabled={zoom>=2} onClick={()=>setZoom(Math.min(2,zoom+.25))}><Icon name="plus" size={13}/></button><span>{zoom}x</span><button className="icon-button" aria-label="Zoom calendar out" title="Zoom out" disabled={zoom<=.5} onClick={()=>setZoom(Math.max(.5,zoom-.25))}><span aria-hidden="true">−</span></button></div>
+      <div className="calendar-date"><span className="calendar-weekday">{dateLabel(day.date,{weekday:'short'})}</span><span className="calendar-day-number">{dateLabel(day.date, { day: '2-digit' })}</span></div>
+      <button className="icon-button" aria-label="Add fixed event" title="Add fixed event" onClick={() => onAddEvent()} disabled={busy}><Icon name="plus" size={17} /></button>
+    </div>
     {day.plan.eventConflicts.length > 0 && <div className="event-conflict" role="status">Fixed events overlap. Check their times.</div>}
     <div className="calendar-scroll" ref={scroll} data-testid="calendar-scroll"><div className="calendar-canvas" style={{ height: 24 * HOUR_HEIGHT }} onDoubleClick={(e) => {
       if ((e.target as Element).closest('button') || busy) return;

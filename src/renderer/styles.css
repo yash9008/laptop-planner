@@ -1906,3 +1906,134 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 .task-checkbox:checked::after { border-color: #0b2b17; }
 .project-tag { font-size: 12px; color: #7c7c7c; }
 .project-tag i { font-size: 15px; }
+
+/* ------------------------------------------------------------------
+   Home screen pass C: Sunsama's measured home silhouette — 60px icon
+   rail below 1024px, one full-width toolbar, a compact WED/28 calendar
+   header aligned to the board, colored cards and quiet columns.
+   Measurements: docs/sunsama-reference.md
+   ------------------------------------------------------------------ */
+
+/* Sidebar: icon rail with a short label under each icon */
+.sidebar-rail .sidebar { width: 60px; padding: 0 5px 8px; }
+.sidebar-rail .sidebar-brand { margin: 22px 0 10px; height: 32px; justify-content: center; }
+.sidebar-rail .sidebar-brand strong { display: none; }
+.sidebar-rail .sidebar-brand .brand-symbol svg { width: 22px; height: 22px; }
+.sidebar-rail .nav-item {
+  flex-direction: column; height: 58px; gap: 5px; justify-content: center;
+  padding: 7px 2px; margin: 2px 0; border-radius: 8px;
+  font-size: 10px; font-weight: 500; text-align: center;
+}
+.sidebar-rail .nav-item svg { width: 20px; height: 20px; }
+.sidebar-rail .nav-item > span:last-child {
+  display: block; font-size: 10px; line-height: 1.1;
+  white-space: normal; overflow: visible; text-overflow: clip;
+}
+.sidebar-rail .nav-item.active { background: #1c1c1d; }
+.sidebar-rail .sidebar-section-label {
+  display: block; width: 26px; height: 1px; margin: 12px auto 8px;
+  background: #242426; color: transparent; font-size: 0; overflow: hidden;
+}
+.sidebar-rail .projects-heading { margin: 14px 0 2px; justify-content: center; }
+.sidebar-rail .projects-heading > span { display: none; }
+.sidebar-rail .sidebar-projects .nav-item { height: 32px; }
+.sidebar-rail .sidebar-projects .nav-item > span:last-child { display: none; }
+.sidebar-rail .sidebar-projects .project-hash { font-size: 16px; }
+.sidebar-rail .add-project-row { justify-content: center; padding: 6px 0; border-left: 0; }
+.sidebar-rail .add-project-row > span { display: none; }
+.sidebar-rail .sidebar-bottom .nav-item { height: 44px; }
+.sidebar-rail .sidebar-footer { justify-content: center; padding: 4px 0; }
+.sidebar-rail .local-indicator { gap: 0; font-size: 0; justify-content: center; }
+.sidebar-auto .sidebar-footer .icon-button { display: none; }
+
+/* One toolbar row across the board, calendar and rail; no divider under it */
+.workspace-topbar { grid-column: 1 / -1; border-bottom: 0; padding: 0 10px; gap: 6px; }
+.calendar-dock, .utility-rail { grid-row: 2 / 6; }
+.toolbar-left, .toolbar-right { gap: 6px; }
+.toolbar-button, .view-switch button {
+  background: #212123; border-color: #212123; padding: 0 7px; gap: 5px;
+}
+.toolbar-button svg, .view-switch button svg { width: 13px; height: 13px; }
+.toolbar-button:hover:not(:disabled), .view-switch button:hover:not(:disabled) {
+  background: #29292c; border-color: #29292c;
+}
+.toolbar-button.selected, .view-switch button[aria-pressed='true'] {
+  background: #2e2e31; border-color: #3a3a3a; color: #e6e6e6;
+}
+.view-switch { background: transparent; border: 0; border-radius: 0; padding: 0; gap: 4px; }
+.toolbar-palette-trigger { width: 24px; padding: 0; justify-content: center; }
+.toolbar-palette-trigger span, .toolbar-palette-trigger kbd { display: none; }
+.date-navigation { gap: 0; }
+.date-navigation .icon-button { width: 22px; height: 22px; padding: 0; color: #7c7c7c; }
+.date-picker input { width: 92px; font-size: 12px; color: #a0a0a0; }
+.toolbar-add.button { background: #212123; border-color: #212123; }
+
+@container (max-width: 560px) {
+  .toolbar-button>span, .toolbar-add>span, .view-switch button>span { display: none; }
+  .toolbar-button[aria-label="Go to today"] { font-size: 0; gap: 0; }
+  .toolbar-left, .toolbar-right { gap: 5px; }
+  .date-picker input { width: 84px; }
+}
+
+/* Calendar: WED / 28 header aligned with the board day headers */
+.calendar-dock { background: transparent; }
+.utility-rail { background: transparent; }
+.calendar-heading {
+  height: 64px; padding: 0 8px 0 0; border-bottom: 0;
+  display: flex; align-items: center; gap: 10px; justify-content: flex-start;
+}
+.calendar-heading > .calendar-zoom {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 45px; align-self: stretch; gap: 0; border-right: 1px solid #1e1e1e;
+  color: #7c7c7c; flex-shrink: 0;
+}
+.calendar-zoom .icon-button { width: 24px; height: 17px; padding: 0; }
+.calendar-zoom > span { font-size: 9px; color: #7c7c7c; line-height: 1.2; }
+.calendar-heading > .calendar-date {
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+  align-items: flex-start; min-height: 0; padding: 0 0 0 12px;
+  border-bottom: 0; flex-shrink: 0; color: #a0a0a0;
+}
+.calendar-weekday {
+  font-size: 10px; font-weight: 600; letter-spacing: .9px;
+  color: #a0a0a0; text-transform: uppercase;
+}
+.calendar-day-number {
+  font-size: 28px; font-weight: 600; letter-spacing: -.8px;
+  line-height: 1; color: #e6e6e6;
+}
+.calendar-heading > .icon-button { margin-left: auto; color: #7c7c7c; }
+.calendar-scroll { padding-top: 0; }
+.calendar-canvas::before {
+  content: ''; position: absolute; left: 45px; top: 0; bottom: 0;
+  width: 1px; background: #1e1e1e;
+}
+.calendar-hour>span { font-size: 10px; color: #7c7c7c; }
+.calendar-hour>i { background: #1e1e1e; }
+.calendar-footer { display: none; }
+
+/* Calendar blocks: project tint, soft hatch, readable type */
+.calendar-block {
+  border-radius: 4px; padding: 4px 7px;
+  background-image: repeating-linear-gradient(135deg, #ffffff0f 0 1px, transparent 1px 5px);
+  border-color: #ffffff26; border-left-width: 2px;
+}
+.calendar-block > strong { font-size: 11px; font-weight: 600; }
+.calendar-block > span { font-size: 9px; opacity: .75; }
+
+/* Cards: raised, project-colored footer, no note preview on the board */
+.planning-board .task-notes { display: none; }
+.task-card { box-shadow: inset 0 1px 0 #ffffff08, 0 1px 3px #000000a6; }
+.duration-badge { font-size: 11px; padding: 2px 5px; }
+.project-tag { font-size: 12px; }
+.board-column-heading .today-label { display: none; }
+.task-add-bar strong {
+  padding: 1px 6px; border-radius: 4px; background: #2c2c2e;
+  font-size: 11px; font-weight: 600; color: #a0a0a0;
+}
+
+/* Overflow is the only column footer left */
+.board-capacity {
+  padding: 2px 12px 10px; border-top: 0; font-size: 11px; font-weight: 500;
+  color: #d8b184;
+}

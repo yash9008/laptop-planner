@@ -43,9 +43,14 @@ async function snapshot() {
   });
 }
 
-async function addTask(title: string, estimate = '45m', plannedDate: string | null = '2026-10-25') {
+async function addTask(
+  title: string,
+  estimate = '45m',
+  plannedDate: string | null = '2026-10-25',
+  projectId: string | null = null
+) {
   return page.evaluate(
-    async ({ title, estimate, plannedDate }) => {
+    async ({ title, estimate, plannedDate, projectId }) => {
       const day = await window.planner.getDay();
       if (!day.ok) throw new Error(day.error.message);
       const minutes = estimate.endsWith('h') ? parseInt(estimate, 10) * 60 : parseInt(estimate, 10);
@@ -56,14 +61,38 @@ async function addTask(title: string, estimate = '45m', plannedDate: string | nu
         notes: `Notes for ${title}`,
         plannedDate,
         plannedMinutes: minutes,
+        projectId,
         viewDate: day.value.date,
       });
       if (!res.ok) throw new Error(res.error.message);
       window.dispatchEvent(new Event('focus'));
       return res.value.allTasks.find((t) => t.title === title)!;
     },
-    { title, estimate, plannedDate }
+    { title, estimate, plannedDate, projectId }
   );
+}
+
+async function addProject(title: string, color: string) {
+  const day = await page.evaluate(
+    async ({ title, color }) => {
+      const current = await window.planner.getDay();
+      if (!current.ok) throw new Error(current.error.message);
+      const res = await window.planner.saveProject({
+        id: crypto.randomUUID(),
+        create: true,
+        title,
+        color,
+        notes: '',
+        deadline: null,
+        viewDate: current.value.date,
+      });
+      if (!res.ok) throw new Error(res.error.message);
+      window.dispatchEvent(new Event('focus'));
+      return res.value;
+    },
+    { title, color }
+  );
+  return day.projects.find((project) => project.title === title)!.id;
 }
 
 test('motion parity: declared transitions, applied nav-icon transform, and zero-duration overlays in normal and reduced motion', async () => {
@@ -460,8 +489,17 @@ test('board panning and keyboard navigation preserve scroll position and support
 });
 
 test('visual evidence: wide 1440x900 and narrow 860x680 captures of normal and reduced motion states', async () => {
-  await addTask('Review Motion Parity', '1h');
-  await addTask('Audit Transition Curves', '30m');
+  const studies = await addProject('Studies', '#c9a15e');
+  const webDev = await addProject('Web dev', '#8ab4f8');
+  const aerospace = await addProject('Aerospace', '#b98cd9');
+  await addTask('Review Motion Parity', '1h', '2026-10-25', studies);
+  await addTask('Audit Transition Curves', '30m', '2026-10-25', webDev);
+  await addTask('Read chapter 4', '45m', '2026-10-25', aerospace);
+  await addTask('Outline the handoff notes', '30m', '2026-10-25', studies);
+  await addTask('Measure the rail breakpoint', '45m', '2026-10-26', webDev);
+  await addTask('Sketch the calendar header', '30m', '2026-10-26', aerospace);
+  await addTask('Plan next week', '1h', '2026-10-27', studies);
+  await page.getByRole('button', { name: 'Go to today', exact: true }).click();
 
   // --- WIDE 1440x900 Normal Motion ---
   await page.setViewportSize({ width: 1440, height: 900 });
