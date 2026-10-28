@@ -1,6 +1,6 @@
 # Acceptance and release verification
 
-Final source checks: **78 scheduler tests per time zone (two zones), 63 database tests, 48 Electron interaction tests**.
+Final source checks: **78 scheduler tests per time zone (two zones), 63 database tests, 132 Electron interaction tests**.
 
 ## Coverage
 
