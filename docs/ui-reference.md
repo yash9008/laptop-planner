@@ -14,7 +14,8 @@ Applied to Laptop Planner:
 
 - Home opens the seven-day board, with the selected day's calendar docked alongside it.
 - Today, Focus, backlog and project views use the same neutral surfaces and compact cards.
-- All implemented task, event, recurrence and timer operations remain available. Paused focus sits in a compact footer; a running focus session stays prominent above the board. Daily capacity totals now sit above the board/day list following UI Phase 1 below.
+- Home has separate Board and Calendars toolbars, a Board/Day dropdown, a local-settings avatar, and reference-position rail actions mapped to offline features.
+- All implemented task, event, recurrence and timer operations remain available. Paused focus sits in a compact footer; a running focus session stays prominent above the board. Board capacity totals sit in each column's Add task row; the Today view retains the full summary.
 - Task filtering affects presentation only. Calendar zoom, panel visibility, sidebar collapse and the A shortcut are local UI controls.
 - Backlog is available from the sidebar and the final board column; task grips support cross-day moves, with the sidebar Backlog item also accepting drops.
 
@@ -56,7 +57,7 @@ The subsequent [motion timing investigation](motion-timings.md) used the live ap
 
 Delivered compact quick-add composer, responsive centered task editor, anchored estimate popover, and keyboard-accessible task actions menu according to [the interaction contract](phase2-interaction-contract.md):
 
-- **Quick add:** pressing `A` or clicking column/toolbar "Add task" opens the compact composer with context-appropriate defaults (selected date, active project, backlog). Focused on mount; Enter submits; positive duration validated inline; Escape or outside click closes without creating a task while preserving the draft in memory; explicit Discard clears draft.
+- **Quick add:** pressing `A`, clicking a Home column's "Add task" row, or using another view's toolbar button opens the compact composer with context-appropriate defaults (selected date, active project, backlog). Focused on mount; Enter submits; positive duration validated inline; Escape or outside click closes without creating a task while preserving the draft in memory; explicit Discard clears draft.
 - **Creation handoff:** "Full details" moves the draft and stable creation UUID into the centered editor without writing to storage; additional fields (notes, deadline, recurrence) survive switching back to quick add.
 - **Centered task editor:** centered modal (up to 670px wide, scrollable content) with dimmed backdrop (`rgba(78, 73, 90, 0.6)`), retaining all existing fields (title, estimate + popover anchor, day, backlog, project, deadline, recurrence, notes), uncommitted draft retention across dismissals, explicit discard, and atomic save.
 - **Estimate popover:** clicking a card's duration badge opens an anchored popover with practical presets (5m through 8h) and custom duration entry; saving commits atomically while preserving all other fields. Inside an uncommitted editor or quick-add composer, choosing an estimate updates that draft only.

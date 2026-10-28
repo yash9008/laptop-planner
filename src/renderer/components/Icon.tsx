@@ -17,7 +17,11 @@ const paths = {
   settings: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-6v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2',
   storage: 'M4 4h16v16H4V4Zm0 8h16M8 8h.01M8 16h.01',
   arrow: 'M5 12h14m-5-5 5 5-5 5', note: 'M5 3h14v18H5V3Zm4 5h6m-6 4h6m-6 4h4',
+  target: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z',
+  moon: 'M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5ZM17 3v4m-2-2h4',
+  bolt: 'm13 2-9 12h7l-1 8 9-12h-7l1-8Z', angles: 'm7 6 6 6-6 6m7-12 6 6-6 6',
 } as const;
-export function Icon({ name, size = 20 }: { name: keyof typeof paths; size?: number }) {
+export type IconName = keyof typeof paths;
+export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]} /></svg>;
 }

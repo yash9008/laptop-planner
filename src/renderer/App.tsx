@@ -17,6 +17,7 @@ import { useBoardDrag } from './components/BoardDrag';
 import { CalendarDock, readCalendarWidth } from './components/CalendarDock';
 import { DailyWorkload } from './components/DailyWorkload';
 import { FilterChooser } from './components/FilterChooser';
+import { HomeMenu } from './components/HomeMenu';
 import { SearchPanel } from './components/SearchPanel';
 import { BacklogPanel } from './components/BacklogPanel';
 import { RecoveryPanel } from './components/RecoveryPanel';
@@ -44,6 +45,8 @@ export function App() {
   }, []);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterAnchor, setFilterAnchor] = useState<HTMLElement | null>(null);
+  const [viewMenuAnchor, setViewMenuAnchor] = useState<HTMLElement | null>(null);
+  const [calendarMenuAnchor, setCalendarMenuAnchor] = useState<HTMLElement | null>(null);
   const [filterQuery, setFilterQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'incomplete' | 'completed'>('all');
   const [filterProjectId, setFilterProjectId] = useState('all');
@@ -1684,7 +1687,7 @@ export function App() {
           <div
             className={`workspace ${isDockOpen ? 'has-calendar' : 'calendar-hidden'} ${
               view === 'focus' ? 'focus-view' : ''
-            }`}
+            } ${view === 'board' ? 'home-view' : ''}`}
             style={{ '--calendar-width': calendarWidth === null ? undefined : `${calendarWidth}px` } as CSSProperties}
           >
             <header className="workspace-topbar">
@@ -1766,54 +1769,133 @@ export function App() {
                 )}
               </div>
               <div className="toolbar-right">
-                <div className="view-switch" aria-label="Planner view">
-                  <button
-                    aria-label="Board view"
-                    aria-pressed={view === 'board'}
-                    title="Board view"
-                    onClick={() => setView('board')}
-                    disabled={busy}
-                  >
-                    <Icon name="board" size={15} />
-                    <span>Board</span>
-                  </button>
-                  <button
-                    aria-label="Today view"
-                    aria-pressed={view === 'day'}
-                    title="Today view"
-                    onClick={() => {
-                      setView('day');
-                      if (boardCalendarDate) goToDate(boardCalendarDate);
-                    }}
-                    disabled={busy}
-                  >
-                    <Icon name="today" size={15} />
-                    <span>Day</span>
-                  </button>
-                </div>
-                <button
-                  className="toolbar-button toolbar-palette-trigger"
-                  aria-label="Open command palette"
-                  title="Command palette · ⌘K"
-                  onClick={(e) => openCommandPalette(e.currentTarget)}
-                  disabled={!day || busy}
-                >
-                  <Icon name="search" size={15} />
-                  <span>Commands</span>
-                  <kbd className="shortcut-kbd">⌘K</kbd>
-                </button>
-                <button
-                  className="button primary toolbar-add"
-                  aria-label="Add task"
-                  title="Add task · A"
-                  onClick={(e) => openNew(undefined, e.currentTarget)}
-                  disabled={!day || busy || loading}
-                >
-                  <Icon name="plus" size={17} />
-                  <span>Add task</span>
-                </button>
+                {view === 'board' ? (
+                  <>
+                    <button
+                      className="toolbar-button view-dropdown"
+                      aria-label="Planner view"
+                      aria-expanded={viewMenuAnchor !== null}
+                      onClick={(event) => setViewMenuAnchor(viewMenuAnchor ? null : event.currentTarget)}
+                      disabled={busy}
+                    >
+                      <Icon name="board" size={15} />
+                      <span>Board</span>
+                      <Icon name="down" size={12} />
+                    </button>
+                    {viewMenuAnchor && (
+                      <HomeMenu
+                        anchor={viewMenuAnchor}
+                        label="Planner view"
+                        align="right"
+                        onDismiss={() => setViewMenuAnchor(null)}
+                        items={[
+                          { id: 'board', label: 'Board', ariaLabel: 'Board view', icon: 'board', selected: true, onSelect: () => setView('board') },
+                          { id: 'day', label: 'Day', ariaLabel: 'Today view', icon: 'today', onSelect: () => {
+                            setView('day');
+                            if (boardCalendarDate) goToDate(boardCalendarDate);
+                          } },
+                        ]}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="view-switch" aria-label="Planner view">
+                      <button
+                        aria-label="Board view"
+                        aria-pressed={false}
+                        title="Board view"
+                        onClick={() => setView('board')}
+                        disabled={busy}
+                      >
+                        <Icon name="board" size={15} />
+                        <span>Board</span>
+                      </button>
+                      <button
+                        aria-label="Today view"
+                        aria-pressed={view === 'day'}
+                        title="Today view"
+                        onClick={() => {
+                          setView('day');
+                          if (boardCalendarDate) goToDate(boardCalendarDate);
+                        }}
+                        disabled={busy}
+                      >
+                        <Icon name="today" size={15} />
+                        <span>Day</span>
+                      </button>
+                    </div>
+                    <button
+                      className="toolbar-button toolbar-palette-trigger"
+                      aria-label="Open command palette"
+                      title="Command palette · ⌘K"
+                      onClick={(e) => openCommandPalette(e.currentTarget)}
+                      disabled={!day || busy}
+                    >
+                      <Icon name="search" size={15} />
+                      <span>Commands</span>
+                      <kbd className="shortcut-kbd">⌘K</kbd>
+                    </button>
+                    <button
+                      className="button primary toolbar-add"
+                      aria-label="Add task"
+                      title="Add task · A"
+                      onClick={(e) => openNew(undefined, e.currentTarget)}
+                      disabled={!day || busy || loading}
+                    >
+                      <Icon name="plus" size={17} />
+                      <span>Add task</span>
+                    </button>
+                  </>
+                )}
               </div>
             </header>
+
+            {view === 'board' && isDockOpen && (
+              <div className="calendar-topbar">
+                <button
+                  className="toolbar-button calendars-trigger"
+                  aria-label="Calendars"
+                  aria-expanded={calendarMenuAnchor !== null}
+                  onClick={(event) => setCalendarMenuAnchor(calendarMenuAnchor ? null : event.currentTarget)}
+                  disabled={!day || busy}
+                >
+                  <Icon name="calendar" size={14} />
+                  <span>Calendars</span>
+                  <Icon name="down" size={12} />
+                </button>
+                <button
+                  className="local-avatar"
+                  aria-label="Open local settings"
+                  title="Local settings"
+                  onClick={(event) => {
+                    settingsOrigin.current = event.currentTarget;
+                    setStorageTitle('Settings');
+                    setStorageOpen(true);
+                  }}
+                >
+                  LP
+                </button>
+                {calendarMenuAnchor && (
+                  <HomeMenu
+                    anchor={calendarMenuAnchor}
+                    label="Local calendar"
+                    onDismiss={() => setCalendarMenuAnchor(null)}
+                    items={[
+                      { id: 'visibility', label: calendarOpen && activeUtilityPanel === null ? 'Hide calendar' : 'Show calendar', icon: 'calendar', onSelect: () => {
+                        if (activeUtilityPanel !== null) {
+                          setActiveUtilityPanel(null);
+                          setCalendarOpen(true);
+                        } else {
+                          setCalendarOpen(!calendarOpen);
+                        }
+                      } },
+                      { id: 'event', label: 'New fixed event', ariaLabel: 'Create fixed event', icon: 'plus', onSelect: () => addEvent() },
+                    ]}
+                  />
+                )}
+              </div>
+            )}
 
             <div className="workspace-context">
               {displayDay && view === 'day' && <DailyWorkload day={displayDay} />}
@@ -2127,9 +2209,9 @@ export function App() {
           )}
           <aside className="utility-rail" aria-label="Quick panels">
             <button
-              className={`rail-button ${calendarOpen && activeUtilityPanel === null ? 'active' : ''}`}
+              className="rail-button rail-toggle"
               aria-label={calendarOpen && activeUtilityPanel === null ? 'Hide calendar' : 'Show calendar'}
-              title="Calendar"
+              title={calendarOpen && activeUtilityPanel === null ? 'Hide right panel' : 'Show right panel'}
               onClick={() => {
                 if (activeUtilityPanel !== null) {
                   setActiveUtilityPanel(null);
@@ -2139,7 +2221,26 @@ export function App() {
                 }
               }}
             >
-              <Icon name="calendar" size={20} />
+              <Icon name="angles" size={17} />
+            </button>
+            <button
+              className={`rail-button ${calendarOpen && activeUtilityPanel === null ? 'active' : ''}`}
+              aria-label="Open calendar panel"
+              title="Calendar"
+              onClick={() => {
+                setActiveUtilityPanel(null);
+                setCalendarOpen(true);
+              }}
+            >
+              <Icon name="calendar" size={18} />
+            </button>
+            <button
+              className={`rail-button ${view === 'focus' ? 'active' : ''}`}
+              aria-label="Open focus view"
+              title="Focus · F"
+              onClick={(event) => enterFocusView(undefined, { element: event.currentTarget, taskId: selectedTaskIdRef.current, surface: 'board' })}
+            >
+              <Icon name="target" size={18} />
             </button>
             <button
               className={`rail-button ${activeUtilityPanel === 'backlog' ? 'active' : ''}`}
@@ -2161,17 +2262,7 @@ export function App() {
                 setActiveUtilityPanel((prev) => (prev === 'backlog' ? null : 'backlog'));
               }}
             >
-              <Icon name="archive" size={20} />
-            </button>
-            <button
-              className={`rail-button ${activeUtilityPanel === 'search' ? 'active' : ''}`}
-              aria-label="Open search panel"
-              title="Search panel"
-              onClick={() => {
-                setActiveUtilityPanel((prev) => (prev === 'search' ? null : 'search'));
-              }}
-            >
-              <Icon name="search" size={20} />
+              <Icon name="archive" size={18} />
             </button>
             <button
               className={`rail-button ${activeUtilityPanel === 'recovery' ? 'active' : ''}`}
@@ -2181,25 +2272,35 @@ export function App() {
                 setActiveUtilityPanel((prev) => (prev === 'recovery' ? null : 'recovery'));
               }}
             >
-              <Icon name="storage" size={20} />
+              <Icon name="moon" size={18} />
             </button>
-            <div className="rail-divider" />
             <button
-              className={`rail-button ${view === 'focus' ? 'active' : ''}`}
-              aria-label="Open focus view"
-              title="Focus · F"
-              onClick={(event) => enterFocusView(undefined, { element: event.currentTarget, taskId: selectedTaskIdRef.current, surface: 'board' })}
+              className={`rail-button ${activeUtilityPanel === 'search' ? 'active' : ''}`}
+              aria-label="Open search panel"
+              title="Search panel"
+              onClick={() => {
+                setActiveUtilityPanel((prev) => (prev === 'search' ? null : 'search'));
+              }}
             >
-              <Icon name="focus" size={20} />
+              <Icon name="search" size={18} />
             </button>
             <button
-              className="rail-button"
+              className="rail-button rail-command"
+              aria-label="Open command palette"
+              title="Command palette · ⌘K"
+              onClick={(event) => openCommandPalette(event.currentTarget)}
+              disabled={!day || busy}
+            >
+              <Icon name="bolt" size={18} />
+            </button>
+            <button
+              className="rail-button rail-add-event"
               aria-label="Create fixed event"
               title="Add fixed event"
               onClick={() => addEvent()}
               disabled={!day || busy}
             >
-              <Icon name="plus" size={22} />
+              <Icon name="plus" size={18} />
             </button>
           </aside>
         </div>

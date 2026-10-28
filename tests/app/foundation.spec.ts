@@ -45,7 +45,7 @@ test('opens the offline daily planner and retains real storage status in the sid
 test('keeps Node and raw IPC out of the renderer and enables isolation and sandboxing', async () => {
   const app = await launch(testDirectory);
   const page = await app.firstWindow();
-  await expect(page.getByRole('button', { name: 'Add task', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Add task for / }).first()).toBeEnabled();
   const surface = await page.evaluate(() => ({
     bridgeKeys: Object.keys(window.planner),
     nodeRequire: typeof (window as unknown as Record<string, unknown>).require,
@@ -63,7 +63,7 @@ test('keeps Node and raw IPC out of the renderer and enables isolation and sandb
 test('blocks renderer fetches, native-session network requests, and new windows', async () => {
   const app = await launch(testDirectory);
   const page = await app.firstWindow();
-  await expect(page.getByRole('button', { name: 'Add task', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Add task for / }).first()).toBeEnabled();
   const networkUrls: string[] = [];
   page.on('request', (request) => { if (/^https?:/.test(request.url())) networkUrls.push(request.url()); });
   const result = await page.evaluate(async () => {
@@ -85,13 +85,13 @@ test('blocks renderer fetches, native-session network requests, and new windows'
 test('reopens the same database after an actual app restart', async () => {
   let app = await launch(testDirectory);
   let page = await app.firstWindow();
-  await expect(page.getByRole('button', { name: 'Add task', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Add task for / }).first()).toBeEnabled();
   const first = await page.evaluate(() => window.planner.getFoundationStatus());
   await app.close();
   application = undefined;
   app = await launch(testDirectory);
   page = await app.firstWindow();
-  await expect(page.getByRole('button', { name: 'Add task', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Add task for / }).first()).toBeEnabled();
   const second = await page.evaluate(() => window.planner.getFoundationStatus());
   expect(second).toEqual(first);
 });

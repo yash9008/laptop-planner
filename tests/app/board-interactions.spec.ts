@@ -85,7 +85,7 @@ test('right-drag pans continuously, nearest left column selects calendar, saves 
   expect(await board().evaluate((host)=>host.scrollLeft)).toBeCloseTo(200,0);
   await panBy(272);await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-27');await expect(page.locator('.calendar-day-number')).toHaveText('27');
   expect((await data()).allTasks).toEqual(before);await expect(column('2026-10-25')).toBeAttached();
-  await page.getByRole('button',{name:'Add task',exact:true}).click();const form=page.getByRole('dialog',{name:'New task',exact:true});
+  await page.keyboard.press('a');const form=page.getByRole('dialog',{name:'New task',exact:true});
   await expect(form.getByLabel('Day',{exact:true})).toHaveValue('2026-10-27');await form.getByLabel('Task title',{exact:true}).fill('Tuesday extra');await form.getByLabel('Estimated time',{exact:true}).fill('30m');await form.getByRole('button',{name:'Add to day',exact:true}).click();await expect(form).not.toBeVisible();
   await expect(page.getByLabel('Go to date',{exact:true})).toHaveValue('2026-10-27');expect(await board().evaluate((host)=>host.scrollLeft)).toBeCloseTo(472,0);
   await page.getByRole('button',{name:'Create fixed event',exact:true}).click();await expect(page.getByRole('dialog',{name:'New fixed event',exact:true}).getByLabel('Start day',{exact:true})).toHaveValue('2026-10-27');

@@ -15,7 +15,7 @@ test.beforeEach(async () => {
   page = await app.firstWindow();
   await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0]!.setContentSize(1440, 900));
   await page.setViewportSize({width: 1440, height: 900});
-  await expect(page.getByRole('button', {name: 'Add task', exact: true})).toBeEnabled();
+  await expect(page.getByRole('button', {name: /^Add task for /}).first()).toBeEnabled();
 });
 
 test.afterEach(async ({}, info) => {
@@ -90,7 +90,8 @@ test('independent: status filtering keeps the underlying completion summary', as
     const result = await window.planner.setTaskCompleted({id, completed: true, viewDate: '2026-10-25'});
     if (!result.ok) throw new Error(result.error.message);
   }, completed.id);
-  await page.getByRole('button', {name: 'Today view', exact: true}).click();
+  await page.getByRole('button', {name: 'Planner view', exact: true}).click();
+  await page.getByRole('menuitem', {name: 'Today view', exact: true}).click();
   await expect(page.locator('.completion-count')).toHaveText('1 of 2 done');
   await page.getByRole('button', {name: 'Filter tasks', exact: true}).click();
   await page.getByRole('dialog', {name: 'Filter tasks', exact: true}).getByRole('button', {name: 'Completed', exact: true}).click();

@@ -15,7 +15,7 @@ test.beforeEach(async () => {
   page = await app.firstWindow();
   await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows()[0]!.setContentSize(1440, 900));
   await page.setViewportSize({width: 1440, height: 900});
-  await expect(page.getByRole('button', {name: 'Add task', exact: true})).toBeEnabled();
+  await expect(page.getByRole('button', {name: /^Add task for /}).first()).toBeEnabled();
 });
 
 test.afterEach(async ({}, info) => {
@@ -57,7 +57,7 @@ test('re-review: quick-add returns focus to its own trigger after editing a sear
   await expect(editor).toHaveCount(0);
   await expect(panel.getByRole('button', {name: 'Open Findable task', exact: true})).toBeFocused();
 
-  const addButton = page.getByRole('button', {name: 'Add task', exact: true});
+  const addButton = page.getByRole('button', {name: /^Add task for /}).first();
   await addButton.click();
   const composer = page.getByRole('dialog', {name: 'New task', exact: true});
   await expect(composer).toBeVisible();

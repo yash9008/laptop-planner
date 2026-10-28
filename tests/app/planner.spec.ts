@@ -11,14 +11,14 @@ async function launch() {
   delete env.ELECTRON_RUN_AS_NODE;
   application = await electron.launch({ args: [resolve('.')], env: { ...env, TZ: 'Asia/Kolkata', LAPTOP_PLANNER_TEST_DATA_DIR: directory, LAPTOP_PLANNER_TEST_NOW: '2026-10-25T01:30:00.000Z' } });
   page = await application.firstWindow();
-  await expect(page.getByRole('button', { name: 'Add task', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Add task for / }).first()).toBeEnabled();
   await page.getByRole('button',{name:'Daily planner',exact:true}).click();
 }
 test.beforeEach(async () => { directory = await mkdtemp(join(tmpdir(), 'laptop-planner-ui-')); await launch(); });
 test.afterEach(async () => { await application?.close(); application = undefined; await rm(directory, { recursive: true, force: true }); });
 
 async function add(title: string, estimate: string, notes = '') {
-  await page.getByRole('button', { name: 'Add task', exact: true }).click();
+  await page.keyboard.press('a');
   const form = page.getByRole('dialog', { name: 'New task', exact: true });
   await form.getByLabel('Task title', { exact: true }).fill(title);
   await form.getByLabel('Estimated time', { exact: true }).fill(estimate);
@@ -135,7 +135,7 @@ test('date navigation and moving a task keep each day separate and persist after
 });
 
 test('invalid estimates keep the draft open and untrusted IPC fields cannot write data', async () => {
-  await page.getByRole('button', { name: 'Add task', exact: true }).click();
+  await page.keyboard.press('a');
   await page.getByLabel('Task title', { exact: true }).fill('Keep my draft');
   await page.getByLabel('Estimated time', { exact: true }).fill('not a duration');
   await page.getByRole('button', { name: 'Add to day', exact: true }).click();

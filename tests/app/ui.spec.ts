@@ -7,11 +7,11 @@ test.beforeEach(async()=>{
   directory=await mkdtemp(join(tmpdir(),'laptop-planner-design-'));
   const env=Object.fromEntries(Object.entries(process.env).filter((entry):entry is [string,string]=>entry[1]!==undefined));delete env.ELECTRON_RUN_AS_NODE;
   application=await electron.launch({args:[resolve('.')],env:{...env,TZ:'Asia/Kolkata',LAPTOP_PLANNER_TEST_DATA_DIR:directory,LAPTOP_PLANNER_TEST_NOW:'2026-10-25T07:30:00.000Z'}});
-  page=await application.firstWindow();await expect(page.getByRole('button',{name:'Add task',exact:true})).toBeEnabled();
+  page=await application.firstWindow();await expect(page.getByRole('button',{name:/^Add task for /}).first()).toBeEnabled();
 });
 test.afterEach(async()=>{await application?.close();application=undefined;await rm(directory,{recursive:true,force:true});});
 async function add(title:string,estimate='45m',repeat=false){
-  await page.getByRole('button',{name:'Add task',exact:true}).click();const form=page.getByRole('dialog',{name:'New task',exact:true});
+  await page.keyboard.press('a');const form=page.getByRole('dialog',{name:'New task',exact:true});
   await form.getByLabel('Task title',{exact:true}).fill(title);await form.getByLabel('Estimated time',{exact:true}).fill(estimate);
   if(repeat) {
     await form.getByRole('button',{name:'Open full details',exact:true}).click();
@@ -44,6 +44,23 @@ test('filtering changes the visible cards without changing scheduling and clears
   await expect(page.getByTestId('board-task')).toHaveCount(1);await expect(page.getByRole('button',{name:'Writing notes',exact:true})).toBeVisible();
   expect(await page.evaluate(()=>window.planner.getDay())).toEqual(before);
   await page.getByRole('button',{name:'Clear task filter',exact:true}).click();await expect(page.getByTestId('board-task')).toHaveCount(2);
+});
+test('Home menus expose local view, calendar and settings actions with safe dismissal',async()=>{
+  await expect(page.getByRole('button',{name:'Calendars',exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Open local settings',exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Add task',exact:true})).toHaveCount(0);
+  const viewTrigger=page.getByRole('button',{name:'Planner view',exact:true});
+  await viewTrigger.click();await expect(page.getByRole('menu',{name:'Planner view',exact:true})).toBeVisible();
+  await page.keyboard.press('Escape');await expect(viewTrigger).toBeFocused();
+  await viewTrigger.click();await page.getByRole('menuitem',{name:'Today view',exact:true}).click();
+  await expect(page.locator('main.view-day')).toBeVisible();
+  await page.getByRole('button',{name:'Board view',exact:true}).click();
+  await page.getByRole('button',{name:'Calendars',exact:true}).click();
+  await page.getByRole('menuitem',{name:'Hide calendar',exact:true}).click();await expect(page.locator('.calendar-dock')).toHaveCount(0);
+  await page.getByRole('button',{name:'Show calendar',exact:true}).click();await expect(page.locator('.calendar-dock')).toBeVisible();
+  await page.getByRole('button',{name:'Open local settings',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:'Settings',exact:true})).toBeVisible();await page.keyboard.press('Escape');
+  await expect(page.getByRole('button',{name:'Open local settings',exact:true})).toBeFocused();
 });
 test('calendar zoom, panel toggles, sidebar collapse and keyboard task creation work at laptop size',async()=>{
   await page.setViewportSize({width:860,height:680});await add('Short task');
@@ -93,7 +110,7 @@ test('calendar divider supports pointer resize, cancellation, keyboard bounds an
   await expect(divider).toHaveAttribute('aria-valuenow',String(Math.round(initial)));
   await divider.focus();await page.keyboard.press('ArrowLeft');
   await expect(divider).toHaveAttribute('aria-valuenow',String(Math.round(initial)+24));
-  await page.reload();await expect(page.getByRole('button',{name:'Add task',exact:true})).toBeEnabled();
+  await page.reload();await expect(page.getByRole('button',{name:/^Add task for /}).first()).toBeEnabled();
   await expect(page.getByRole('separator',{name:'Resize calendar',exact:true})).toHaveAttribute('aria-valuenow',String(Math.round(initial)+24));
   await page.getByRole('separator',{name:'Resize calendar',exact:true}).focus();await page.keyboard.press('Home');
   await expect(page.locator('.calendar-dock')).toHaveCSS('width','240px');

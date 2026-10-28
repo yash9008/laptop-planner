@@ -9,7 +9,7 @@ let app:ElectronApplication;let page:Page;let directory:string;let clock:number;
 async function launch(){
   const env=Object.fromEntries(Object.entries(process.env).filter((entry):entry is [string,string]=>entry[1]!==undefined));delete env.ELECTRON_RUN_AS_NODE;
   app=await electron.launch({args:[resolve('.')],env:{...env,TZ:'Asia/Kolkata',LAPTOP_PLANNER_TEST_DATA_DIR:directory,LAPTOP_PLANNER_TEST_NOW:new Date(clock).toISOString()}});
-  page=await app.firstWindow();await expect(page.getByRole('button',{name:'Add task',exact:true})).toBeEnabled();
+  page=await app.firstWindow();await expect(page.getByRole('button',{name:/^Add task for /}).first()).toBeEnabled();
   await app.evaluate(({Tray,dialog})=>{
     globalThis.menuBarTest={tray:null,menu:null,errors:[]};
     const title=Tray.prototype.setTitle;const menu=Tray.prototype.setContextMenu;
@@ -24,7 +24,7 @@ async function menuLabel(id:string){return app.evaluate((_electron,id)=>globalTh
 async function clickMenu(id:string){await app.evaluate((_electron,id)=>{const item=globalThis.menuBarTest?.menu?.getMenuItemById(id);if(!item?.enabled)throw new Error(`Menu item unavailable: ${id}`);item.click();},id);}
 async function advance(ms:number){clock+=ms;await app.evaluate((_electron,iso)=>{process.env.LAPTOP_PLANNER_TEST_NOW=iso;},new Date(clock).toISOString());}
 async function add(title='Practice'){
-  await page.getByRole('button',{name:'Add task',exact:true}).click();const form=page.getByRole('dialog',{name:'New task',exact:true});
+  await page.keyboard.press('a');const form=page.getByRole('dialog',{name:'New task',exact:true});
   await form.getByLabel('Task title',{exact:true}).fill(title);await form.getByLabel('Estimated time',{exact:true}).fill('45m');await form.getByRole('button',{name:'Add to day',exact:true}).click();await expect(form).not.toBeVisible();
 }
 async function start(title='Practice'){await page.getByRole('button',{name:`Start focus ${title}`,exact:true}).click();await expect.poll(()=>menuLabel('focus-task')).toBe(title);}

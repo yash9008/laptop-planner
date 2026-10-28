@@ -11,7 +11,7 @@ async function launch() {
   delete env.ELECTRON_RUN_AS_NODE;
   application = await electron.launch({args:[resolve('.')], env:{...env,TZ:'Asia/Kolkata',LAPTOP_PLANNER_TEST_DATA_DIR:directory,LAPTOP_PLANNER_TEST_NOW:'2026-10-25T07:30:00.000Z'}});
   page = await application.firstWindow();
-  await expect(page.getByRole('button',{name:'Add task',exact:true})).toBeEnabled();
+  await expect(page.getByRole('button',{name:/^Add task for /}).first()).toBeEnabled();
   await page.getByRole('button',{name:'Daily planner',exact:true}).click();
 }
 test.beforeEach(async()=>{directory=await mkdtemp(join(tmpdir(),'laptop-planner-phase4-'));await launch();});
@@ -20,7 +20,7 @@ async function snapshot(date?:string) {
   return page.evaluate(async(date)=>{const result=await window.planner.getDay(date); if(!result.ok)throw new Error(result.error.message);return result.value;},date);
 }
 async function addTask(title='Deep work',estimate='2h') {
-  await page.getByRole('button',{name:'Add task',exact:true}).click();
+  await page.keyboard.press('a');
   const form=page.getByRole('dialog',{name:'New task',exact:true});
   await form.getByLabel('Task title',{exact:true}).fill(title);
   await form.getByLabel('Estimated time',{exact:true}).fill(estimate);
@@ -126,7 +126,7 @@ test('project details and deadlines persist; project backlog tasks can be schedu
   await form.getByRole('button',{name:'Create project',exact:true}).click();await expect(form).not.toBeVisible();
   await page.getByRole('button',{name:'Open project Learning',exact:true}).click();
   await expect(page.getByText('Study a little every day.',{exact:true})).toBeVisible();
-  await page.getByRole('button',{name:'Add task',exact:true}).click();
+  await page.keyboard.press('a');
   form=page.getByRole('dialog',{name:'New task',exact:true});
   await expect(form.getByLabel('Keep in backlog',{exact:true})).toBeChecked();
   await form.getByLabel('Task title',{exact:true}).fill('Read chapter');

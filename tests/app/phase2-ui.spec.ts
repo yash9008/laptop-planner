@@ -23,7 +23,7 @@ test.beforeEach(async () => {
     },
   });
   page = await application.firstWindow();
-  await expect(page.getByRole('button', { name: 'Add task', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Add task for / }).first()).toBeEnabled();
 });
 
 test.afterEach(async () => {
@@ -757,8 +757,8 @@ test('R7 regression: panning board updates date default for keyboard and toolbar
   await page.keyboard.press('Escape');
   await expect(composer).not.toBeVisible();
 
-  // Click toolbar 'Add task' button: must also default to Oct 26
-  await page.getByRole('button', { name: 'Add task', exact: true }).click();
+  // Keyboard creation must also default to Oct 26
+  await page.keyboard.press('a');
   await expect(composer).toBeVisible();
   await expect(composer.getByLabel('Day', { exact: true })).toHaveValue('2026-10-26');
   await page.keyboard.press('Escape');
@@ -768,7 +768,7 @@ test('R8 regression: parent modal dismissal restores focus to originating trigge
   await page.setViewportSize({ width: 1440, height: 900 });
 
   // 1. Quick add dismissal restores focus to Add task button
-  const addTaskButton = page.getByRole('button', { name: 'Add task', exact: true });
+  const addTaskButton = page.getByRole('button', { name: /^Add task for / }).first();
   await addTaskButton.click();
   const composer = page.getByRole('dialog', { name: 'New task', exact: true });
   await expect(composer).toBeVisible();
@@ -858,9 +858,9 @@ test('R8 regression: child estimate popover receives keyboard focus and dismissa
 
 test('R8 regression: changing creation entry points restores the most recent trigger', async () => {
   const composer = page.getByRole('dialog', { name: 'New task', exact: true });
-  const toolbar = page.getByRole('button', { name: 'Add task', exact: true });
+  const backlog = page.getByRole('button', { name: /Add to backlog/ });
   const column = page.getByRole('button', { name: 'Add task for 2026-10-25', exact: true });
-  for (const trigger of [toolbar, column]) {
+  for (const trigger of [backlog, column]) {
     await trigger.click();
     await expect(composer).toBeVisible();
     await page.keyboard.press('Escape');

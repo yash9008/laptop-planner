@@ -9,12 +9,12 @@ let directory:string;let page:Page;let clock:number;
 async function launch() {
   const env=Object.fromEntries(Object.entries(process.env).filter((entry):entry is [string,string]=>entry[1]!==undefined));delete env.ELECTRON_RUN_AS_NODE;
   application=await electron.launch({args:[resolve('.')],env:{...env,TZ:'Asia/Kolkata',LAPTOP_PLANNER_TEST_DATA_DIR:directory,LAPTOP_PLANNER_TEST_NOW:new Date(clock).toISOString()}});
-  page=await application.firstWindow();await expect(page.getByRole('button',{name:'Add task',exact:true})).toBeEnabled();await page.getByRole('button',{name:'Daily planner',exact:true}).click();
+  page=await application.firstWindow();await expect(page.getByRole('button',{name:/^Add task for /}).first()).toBeEnabled();await page.getByRole('button',{name:'Daily planner',exact:true}).click();
 }
 async function setClock(at:number) {clock=at;await application!.evaluate((_electron,iso)=>{process.env.LAPTOP_PLANNER_TEST_NOW=iso;},new Date(clock).toISOString());}
 async function data() {return page.evaluate(async()=>{const result=await window.planner.getDay();if(!result.ok)throw new Error(result.error.message);return result.value;});}
 async function add(title:string,repeat?:'daily'|'weekdays') {
-  await page.getByRole('button',{name:'Add task',exact:true}).click();const form=page.getByRole('dialog',{name:'New task',exact:true});
+  await page.keyboard.press('a');const form=page.getByRole('dialog',{name:'New task',exact:true});
   await form.getByLabel('Task title',{exact:true}).fill(title);await form.getByLabel('Estimated time',{exact:true}).fill('45m');
   if(repeat) {
     await form.getByRole('button',{name:'Open full details',exact:true}).click();

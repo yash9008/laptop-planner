@@ -15,7 +15,7 @@ test.beforeEach(async () => {
   page = await app.firstWindow();
   await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.setContentSize(1440, 900));
   await page.setViewportSize({ width: 1440, height: 900 });
-  await expect(page.getByRole('button', { name: 'Add task', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^Add task for / }).first()).toBeEnabled();
 });
 
 test.afterEach(async ({}, info) => {

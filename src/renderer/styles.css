@@ -6,7 +6,7 @@
   --green: #78b99a; --amber: #e3bf83;
 }
 * { box-sizing: border-box; }
-body { margin: 0; }
+body { margin: 0; font-size: 14px; font-weight: 500; }
 button, input, textarea, select { font: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: default; opacity: .4; }
@@ -189,8 +189,8 @@ kbd { font-family: inherit; font-size: 10px; background: #ffffff06; border: 1px 
 .calendar-hour { position: absolute; left: 0; right: 0; height: 1px; display: flex; align-items: center; gap: 9px; }
 .calendar-hour>span { width: 36px; flex-shrink: 0; color: #777780; font-size: 9px; text-align: right; transform: translateY(-1px); }
 .calendar-hour>i { flex: 1; height: 1px; background: #252529; }
-.off-hours { position: absolute; left: 45px; right: 0; background: #ffffff01; pointer-events: none; }
-.calendar-block { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; position: absolute; left: 47px; right: 2px; z-index: 1; background: #665b3b; border: 1px solid #b7a56c80; border-left: 2px solid #d4bf7f; border-radius: 4px; padding: 4px 6px; color: #f0e6c8; text-align: left; overflow: hidden; }
+.off-hours { position: absolute; left: 47px; right: 0; background: #ffffff01; pointer-events: none; }
+.calendar-block { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; position: absolute; left: 49px; right: 2px; z-index: 1; background: #665b3b; border: 1px solid #b7a56c80; border-left: 2px solid #d4bf7f; border-radius: 4px; padding: 4px 6px; color: #f0e6c8; text-align: left; overflow: hidden; }
 .calendar-block:hover:not(:disabled) { filter: brightness(1.1); }
 .calendar-block>strong { display: flex; align-items: center; gap: 4px; font-size: 11px; line-height: 1.2; font-weight: 550; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .calendar-block>span { display: block; font-size: 9px; margin-top: 2px; color: #e4d9ba; white-space: nowrap; }
@@ -1764,7 +1764,7 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 }
 
 :root {
-  font-family: Avenir, 'Avenir Next', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: Avenir, Arial, 'Helvetica Neue', Helvetica, Inter, sans-serif;
   background: #08090a;
   --canvas: #131314;
   --card: #212123;
@@ -1792,7 +1792,7 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 
 /* Sidebar: 200px, 28px rows on a 4px radius */
 .sidebar { width: 200px; padding: 0 12px 8px; background: #08090a; }
-.sidebar-brand { height: 31px; margin: 28px 0 8px; gap: 8px; }
+.sidebar-brand { height: 80px; margin: 0; gap: 8px; }
 .sidebar-brand strong { font-size: 16px; font-weight: 600; letter-spacing: 0; color: #c9c9c9; }
 .nav-item {
   height: 28px; gap: 9px; padding: 0 6px; margin: 2px 0;
@@ -1864,15 +1864,15 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   padding: 1px 5px; margin-top: 0;
 }
 .board-selected .board-column-heading strong { color: #ffffff; }
-.completion-track { height: 8px; margin: 4px 12px 16px; background: #1f1f1e; border-radius: 4px; }
+.completion-track { height: 8px; margin: 4px 20px 18px; background: #1f1f1e; border-radius: 4px; }
 .completion-track>div { background: #4dcd7d; border-radius: 4px; }
 .board-today>.completion-track, .board-selected>.completion-track { background: #1f1f1e; }
 
 /* Add-task row: 34px, flat surface, day total on the right */
 .task-add-bar {
-  height: 34px; gap: 8px; padding: 0 12px; margin: 0 8px 8px;
+  height: 34px; gap: 8px; padding: 6px 12px; margin: 0 10px 8px;
   background: #212123; border: 1px solid #212123; border-radius: 4px;
-  box-shadow: none; color: #a0a0a0; font-size: 14px; font-weight: 500;
+  box-shadow: 1px 2px 4px #000000e6; color: #e6e6e6; font-size: 14px; font-weight: 500;
 }
 .task-add-bar:hover:not(:disabled) { background: #29292c; border-color: #29292c; color: #e6e6e6; }
 .task-add-bar strong {
@@ -1880,7 +1880,7 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   font-size: 12px; font-weight: 500; color: #7c7c7c; font-variant-numeric: tabular-nums;
 }
 .task-panel .task-add-bar { margin-left: 0; margin-right: 0; }
-.board-task-list { padding: 0 6px; }
+.board-task-list { padding: 0 8px; }
 .board-empty { font-size: 13px; color: #7c7c7c; padding: 18px 0; }
 .board-capacity { padding: 6px 12px 10px; font-size: 11px; color: #7c7c7c; border-top: 0; }
 .board-capacity>span { color: #787878; }
@@ -1892,15 +1892,16 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   box-shadow: 0 1px 2px #000000e6;
 }
 .task-card:hover { background: #26262a; border-color: #26262a; }
-.card-topline { min-height: 20px; margin-bottom: 2px; }
+.card-topline { min-height: 18px; margin-bottom: 2px; }
 .task-time { font-size: 12px; font-weight: 500; color: #a0a0a0; }
+.planning-board .task-time { font-size: 10px; font-weight: 600; }
 .duration-badge {
   background: #3c3c3c; color: #a0a0a0; padding: 2px 4px;
   border-radius: 4px; font-size: 10px; font-weight: 600;
 }
-.task-title { font-size: 14px; line-height: 1.45; font-weight: 500; color: #e6e6e6; }
+.task-title { font-size: 14px; line-height: 1.42; font-weight: 500; color: #e6e6e6; }
 .task-notes { font-size: 12px; line-height: 1.5; color: #7c7c7c; margin: 4px 0 0; }
-.card-footer { gap: 6px; min-height: 20px; margin-top: 6px; }
+.card-footer { gap: 6px; min-height: 20px; margin-top: 2px; }
 .task-checkbox { width: 16px; height: 16px; border-color: #7c7c7c; }
 .task-checkbox:checked { background: #4dcd7d; border-color: #4dcd7d; }
 .task-checkbox:checked::after { border-color: #0b2b17; }
@@ -1908,27 +1909,22 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 .project-tag i { font-size: 15px; }
 
 /* ------------------------------------------------------------------
-   Home screen pass C: Sunsama's measured home silhouette — 60px icon
-   rail below 1024px, one full-width toolbar, a compact WED/28 calendar
-   header aligned to the board, colored cards and quiet columns.
+   Home screen pass C: measured shell, separate board/calendar headers,
+   48px compact navigation tiles, colored cards and quiet columns.
    Measurements: docs/sunsama-reference.md
    ------------------------------------------------------------------ */
 
-/* Sidebar: icon rail with a short label under each icon */
-.sidebar-rail .sidebar { width: 60px; padding: 0 5px 8px; }
-.sidebar-rail .sidebar-brand { margin: 22px 0 10px; height: 32px; justify-content: center; }
+/* Sidebar: the reference's compact 48px icon tiles below 1024px */
+.sidebar-rail .sidebar { width: 60px; padding: 0 0 8px 8px; }
+.sidebar-rail .sidebar-brand { width: 52px; height: 80px; margin: 0; justify-content: center; }
 .sidebar-rail .sidebar-brand strong { display: none; }
 .sidebar-rail .sidebar-brand .brand-symbol svg { width: 22px; height: 22px; }
 .sidebar-rail .nav-item {
-  flex-direction: column; height: 58px; gap: 5px; justify-content: center;
-  padding: 7px 2px; margin: 2px 0; border-radius: 8px;
-  font-size: 10px; font-weight: 500; text-align: center;
+  width: 48px; height: 48px; justify-content: center; flex-direction: row;
+  padding: 0; margin: 2px; border-radius: 10px;
 }
 .sidebar-rail .nav-item svg { width: 20px; height: 20px; }
-.sidebar-rail .nav-item > span:last-child {
-  display: block; font-size: 10px; line-height: 1.1;
-  white-space: normal; overflow: visible; text-overflow: clip;
-}
+.sidebar-rail .nav-item > span:last-child { display: none; }
 .sidebar-rail .nav-item.active { background: #1c1c1d; }
 .sidebar-rail .sidebar-section-label {
   display: block; width: 26px; height: 1px; margin: 12px auto 8px;
@@ -1936,8 +1932,7 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 }
 .sidebar-rail .projects-heading { margin: 14px 0 2px; justify-content: center; }
 .sidebar-rail .projects-heading > span { display: none; }
-.sidebar-rail .sidebar-projects .nav-item { height: 32px; }
-.sidebar-rail .sidebar-projects .nav-item > span:last-child { display: none; }
+.sidebar-rail .sidebar-projects .nav-item { height: 40px; }
 .sidebar-rail .sidebar-projects .project-hash { font-size: 16px; }
 .sidebar-rail .add-project-row { justify-content: center; padding: 6px 0; border-left: 0; }
 .sidebar-rail .add-project-row > span { display: none; }
@@ -1946,9 +1941,34 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 .sidebar-rail .local-indicator { gap: 0; font-size: 0; justify-content: center; }
 .sidebar-auto .sidebar-footer .icon-button { display: none; }
 
-/* One toolbar row across the board, calendar and rail; no divider under it */
+/* Board and calendar have their own 44px headers, as in the reference */
 .workspace-topbar { grid-column: 1 / -1; border-bottom: 0; padding: 0 10px; gap: 6px; }
 .calendar-dock, .utility-rail { grid-row: 2 / 6; }
+.home-view .workspace-topbar { grid-column: 1; }
+.home-view .utility-rail { grid-row: 1 / 6; }
+.calendar-topbar {
+  grid-column: 2; grid-row: 1; display: flex; align-items: center;
+  justify-content: space-between; gap: 8px; padding: 0 10px;
+  border-left: 1px solid #1e1e1e; -webkit-app-region: drag;
+}
+.calendars-trigger { flex-shrink: 0; }
+.calendars-trigger svg:last-child, .view-dropdown svg:last-child { color: #7c7c7c; }
+.local-avatar {
+  width: 20px; height: 20px; flex-shrink: 0; padding: 0; border: 1px solid #4a4a4d;
+  border-radius: 50%; background: #343437; color: #d6d6d6;
+  font-size: 8px; font-weight: 600; letter-spacing: -.2px;
+}
+.local-avatar:hover { background: #444448; color: #fff; }
+.home-menu .menu-item span { flex: 1; }
+.home-view .date-navigation { margin-left: -6px; }
+.home-view .date-navigation > .icon-button { display: none; }
+.home-view .toolbar-left > .toolbar-button[aria-label='Go to today'] { border-radius: 4px 0 0 4px; }
+.home-view .date-picker input {
+  width: 24px; height: 24px; padding: 0 5px; color: transparent;
+  background: #212123; border: 1px solid #212123; border-left-color: #323232;
+  border-radius: 0 4px 4px 0;
+}
+.home-view .date-picker input::-webkit-calendar-picker-indicator { width: 12px; margin: 0; }
 .toolbar-left, .toolbar-right { gap: 6px; }
 .toolbar-button, .view-switch button {
   background: #212123; border-color: #212123; padding: 0 7px; gap: 5px;
@@ -1977,38 +1997,51 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 
 /* Calendar: WED / 28 header aligned with the board day headers */
 .calendar-dock { background: transparent; }
-.utility-rail { background: transparent; }
+.workspace { --rail-width: 49px; }
+.utility-rail {
+  gap: 0; padding-top: 0; background: #141415; border-left-color: #1e1e1e;
+}
+.rail-button {
+  width: 32px; height: 32px; flex-shrink: 0; margin: 8px; padding: 6px;
+  border-radius: 10px; color: #a0a0a0;
+}
+.rail-button.active { background: #bebebe33; color: #e6e6e6; }
+.rail-button:hover { background: #29292c; color: #e6e6e6; }
+.rail-toggle { margin: 6px 8px; }
+.rail-add-event { margin-top: 21px; }
+.rail-divider { display: none; }
 .calendar-heading {
-  height: 64px; padding: 0 8px 0 0; border-bottom: 0;
-  display: flex; align-items: center; gap: 10px; justify-content: flex-start;
+  height: 80px; padding: 0; border-bottom: 0;
+  display: flex; align-items: stretch; gap: 0; justify-content: flex-start;
 }
 .calendar-heading > .calendar-zoom {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  width: 45px; align-self: stretch; gap: 0; border-right: 1px solid #1e1e1e;
+  width: 48px; align-self: stretch; gap: 0; border-right: 0;
   color: #7c7c7c; flex-shrink: 0;
 }
-.calendar-zoom .icon-button { width: 24px; height: 17px; padding: 0; }
-.calendar-zoom > span { font-size: 9px; color: #7c7c7c; line-height: 1.2; }
+.calendar-zoom .icon-button { width: 24px; height: 22px; padding: 6px; }
+.calendar-zoom > span { font-size: 10px; font-weight: 600; color: #7c7c7c; line-height: 10px; }
 .calendar-heading > .calendar-date {
-  display: flex; flex-direction: column; justify-content: center; gap: 2px;
-  align-items: flex-start; min-height: 0; padding: 0 0 0 12px;
-  border-bottom: 0; flex-shrink: 0; color: #a0a0a0;
+  display: flex; flex-direction: column; justify-content: flex-start; gap: 2px;
+  align-items: flex-start; min-height: 0; padding: 12px 12px 0;
+  border-bottom: 0; flex-shrink: 0; color: #e6e6e6;
 }
 .calendar-weekday {
-  font-size: 10px; font-weight: 600; letter-spacing: .9px;
-  color: #a0a0a0; text-transform: uppercase;
+  font-size: 10px; font-weight: 600; letter-spacing: 0;
+  color: #e6e6e6; text-transform: uppercase; line-height: 14px;
 }
 .calendar-day-number {
-  font-size: 28px; font-weight: 600; letter-spacing: -.8px;
-  line-height: 1; color: #e6e6e6;
+  font-size: 20px; font-weight: 500; letter-spacing: 0;
+  line-height: 26px; color: #e6e6e6;
 }
 .calendar-heading > .icon-button { margin-left: auto; color: #7c7c7c; }
+.home-view .calendar-heading > .icon-button { display: none; }
 .calendar-scroll { padding-top: 0; }
 .calendar-canvas::before {
-  content: ''; position: absolute; left: 45px; top: 0; bottom: 0;
+  content: ''; position: absolute; left: 47px; top: 0; bottom: 0;
   width: 1px; background: #1e1e1e;
 }
-.calendar-hour>span { font-size: 10px; color: #7c7c7c; }
+.calendar-hour>span { width: 38px; font-size: 10px; color: #7c7c7c; }
 .calendar-hour>i { background: #1e1e1e; }
 .calendar-footer { display: none; }
 
@@ -2034,13 +2067,14 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 
 /* Cards: raised, project-colored footer, no note preview on the board */
 .planning-board .task-notes { display: none; }
-.task-card { box-shadow: inset 0 1px 0 #ffffff08, 0 1px 3px #000000a6; }
-.duration-badge { font-size: 11px; padding: 2px 5px; }
+.task-card { box-shadow: 1px 2px 4px #000000e6; }
+.planning-board .task-card { margin: 2px 2px 8px; }
+.duration-badge { font-size: 10px; padding: 2px 4px; }
 .project-tag { font-size: 12px; }
 .board-column-heading .today-label { display: none; }
 .task-add-bar strong {
-  padding: 1px 6px; border-radius: 4px; background: #2c2c2e;
-  font-size: 11px; font-weight: 600; color: #a0a0a0;
+  padding: 2px 4px; border-radius: 4px; background: #3c3c3c;
+  font-size: 10px; font-weight: 600; color: #a0a0a0;
 }
 
 /* Overflow is the only column footer left */
