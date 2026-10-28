@@ -33,6 +33,11 @@ export function FocusScreen({
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    // A completed long task can leave the scroll container part-way down; the
+    // next task should start at its header rather than mid-content.
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
     requestAnimationFrame(() => {
       const el = mainRef.current;
       if (!el) return;

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { PlannerDay, PlannerTask } from '../../shared/contracts';
 import { formatElapsed } from '../../shared/task-input';
 import { Icon } from './Icon';
@@ -35,11 +36,23 @@ export function RecoveryPanel({
 
   const isHealthy = !error && !isFocusRecovered && !isFocusPaused && day !== null;
 
+  const panelRef = useRef<HTMLElement | null>(null);
+
+  // Focus the panel on mount so palette and rail entry do not leave focus on
+  // BODY once the trigger unmounts or the palette closes.
+  useEffect(() => {
+    panelRef.current?.focus({ preventScroll: true });
+  }, []);
+
   return (
     <aside
       className="recovery-panel utility-panel"
       data-testid="recovery-panel"
       aria-label="Recovery and storage"
+      ref={(node) => {
+        panelRef.current = node;
+      }}
+      tabIndex={-1}
     >
       <div className="panel-header">
         <div className="panel-title-wrap">

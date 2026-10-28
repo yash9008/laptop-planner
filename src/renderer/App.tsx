@@ -76,6 +76,7 @@ export function App() {
   const originatingElement = useRef<HTMLElement | null>(null);
   const originatingTaskId = useRef<string | null>(null);
   const originatingSurface = useRef<TaskSurface>('board');
+  const settingsOrigin = useRef<HTMLElement | null>(null);
   const [activeSearchResultId, setActiveSearchResultId] = useState<string | null>(null);
   const prevActiveUtilityPanel = useRef<'backlog' | 'search' | 'recovery' | null>(null);
 
@@ -899,7 +900,11 @@ export function App() {
     }
   }, [keyboardHelpOpen]);
 
-  const selectedTask = selectedTaskId && day ? day.allTasks.find((t) => t.id === selectedTaskId) : null;
+  // The Focus view keeps its own task cursor, so palette task commands must
+  // follow the task on screen rather than the last board selection.
+  const paletteTaskId = view === 'focus' ? focusTaskId : selectedTaskId;
+  const selectedTask =
+    paletteTaskId && day ? day.allTasks.find((t) => t.id === paletteTaskId) ?? null : null;
 
   const paletteCommands: CommandItem[] = [];
 
@@ -1068,8 +1073,11 @@ export function App() {
       disabled: !day || busy || loading,
       disabledReason: busy ? 'Save in progress' : undefined,
       run: () => {
+        // Capture the trigger while the palette is still mounted: openNew
+        // would otherwise recapture from BODY after the palette unmounts.
+        const trigger = originatingElement.current ?? undefined;
         setCommandPaletteOpen(false);
-        setTimeout(() => openNew(), 0);
+        setTimeout(() => openNew(undefined, trigger), 0);
       },
     },
     {
@@ -1116,9 +1124,16 @@ export function App() {
     {
       id: 'calendar-toggle',
       category: 'Panels',
-      title: calendarOpen ? 'Hide calendar' : 'Show calendar',
+      title: calendarOpen && !activeUtilityPanel ? 'Hide calendar' : 'Show calendar',
       run: () => {
         setCommandPaletteOpen(false);
+        if (activeUtilityPanel) {
+          // A docked utility panel occupies the calendar slot, so showing the
+          // calendar has to release it rather than only flipping the flag.
+          setActiveUtilityPanel(null);
+          setCalendarOpen(true);
+          return;
+        }
         setCalendarOpen(!calendarOpen);
       },
     }
@@ -1130,6 +1145,7 @@ export function App() {
     category: 'Settings',
     title: 'Open storage settings',
     run: () => {
+      settingsOrigin.current = originatingElement.current;
       setCommandPaletteOpen(false);
       setTimeout(() => {
         setStorageTitle('Local storage');
@@ -1203,6 +1219,12 @@ export function App() {
         return;
       }
 
+      if (event.key === '?') {
+        event.preventDefault();
+        setKeyboardHelpOpen(true);
+        return;
+      }
+
       const key = event.key.toLowerCase();
       if (key === 'a') {
         event.preventDefault();
@@ -1266,7 +1288,7 @@ export function App() {
         data-testid={board ? 'board-task' : 'task-card'}
         data-task-id={task.id}
         data-completed={task.completed}
-        aria-selected={selectedTaskId === task.id}
+        aria-current={selectedTaskId === task.id ? 'true' : undefined}
         draggable={board && !busy}
         onClick={(event) => {
           const target = event.target as HTMLElement;
@@ -2313,7 +2335,16 @@ export function App() {
           viewDate={day?.date ?? '2026-01-01'}
           onSaveSettings={saveSettings}
           onRestored={afterRestore}
-          onDismiss={() => setStorageOpen(false)}
+          onDismiss={() => {
+            setStorageOpen(false);
+            const origin = settingsOrigin.current;
+            settingsOrigin.current = null;
+            if (origin && origin.isConnected) {
+              requestAnimationFrame(() => origin.focus({ preventScroll: true }));
+            } else {
+              restoreOriginatingFocus();
+            }
+          }}
         />
       )}
 

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { PlannerDay, PlannerTask } from '../../shared/contracts';
 import { formatDuration } from '../../shared/task-input';
 import { Icon } from './Icon';
@@ -33,6 +34,21 @@ export function BacklogPanel({
   onSelectTask,
 }: BacklogPanelProps) {
   const backlog = day?.backlog ?? [];
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+
+  // Opening the panel moves focus to the top backlog task, matching the search
+  // panel's query focus. This runs on mount only so background refreshes do
+  // not pull focus out of whatever the user is doing.
+  useEffect(() => {
+    const body = bodyRef.current;
+    if (!body) return;
+    const firstTitle = body.querySelector<HTMLElement>('.task-card .task-title');
+    if (firstTitle) {
+      firstTitle.focus({ preventScroll: true });
+    } else {
+      body.focus({ preventScroll: true });
+    }
+  }, []);
 
   return (
     <aside
@@ -94,6 +110,8 @@ export function BacklogPanel({
       <div
         className="panel-body backlog-panel-body"
         role="list"
+        ref={bodyRef}
+        tabIndex={-1}
         onPointerDownCapture={dndHandlers?.onPointerDownCapture}
         onDragStartCapture={dndHandlers?.onDragStartCapture}
         onDragEndCapture={dndHandlers?.onDragEndCapture}
@@ -120,7 +138,7 @@ export function BacklogPanel({
                 data-testid="backlog-panel-item"
                 data-task-id={task.id}
                 data-completed={task.completed}
-                aria-selected={selectedTaskId === task.id}
+                aria-current={selectedTaskId === task.id ? 'true' : undefined}
                 draggable={!busy}
                 onClick={(e) => {
                   const target = e.target as HTMLElement;

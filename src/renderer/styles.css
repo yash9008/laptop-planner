@@ -317,6 +317,8 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   .search-result-item { transition: border-color 150ms ease, background 150ms ease; }
   .rail-button { transition: background 200ms ease, color 200ms ease, opacity 200ms ease; }
   .nav-item svg { transition: transform 300ms ease-in-out; }
+  .nav-item:hover:not(:disabled) svg,
+  .nav-item:focus-visible svg { transform: scale(1.12); }
 }
 
 /* A paused session stays reachable without displacing the board's day headings. */
