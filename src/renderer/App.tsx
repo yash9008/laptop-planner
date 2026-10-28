@@ -1813,7 +1813,7 @@ export function App() {
             </header>
 
             <div className="workspace-context">
-              {displayDay && (view === 'day' || view === 'board') && <DailyWorkload day={displayDay} />}
+              {displayDay && view === 'day' && <DailyWorkload day={displayDay} />}
             </div>
 
         {day && view !== 'focus' && (
