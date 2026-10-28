@@ -126,3 +126,44 @@ descriptions are corrected only where they still overstate the result.
 | Test names | Renamed to match assertions, with assertions strengthened where cheap |
 | Matrix rows 45/48/60 | Retained, now backed by implementation |
 | Screenshot caption | Describes the captured `00:00` state |
+
+## Fixes applied
+
+All findings above are addressed on branch `fix/phase4-5-review`.
+
+**Application**
+
+- `App.tsx` — palette task commands derive from the Focus task while the Focus
+  view is active, so `Cmd+K` matches the task on screen.
+- `App.tsx` — the calendar command releases a docked utility panel before
+  showing the calendar, and its label reflects the panel state.
+- `App.tsx` — the Add-task command passes its palette trigger into `openNew`,
+  and storage settings restore the originating control on dismiss.
+- `BacklogPanel.tsx` — focuses the top backlog task on mount only, and exposes
+  selection with `aria-current` instead of an unsupported `aria-selected`.
+- `RecoveryPanel.tsx` — focuses the panel on mount.
+- `App.tsx` — a task card marks its selection with `aria-current`.
+- `App.tsx` — `?` opens keyboard help outside text entry and modal states;
+  closing it restores the previous control.
+- `FocusScreen.tsx` — the scroll container returns to the top when the focused
+  task changes.
+- `styles.css` — navigation icons scale to `1.12` on hover and keyboard focus,
+  so the 300 ms transform transition now animates a real change.
+
+**Tests**
+
+- `tests/app/phase4-5-fix.spec.ts` covers the palette/Focus identity, the `?`
+  trigger and its focus restoration, the calendar command against a docked
+  panel, and the Backlog mount focus.
+- `tests/app/phase5-ui.spec.ts` asserts the hovered navigation-icon matrix is
+  not `none`, and three test names now match their assertions.
+- `tests/app/phase4-ui.spec.ts` parses `1h 30m` as 90 minutes.
+
+**Documentation**
+
+- The navigation-icon, utility-panel, and completion rows of the acceptance
+  matrix now describe implemented behavior.
+- The wide Focus screenshot caption matches the captured `00:00` state.
+
+The hosted run for this branch is the evidence for these changes; the receipts
+recorded above cover the earlier revisions.

@@ -92,7 +92,7 @@ The 5 visual receipts logged in test `phase5-ui.spec.ts:454:1` were retrieved fr
 | --- | --- | --- | --- |
 | `ui-phase5-board-wide.png` | 1440 × 900 | Populated multi-day board with active workload headers, cards, and calendar dock | `2fa6dabfb19ea8b48363738d28f7b6dc6a0d04093ee15d7ec4d4a3362df756a3` |
 | `ui-phase5-editor-popover-wide.png` | 1440 × 900 | Centered task detail editor with child estimate popover nested and anchored | `5c7df57d2bb5a79fc4a597a7dc804b2f8d6149f7c5c45c2f82f11f9bf187c6f4` |
-| `ui-phase5-focus-wide.png` | 1440 × 900 | Single-task Focus screen with running timer, elapsed authority, and tags | `c10b1c05ea148056be2c2e16068602249218ad1843d06a0ec849da3db96bc3e6` |
+| `ui-phase5-focus-wide.png` | 1440 × 900 | Single-task Focus screen with an unstarted timer (`00:00`, "Start focus") and task tags | `c10b1c05ea148056be2c2e16068602249218ad1843d06a0ec849da3db96bc3e6` |
 | `ui-phase5-board-narrow-reduced.png` | 860 × 680 | Narrow laptop viewport under `prefers-reduced-motion: reduce` with collapsed layout | `de3229b8baad2300299ff5c6bdbf809a4f647f78b340bb2c7638ba744c032414` |
 | `ui-phase5-palette-narrow-reduced.png` | 860 × 680 | Narrow command palette modal under reduced motion with query combobox active | `acff408c0e71f03f0b6c6ab5b4947f652691446000f65771227b7d1ca4d062e0` |
 
