@@ -3,7 +3,7 @@ import { Icon } from './Icon';
 
 export interface CommandItem {
   id: string;
-  category: 'Task' | 'Navigation' | 'Actions' | 'Panels' | 'Settings';
+  category: 'Task' | 'Navigation' | 'Actions' | 'Panels' | 'Settings' | 'Rituals';
   title: string;
   description?: string;
   shortcut?: string;

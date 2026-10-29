@@ -4,11 +4,11 @@ import { dateLabel,formatDuration } from '../../shared/task-input';
 import { Icon } from './Icon';
 import { useBoardDrag } from './BoardDrag';
 
-export function PlanningBoard({active=true,panelRef: externalPanelRef,dnd: externalDnd,day,selectedDate,busy,navigationKey,onMove,onAdd,onOpenDay,onActiveDay,renderTask,matches}:{
+export function PlanningBoard({active=true,panelRef: externalPanelRef,dnd: externalDnd,day,selectedDate,busy,navigationKey,boardRange=7,onMove,onAdd,onOpenDay,onActiveDay,renderTask,matches}:{
   active?: boolean;
   panelRef?: React.RefObject<HTMLElement | null>;
   dnd?: ReturnType<typeof useBoardDrag>;
-  day:PlannerDay;selectedDate:string;busy:boolean;navigationKey:number;onMove(input:MoveTaskInput):Promise<string|null>;onAdd(date:string|null):void;
+  day:PlannerDay;selectedDate:string;busy:boolean;navigationKey:number;boardRange?:number;onMove(input:MoveTaskInput):Promise<string|null>;onAdd(date:string|null):void;
   onOpenDay(date:string):void;onActiveDay(date:string):void;renderTask(task:PlannerTask,index:number):ReactNode;matches(task:PlannerTask):boolean;
 }) {
   const internalPanel=useRef<HTMLElement>(null);
@@ -90,7 +90,7 @@ export function PlanningBoard({active=true,panelRef: externalPanelRef,dnd: exter
     onDragStartCapture={dnd.handlers.onDragStartCapture} onDragEnter={edgeScroll} onDragOver={edgeScroll}
     onDrop={(event)=>{stopScroll();dnd.handlers.onDrop(event);}} onDragEndCapture={()=>{stopScroll();dnd.handlers.onDragEndCapture();}}
     onDragLeave={(event)=>{const bounds=event.currentTarget.getBoundingClientRect();if(event.clientX<bounds.left || event.clientX>=bounds.right || event.clientY<bounds.top || event.clientY>=bounds.bottom)stopScroll();}}>
-    {day.board.map((column)=><div key={column.date} className={`board-column ${column.date===day.today?'board-today':''} ${column.date===selectedDate?'board-selected':''}`} data-testid="board-day" data-date={column.date} data-board-date={column.date}>
+    {day.board.slice(0, boardRange).map((column)=><div key={column.date} className={`board-column ${column.date===day.today?'board-today':''} ${column.date===selectedDate?'board-selected':''}`} data-testid="board-day" data-date={column.date} data-board-date={column.date}>
       <div className="board-column-heading"><button onClick={()=>onOpenDay(column.date)} aria-label={`Open ${column.date}`} aria-current={column.date===day.today?'date':undefined}><strong>{dateLabel(column.date,{weekday:'long'})}</strong><span>{dateLabel(column.date,{month:'long',day:'numeric'})}</span></button>{column.date===day.today && <span className="today-label">Today</span>}</div>
       <div className="completion-track" role="progressbar" aria-label={`${dateLabel(column.date,{weekday:'long'})} progress`} aria-valuemin={0} aria-valuemax={column.tasks.length || 1} aria-valuenow={column.tasks.filter((task)=>task.completed).length} aria-valuetext={`${column.tasks.filter((task)=>task.completed).length} of ${column.tasks.length} done`}><div style={{width:`${column.tasks.length?column.tasks.filter((task)=>task.completed).length/column.tasks.length*100:0}%`}}/></div>
       <button className="task-add-bar" onClick={()=>onAdd(column.date)} aria-label={`Add task for ${column.date}`} disabled={busy}><Icon name="plus" size={18}/><span>Add task</span><strong>{formatDuration(column.plan.summary.remainingWorkMinutes)}</strong></button>

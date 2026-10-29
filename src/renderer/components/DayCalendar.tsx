@@ -6,12 +6,14 @@ import { Icon } from './Icon';
 
 const BASE_HOUR_HEIGHT = 48;
 
-export function DayCalendar({ day, busy, onEdit, onAddEvent, onEditEvent, onChangeEvent }: {
+export function DayCalendar({ day, busy, onEdit, onAddEvent, onEditEvent, onChangeEvent, onTimeboxTask }: {
   day: PlannerDay; busy: boolean; onEdit(task: PlannerTask): void;
   onAddEvent(minute?: number): void; onEditEvent(event: PlannerEvent): void;
   onChangeEvent(event: PlannerEvent): Promise<string | null>;
+  onTimeboxTask?: (taskId: string, startMinute: number) => void;
 }) {
   const [zoom,setZoom]=useState(1);
+  const [dropPreviewMinute, setDropPreviewMinute] = useState<number | null>(null);
   const HOUR_HEIGHT=BASE_HOUR_HEIGHT*zoom;
   const scale=HOUR_HEIGHT/60;
   const scroll = useRef<HTMLDivElement>(null);
@@ -73,11 +75,41 @@ export function DayCalendar({ day, busy, onEdit, onAddEvent, onEditEvent, onChan
       <button className="icon-button" aria-label="Add fixed event" title="Add fixed event" onClick={() => onAddEvent()} disabled={busy}><Icon name="plus" size={17} /></button>
     </div>
     {day.plan.eventConflicts.length > 0 && <div className="event-conflict" role="status">Fixed events overlap. Check their times.</div>}
-    <div className="calendar-scroll" ref={scroll} data-testid="calendar-scroll"><div className="calendar-canvas" style={{ height: 24 * HOUR_HEIGHT }} onDoubleClick={(e) => {
-      if ((e.target as Element).closest('button') || busy) return;
-      const minute = Math.max(0, Math.min(1425, Math.round((e.clientY - e.currentTarget.getBoundingClientRect().top) / scale / 15) * 15));
-      onAddEvent(minute);
-    }}>
+    <div className="calendar-scroll" ref={scroll} data-testid="calendar-scroll"><div className="calendar-canvas" style={{ height: 24 * HOUR_HEIGHT }}
+      onDragOver={(e) => {
+        if (!e.dataTransfer.types.includes('application/x-laptop-planner-task')) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        const bounds = e.currentTarget.getBoundingClientRect();
+        const minute = Math.max(0, Math.min(1425, Math.round((e.clientY - bounds.top) / scale / 15) * 15));
+        setDropPreviewMinute(minute);
+      }}
+      onDragLeave={(e) => {
+        const bounds = e.currentTarget.getBoundingClientRect();
+        if (e.clientX < bounds.left || e.clientX >= bounds.right || e.clientY < bounds.top || e.clientY >= bounds.bottom) {
+          setDropPreviewMinute(null);
+        }
+      }}
+      onDrop={(e) => {
+        const taskId = e.dataTransfer.getData('application/x-laptop-planner-task') || e.dataTransfer.getData('text/plain');
+        setDropPreviewMinute(null);
+        if (!taskId || busy) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const bounds = e.currentTarget.getBoundingClientRect();
+        const minute = Math.max(0, Math.min(1425, Math.round((e.clientY - bounds.top) / scale / 15) * 15));
+        onTimeboxTask?.(taskId, minute);
+      }}
+      onDoubleClick={(e) => {
+        if ((e.target as Element).closest('button') || busy) return;
+        const minute = Math.max(0, Math.min(1425, Math.round((e.clientY - e.currentTarget.getBoundingClientRect().top) / scale / 15) * 15));
+        onAddEvent(minute);
+      }}>
+      {dropPreviewMinute !== null && (
+        <div className="calendar-timebox-drop-preview" style={{ top: dropPreviewMinute * scale, height: 45 * scale }}>
+          <span>Schedule task at {formatTime(dropPreviewMinute)}</span>
+        </div>
+      )}
       <div className="off-hours" style={{ top: 0, height: day.dailyHours.startMinute * scale }} /><div className="off-hours" style={{ top: day.dailyHours.endMinute * scale, bottom: 0 }} />
       {Array.from({ length: 24 }, (_, hour) => <div key={hour} className="calendar-hour" style={{ top: hour * HOUR_HEIGHT }}><span>{hour === 0 ? '12 AM' : hour === 12 ? '12 PM' : `${hour % 12} ${hour < 12 ? 'AM' : 'PM'}`}</span><i /></div>)}
       {blocks.map((block) => {

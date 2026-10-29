@@ -157,3 +157,33 @@ test('day totals live in each column, overflow is exposed there, and the Today v
   await page.setViewportSize({width:860,height:680});
   await page.screenshot({path:'test-results/planner-ui-phase1-laptop.png'});
 });
+
+test('board view range switching and rituals modals operate cleanly', async () => {
+  const viewTrigger = page.getByRole('button', { name: 'Planner view', exact: true });
+  await viewTrigger.click();
+  await page.getByRole('menuitem', { name: '3 days view', exact: true }).click();
+  await expect(page.locator('[data-testid="board-day"]')).toHaveCount(3);
+
+  await viewTrigger.click();
+  await page.getByRole('menuitem', { name: '5 days view', exact: true }).click();
+  await expect(page.locator('[data-testid="board-day"]')).toHaveCount(5);
+
+  await viewTrigger.click();
+  await page.getByRole('menuitem', { name: 'Board view', exact: true }).click();
+  await expect(page.locator('[data-testid="board-day"]')).toHaveCount(7);
+
+  await page.getByRole('button', { name: 'Daily planning', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Daily planning', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Daily planning', exact: true })).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Daily shutdown', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Daily shutdown', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Daily shutdown', exact: true })).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Weekly review', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Weekly review', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Weekly review', exact: true })).toHaveCount(0);
+});

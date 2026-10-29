@@ -2110,3 +2110,416 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
   padding: 2px 12px 10px; border-top: 0; font-size: 11px; font-weight: 500;
   color: #d8b184;
 }
+
+/* ------------------------------------------------------------------
+   Sunsama Home Parity: Timeboxing Dropzone, Red Now-Line, & Guided Rituals
+   ------------------------------------------------------------------ */
+
+.calendar-timebox-drop-preview {
+  position: absolute;
+  left: 49px;
+  right: 8px;
+  border: 2px dashed #e5a93c;
+  background: rgba(229, 169, 60, 0.16);
+  border-radius: 4px;
+  z-index: 25;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffbe45;
+}
+
+.home-view .now-line > span {
+  color: #ea4335;
+  font-size: 8px;
+  font-weight: 600;
+  width: 44px;
+}
+.home-view .now-line > i {
+  background: #ea4335;
+}
+.home-view .now-line > i::before {
+  left: -3px;
+  top: -3.5px;
+  width: 8px;
+  height: 8px;
+  background: #ea4335;
+}
+
+.ritual-nav-item {
+  position: relative;
+}
+.ritual-nav-item .ritual-check {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4cd964;
+}
+.sidebar-rail .ritual-nav-item .ritual-check {
+  display: none;
+}
+
+/* Guided Ritual Modals (Daily Planning, Daily Shutdown, Weekly Review) */
+.ritual-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.75);
+  backdrop-filter: blur(3px);
+  z-index: 2100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.ritual-modal {
+  width: min(580px, calc(100vw - 32px));
+  background: #18181b;
+  border: 1px solid #2e2e33;
+  border-radius: 8px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85);
+  color: #dedee5;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ritual-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #27272a;
+  background: #151518;
+}
+
+.ritual-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ritual-title-group h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #f4f4f5;
+}
+
+.ritual-subtitle {
+  font-size: 11px;
+  color: #71717a;
+  margin: 2px 0 0;
+}
+
+.ritual-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ritual-icon-badge.sun {
+  background: rgba(245, 166, 35, 0.15);
+  color: #f5a623;
+}
+.ritual-icon-badge.moon {
+  background: rgba(167, 139, 250, 0.15);
+  color: #a78bfa;
+}
+.ritual-icon-badge.sparkle {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.ritual-steps {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: #71717a;
+}
+.ritual-steps .step-dot.active {
+  color: #e4e4e7;
+  font-weight: 600;
+}
+
+.ritual-body {
+  padding: 20px;
+  max-height: calc(85vh - 140px);
+  overflow-y: auto;
+}
+
+.ritual-step-content h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: #f4f4f5;
+}
+
+.ritual-step-content p {
+  font-size: 13px;
+  color: #a1a1aa;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.ritual-capacity-card {
+  display: flex;
+  gap: 16px;
+  background: #202024;
+  border: 1px solid #2a2a2e;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.capacity-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.capacity-stat span {
+  font-size: 11px;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.capacity-stat strong {
+  font-size: 16px;
+  color: #f4f4f5;
+  font-weight: 600;
+}
+
+.ritual-progress-track {
+  height: 6px;
+  background: #27272a;
+  border-radius: 3px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.ritual-progress-track .track-fill {
+  height: 100%;
+  background: #e5a93c;
+  border-radius: 3px;
+  transition: width 200ms ease;
+}
+
+.ritual-progress-track .track-fill.overdue {
+  background: #ef4444;
+}
+
+.ritual-warning-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: #fca5a5;
+  line-height: 1.4;
+}
+
+.ritual-inline-add {
+  margin-bottom: 16px;
+}
+
+.ritual-inline-add input {
+  width: 100%;
+  background: #202024;
+  border: 1px solid #2e2e33;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #f4f4f5;
+  font-size: 13px;
+}
+.ritual-inline-add input:focus {
+  outline: none;
+  border-color: #52525b;
+}
+
+.ritual-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ritual-task-list h4 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a1a1aa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 6px;
+}
+
+.ritual-task-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #202024;
+  border: 1px solid #2a2a2e;
+  border-radius: 6px;
+  gap: 12px;
+}
+
+.ritual-task-row .task-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;
+}
+
+.ritual-task-row .task-info strong {
+  font-size: 13px;
+  color: #f4f4f5;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ritual-task-row .task-subtext {
+  font-size: 11px;
+  color: #71717a;
+}
+
+.ritual-task-row .task-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ritual-action-btn {
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 4px;
+  color: #d4d4d8;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+.ritual-action-btn:hover {
+  background: #3f3f46;
+  color: #ffffff;
+}
+.ritual-action-btn.primary {
+  background: #d97706;
+  border-color: #b45309;
+  color: #ffffff;
+}
+.ritual-action-btn.primary:hover {
+  background: #f59e0b;
+}
+
+.ritual-task-row .task-title-text {
+  font-size: 13px;
+  color: #f4f4f5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ritual-task-row .task-title-text.done {
+  color: #a1a1aa;
+  text-decoration: line-through;
+}
+
+.ritual-textarea {
+  width: 100%;
+  background: #202024;
+  border: 1px solid #2e2e33;
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: #f4f4f5;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.ritual-textarea:focus {
+  outline: none;
+  border-color: #52525b;
+}
+
+.ritual-finish-card {
+  text-align: center;
+  padding: 32px 16px;
+}
+.ritual-finish-card .finish-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ritual-finish-card .finish-icon.sun {
+  background: rgba(245, 166, 35, 0.15);
+  color: #f5a623;
+}
+.ritual-finish-card .finish-icon.moon {
+  background: rgba(167, 139, 250, 0.15);
+  color: #a78bfa;
+}
+.ritual-finish-card .finish-icon.sparkle {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+.ritual-finish-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: #f4f4f5;
+}
+.ritual-finish-card p {
+  font-size: 13px;
+  color: #a1a1aa;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.ritual-empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: #71717a;
+}
+.ritual-empty p {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.ritual-footer {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid #27272a;
+  background: #151518;
+}
+
+.ritual-footer .primary-btn {
+  background: #d97706;
+  border-color: #b45309;
+  color: #ffffff;
+}
+.ritual-footer .primary-btn:hover {
+  background: #f59e0b;
+}

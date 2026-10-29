@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
-import type { PlannerDay, PlannerResult, PlannerTask, PlannerProject, PlannerEvent, SaveProjectInput, SaveEventInput, SaveSettingsInput, MoveTaskInput } from '../shared/contracts';
+import type { PlannerDay, PlannerResult, PlannerTask, PlannerProject, PlannerEvent, SaveProjectInput, SaveEventInput, SaveSettingsInput, SaveTaskInput, MoveTaskInput } from '../shared/contracts';
 import { dateLabel, formatDuration, formatTime, shiftDate, formatElapsed, parseDuration, WEEKDAYS } from '../shared/task-input';
 import { creationDraftKey, isDraftDirty, newCreationDraft, taskToDraft, reconcileTaskDraft, type TaskDraft } from './drafts';
 import { DayCalendar } from './components/DayCalendar';
@@ -24,6 +24,9 @@ import { RecoveryPanel } from './components/RecoveryPanel';
 import { CommandPalette, type CommandItem } from './components/CommandPalette';
 import { KeyboardHelpDialog } from './components/KeyboardHelpDialog';
 import { FocusScreen } from './components/FocusScreen';
+import { DailyPlanningModal } from './components/DailyPlanningModal';
+import { DailyShutdownModal } from './components/DailyShutdownModal';
+import { WeeklyReviewModal } from './components/WeeklyReviewModal';
 
 type TaskSurface = 'board' | 'search' | 'backlog' | 'recovery' | 'calendar' | 'focus' | 'other';
 type TaskOrigin = { element: HTMLElement | null; taskId: string | null; surface: TaskSurface };
@@ -33,6 +36,32 @@ export function App() {
   const [view, setView] = useState<'day' | 'board' | 'backlog' | 'project' | 'focus'>('board');
   const [boardNavigationKey, setBoardNavigationKey] = useState(0);
   const [boardCalendarDate, setBoardCalendarDate] = useState<string | null>(null);
+  const [boardRange, setBoardRange] = useState<1 | 3 | 5 | 7>(() => {
+    try {
+      const saved = localStorage.getItem('laptop_planner_board_range');
+      const n = Number(saved);
+      if ([1, 3, 5, 7].includes(n)) return n as 1 | 3 | 5 | 7;
+    } catch {}
+    return 7;
+  });
+  const changeBoardRange = (range: 1 | 3 | 5 | 7) => {
+    setBoardRange(range);
+    try {
+      localStorage.setItem('laptop_planner_board_range', String(range));
+    } catch {}
+  };
+  const [dailyPlanningOpen, setDailyPlanningOpen] = useState(false);
+  const [dailyShutdownOpen, setDailyShutdownOpen] = useState(false);
+  const [weeklyReviewOpen, setWeeklyReviewOpen] = useState(false);
+  const [planningCompleted, setPlanningCompleted] = useState(false);
+  const [shutdownCompleted, setShutdownCompleted] = useState(false);
+  useEffect(() => {
+    if (!day?.date) return;
+    try {
+      setPlanningCompleted(Boolean(localStorage.getItem(`laptop_planner_daily_planning_${day.date}`)));
+      setShutdownCompleted(Boolean(localStorage.getItem(`laptop_planner_daily_shutdown_${day.date}`)));
+    } catch {}
+  }, [day?.date]);
   const [calendarOpen, setCalendarOpen] = useState(true);
   const [calendarWidth, setCalendarWidth] = useState(readCalendarWidth);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -695,6 +724,62 @@ export function App() {
     return commit(() => window.planner.moveTask(input));
   }
 
+  async function handleTimeboxTask(taskId: string, startMinute: number) {
+    if (busy || !day) return;
+    const task = day.allTasks.find((t) => t.id === taskId);
+    if (!task) return;
+    const duration = task.plannedMinutes > 0 ? task.plannedMinutes : 30;
+    const endMinute = Math.min(1440, startMinute + duration);
+
+    await commit(() =>
+      window.planner.saveEvent({
+        create: true,
+        title: task.title,
+        notes: `task:${task.id}`,
+        start: { date: day.date, minute: startMinute },
+        end: { date: day.date, minute: endMinute },
+        viewDate: day.date,
+      })
+    );
+
+    if (task.plannedDate !== day.date) {
+      await commit(() =>
+        window.planner.saveTask({
+          id: task.id,
+          create: false,
+          title: task.title,
+          notes: task.notes,
+          plannedDate: day.date,
+          plannedMinutes: task.plannedMinutes,
+          viewDate: day.date,
+          projectId: task.projectId,
+          deadline: task.deadline,
+        })
+      );
+    }
+  }
+
+  async function handleUpdateTask(task: PlannerTask, patch: Partial<SaveTaskInput> & { completed?: boolean }) {
+    if (!day) return;
+    if (typeof patch.completed === 'boolean') {
+      await commit(() => window.planner.setTaskCompleted({ id: task.id, completed: patch.completed!, viewDate: day.date }));
+    } else {
+      await commit(() =>
+        window.planner.saveTask({
+          id: task.id,
+          create: false,
+          title: patch.title !== undefined ? patch.title : task.title,
+          notes: patch.notes !== undefined ? patch.notes : task.notes,
+          plannedDate: patch.plannedDate !== undefined ? patch.plannedDate : task.plannedDate,
+          plannedMinutes: patch.plannedMinutes !== undefined ? patch.plannedMinutes : task.plannedMinutes,
+          projectId: patch.projectId !== undefined ? patch.projectId : task.projectId,
+          deadline: patch.deadline !== undefined ? patch.deadline : task.deadline,
+          viewDate: day.date,
+        })
+      );
+    }
+  }
+
   const boardPanelRef = useRef<HTMLElement | null>(null);
   const dnd = useBoardDrag({
     panel: boardPanelRef,
@@ -1153,6 +1238,37 @@ export function App() {
     }
   );
 
+  // Rituals
+  paletteCommands.push(
+    {
+      id: 'ritual-daily-planning',
+      category: 'Rituals',
+      title: 'Start daily planning',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setDailyPlanningOpen(true);
+      },
+    },
+    {
+      id: 'ritual-daily-shutdown',
+      category: 'Rituals',
+      title: 'Start daily shutdown',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setDailyShutdownOpen(true);
+      },
+    },
+    {
+      id: 'ritual-weekly-review',
+      category: 'Rituals',
+      title: 'Start weekly review',
+      run: () => {
+        setCommandPaletteOpen(false);
+        setWeeklyReviewOpen(true);
+      },
+    }
+  );
+
   // Settings
   paletteCommands.push({
     id: 'settings-storage',
@@ -1519,7 +1635,10 @@ export function App() {
     keyboardHelpOpen ||
     storageOpen ||
     eventEditor !== null ||
-    projectEditor !== undefined;
+    projectEditor !== undefined ||
+    dailyPlanningOpen ||
+    dailyShutdownOpen ||
+    weeklyReviewOpen;
 
   return (
     <>
@@ -1566,6 +1685,47 @@ export function App() {
             <span>Focus</span>
           </button>
         </nav>
+        <div className="sidebar-section-label">RITUALS</div>
+        <button
+          className={`nav-item ritual-nav-item ${planningCompleted ? 'is-completed' : ''}`}
+          aria-label="Daily planning"
+          title="Daily planning"
+          onClick={() => setDailyPlanningOpen(true)}
+          disabled={busy}
+        >
+          <Icon name="sun" />
+          <span>Daily planning</span>
+          {planningCompleted && (
+            <span className="ritual-check" aria-hidden="true">
+              <Icon name="check" size={12} />
+            </span>
+          )}
+        </button>
+        <button
+          className={`nav-item ritual-nav-item ${shutdownCompleted ? 'is-completed' : ''}`}
+          aria-label="Daily shutdown"
+          title="Daily shutdown"
+          onClick={() => setDailyShutdownOpen(true)}
+          disabled={busy}
+        >
+          <Icon name="moon" />
+          <span>Daily shutdown</span>
+          {shutdownCompleted && (
+            <span className="ritual-check" aria-hidden="true">
+              <Icon name="check" size={12} />
+            </span>
+          )}
+        </button>
+        <button
+          className="nav-item ritual-nav-item"
+          aria-label="Weekly review"
+          title="Weekly review"
+          onClick={() => setWeeklyReviewOpen(true)}
+          disabled={busy}
+        >
+          <Icon name="sparkle" />
+          <span>Weekly review</span>
+        </button>
         <div className="sidebar-section-label">YOUR PLANNING</div>
         <button
           className={`nav-item ${view === 'backlog' ? 'active' : ''}`}
@@ -1783,7 +1943,7 @@ export function App() {
                       disabled={busy}
                     >
                       <Icon name="board" size={15} />
-                      <span>Board</span>
+                      <span>{boardRange === 7 ? 'Board' : `Board (${boardRange}d)`}</span>
                       <Icon name="down" size={12} />
                     </button>
                     {viewMenuAnchor && (
@@ -1793,11 +1953,61 @@ export function App() {
                         align="right"
                         onDismiss={() => setViewMenuAnchor(null)}
                         items={[
-                          { id: 'board', label: 'Board', ariaLabel: 'Board view', icon: 'board', selected: true, onSelect: () => setView('board') },
-                          { id: 'day', label: 'Day', ariaLabel: 'Today view', icon: 'today', onSelect: () => {
-                            setView('day');
-                            if (boardCalendarDate) goToDate(boardCalendarDate);
-                          } },
+                          {
+                            id: 'board-7',
+                            label: 'Board (7 days)',
+                            ariaLabel: 'Board view',
+                            icon: 'board',
+                            selected: boardRange === 7,
+                            onSelect: () => {
+                              changeBoardRange(7);
+                              setView('board');
+                            },
+                          },
+                          {
+                            id: 'board-5',
+                            label: '5 days (work week)',
+                            ariaLabel: '5 days view',
+                            icon: 'board',
+                            selected: boardRange === 5,
+                            onSelect: () => {
+                              changeBoardRange(5);
+                              setView('board');
+                            },
+                          },
+                          {
+                            id: 'board-3',
+                            label: '3 days',
+                            ariaLabel: '3 days view',
+                            icon: 'board',
+                            selected: boardRange === 3,
+                            onSelect: () => {
+                              changeBoardRange(3);
+                              setView('board');
+                            },
+                          },
+                          {
+                            id: 'board-1',
+                            label: '1 day',
+                            ariaLabel: '1 day view',
+                            icon: 'board',
+                            selected: boardRange === 1,
+                            onSelect: () => {
+                              changeBoardRange(1);
+                              setView('board');
+                            },
+                          },
+                          {
+                            id: 'day',
+                            label: 'Day',
+                            ariaLabel: 'Today view',
+                            icon: 'today',
+                            selected: false,
+                            onSelect: () => {
+                              setView('day');
+                              if (boardCalendarDate) goToDate(boardCalendarDate);
+                            },
+                          },
                         ]}
                       />
                     )}
@@ -1995,6 +2205,7 @@ export function App() {
                       selectedDate={displayDay!.date}
                       busy={busy}
                       navigationKey={boardNavigationKey}
+                      boardRange={boardRange}
                       onMove={moveBoardTask}
                       onActiveDay={(date) => {
                         setBoardCalendarDate(date);
@@ -2207,6 +2418,7 @@ export function App() {
                   onAddEvent={addEvent}
                   onEditEvent={(event) => setEventEditor({ event, minute: event.start.minute })}
                   onChangeEvent={changeEvent}
+                  onTimeboxTask={handleTimeboxTask}
                 />
               ) : null}
             </CalendarDock>
@@ -2484,6 +2696,45 @@ export function App() {
             <Icon name="close" size={14} />
           </button>
         </div>
+      )}
+
+      {day && (
+        <>
+          <DailyPlanningModal
+            day={day}
+            isOpen={dailyPlanningOpen}
+            onClose={() => setDailyPlanningOpen(false)}
+            onUpdateTask={handleUpdateTask}
+            onComplete={() => {
+              try {
+                localStorage.setItem(`laptop_planner_daily_planning_${day.date}`, 'true');
+              } catch {}
+              setPlanningCompleted(true);
+            }}
+          />
+          <DailyShutdownModal
+            day={day}
+            isOpen={dailyShutdownOpen}
+            onClose={() => setDailyShutdownOpen(false)}
+            onUpdateTask={handleUpdateTask}
+            onComplete={() => {
+              try {
+                localStorage.setItem(`laptop_planner_daily_shutdown_${day.date}`, 'true');
+              } catch {}
+              setShutdownCompleted(true);
+            }}
+          />
+          <WeeklyReviewModal
+            day={day}
+            isOpen={weeklyReviewOpen}
+            onClose={() => setWeeklyReviewOpen(false)}
+            onComplete={() => {
+              try {
+                localStorage.setItem(`laptop_planner_weekly_review_${day.board[0]?.date || day.date}`, 'true');
+              } catch {}
+            }}
+          />
+        </>
       )}
 
       <CommandPalette
