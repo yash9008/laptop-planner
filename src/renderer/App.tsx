@@ -41,7 +41,11 @@ export function App() {
     const query = window.matchMedia('(max-width: 1024px)');
     const sync = () => setNarrowSidebar(query.matches);
     query.addEventListener('change', sync);
-    return () => query.removeEventListener('change', sync);
+    window.addEventListener('resize', sync);
+    return () => {
+      query.removeEventListener('change', sync);
+      window.removeEventListener('resize', sync);
+    };
   }, []);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterAnchor, setFilterAnchor] = useState<HTMLElement | null>(null);

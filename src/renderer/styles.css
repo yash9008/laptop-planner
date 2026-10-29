@@ -1941,6 +1941,34 @@ code { font-family: ui-monospace,SFMono-Regular,Menlo,monospace; font-size: 10px
 .sidebar-rail .local-indicator { gap: 0; font-size: 0; justify-content: center; }
 .sidebar-auto .sidebar-footer .icon-button { display: none; }
 
+@media (max-width: 1024px) {
+  .sidebar { width: 60px; padding: 0 0 8px 8px; }
+  .sidebar-brand { width: 52px; height: 80px; margin: 0; justify-content: center; }
+  .sidebar-brand strong { display: none; }
+  .sidebar-brand .brand-symbol svg { width: 22px; height: 22px; }
+  .nav-item {
+    width: 48px; height: 48px; justify-content: center; flex-direction: row;
+    padding: 0; margin: 2px; border-radius: 10px;
+  }
+  .nav-item svg { width: 20px; height: 20px; }
+  .nav-item > span:last-child { display: none; }
+  .nav-item.active { background: #1c1c1d; }
+  .sidebar-section-label {
+    display: block; width: 26px; height: 1px; margin: 12px auto 8px;
+    background: #242426; color: transparent; font-size: 0; overflow: hidden;
+  }
+  .projects-heading { margin: 14px 0 2px; justify-content: center; }
+  .projects-heading > span { display: none; }
+  .sidebar-projects .nav-item { height: 40px; }
+  .sidebar-projects .project-hash { font-size: 16px; }
+  .add-project-row { justify-content: center; padding: 6px 0; border-left: 0; }
+  .add-project-row > span { display: none; }
+  .sidebar-bottom .nav-item { height: 44px; }
+  .sidebar-footer { justify-content: center; padding: 4px 0; }
+  .local-indicator { gap: 0; font-size: 0; justify-content: center; }
+  .sidebar-footer .icon-button { display: none; }
+}
+
 /* Board and calendar have their own 44px headers, as in the reference */
 .workspace-topbar { grid-column: 1 / -1; border-bottom: 0; padding: 0 10px; gap: 6px; }
 .calendar-dock, .utility-rail { grid-row: 2 / 6; }

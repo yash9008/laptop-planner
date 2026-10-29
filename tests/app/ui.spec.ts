@@ -23,6 +23,7 @@ async function add(title:string,estimate='45m',repeat=false){
 async function resizeWindow(width:number,height:number){
   await application!.evaluate(({BrowserWindow},size)=>{BrowserWindow.getAllWindows()[0]!.setContentSize(size.width,size.height);},{width,height});
   await page.setViewportSize({width,height});
+  await page.evaluate(()=>window.dispatchEvent(new Event('resize')));
 }
 test('Home opens with day columns and a docked calendar, and board checkboxes update real tasks',async()=>{
   await page.setViewportSize({width:1710,height:1072});
