@@ -8,7 +8,7 @@ const label=process.argv[3]??'app';const executable=join(bundle,'Contents/MacOS/
 const verificationHome=await mkdtemp(join(tmpdir(),'planner-packaged-'));await mkdir(join(verificationHome,'Documents'));await mkdir(join(verificationHome,'Library'));
 const env={...process.env,HOME:verificationHome,CFFIXED_USER_HOME:verificationHome,TZ:'Asia/Kolkata'};delete env.ELECTRON_RUN_AS_NODE;delete env.LAPTOP_PLANNER_TEST_DATA_DIR;delete env.LAPTOP_PLANNER_TEST_NOW;
 let application;let status;
-async function launch(){application=await electron.launch({executablePath:executable,env});const page=await application.firstWindow();await expect(page.getByRole('button',{name:'Add task',exact:true})).toBeEnabled();return page;}
+async function launch(){application=await electron.launch({executablePath:executable,env});const page=await application.firstWindow();await expect(page.getByRole('button',{name:/^Add task for /}).first()).toBeEnabled();return page;}
 try {
   let page=await launch();const errors=[];page.on('pageerror',(error)=>errors.push(error.message));
   const packaged=await application.evaluate(({app})=>app.isPackaged);assert.equal(packaged,true);
