@@ -496,6 +496,23 @@ test('completion, deletion and moving away stop focus while preserving actual re
   }
 });
 
+test('completed split focus keeps both actual calendar segments and the break between them',()=>{
+  const repository=new PlannerRepository(open());const task=save(repository,'Typing',45).tasks[0]!;
+  const firstStart=new Date('2026-10-25T09:30:00.000Z'); // 3 PM Asia/Kolkata
+  repository.startFocus({id:task.id,viewDate:DAY},firstStart);
+  const firstEnd=advanceFocus(repository,firstStart,20*60_000);
+  repository.pauseFocus({id:task.id,viewDate:DAY},firstEnd);
+  const secondStart=new Date(firstEnd.getTime()+60*60_000);
+  repository.startFocus({id:task.id,viewDate:DAY},secondStart);
+  const secondEnd=advanceFocus(repository,secondStart,20*60_000);
+  repository.pauseFocus({id:task.id,viewDate:DAY},secondEnd);
+  const completed=repository.setTaskCompleted({id:task.id,completed:true,viewDate:DAY},secondEnd);
+  assert.equal(completed.tasks[0]!.completed,true);
+  assert.deepEqual(completed.plan.recordedBlocks.map(({startMinute,endMinute})=>[startMinute,endMinute]),[[900,920],[980,1000]]);
+  assert.equal(completed.plan.completedBlocks.length,0);
+  assert.equal(completed.plan.tasks[0]!.actualMinutes,40);
+});
+
 test('overrun focus remains running with zero remaining estimate and positive actual time',()=>{
   const repository=new PlannerRepository(open());const task=save(repository,'Short',1).tasks[0]!;
   repository.startFocus({id:task.id,viewDate:DAY},NOW);const at=advanceFocus(repository,NOW,90000);const data=repository.getDay(DAY,at);
