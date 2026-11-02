@@ -21,14 +21,6 @@ export function DayCalendar({ day, busy, onEdit, onAddEvent, onEditEvent, onChan
   const [preview, setPreview] = useState<PlannerEvent | null>(null);
   const tasks = new Map(day.allTasks.map((task) => [task.id, task]));
   const blocks = [...day.plan.scheduledBlocks.map((block) => ({ ...block, completed: false, recorded: false })), ...day.plan.completedBlocks.map((block) => ({ ...block, completed: true, recorded: false })), ...day.plan.recordedBlocks.map((block)=>({...block,completed:false,recorded:true}))];
-  const lastCompletedRecord = new Map<string, string>();
-  for (const task of day.allTasks) {
-    if (!task.completed) continue;
-    const lastRecord = day.plan.recordedBlocks
-      .filter((block) => block.taskId === task.id)
-      .sort((left, right) => right.endMinute - left.endMinute || right.startMinute - left.startMinute)[0];
-    if (lastRecord) lastCompletedRecord.set(task.id, lastRecord.id);
-  }
   useEffect(() => {
     const target = day.date === day.today ? Math.max(day.dailyHours.startMinute, Math.min(day.clock.minute, day.dailyHours.endMinute - 60)) : day.dailyHours.startMinute;
     if (scroll.current) scroll.current.scrollTop = Math.max(0, (target - 40) * scale);
@@ -122,14 +114,12 @@ export function DayCalendar({ day, busy, onEdit, onAddEvent, onEditEvent, onChan
       {Array.from({ length: 24 }, (_, hour) => <div key={hour} className="calendar-hour" style={{ top: hour * HOUR_HEIGHT }}><span>{hour === 0 ? '12 AM' : hour === 12 ? '12 PM' : `${hour % 12} ${hour < 12 ? 'AM' : 'PM'}`}</span><i /></div>)}
       {blocks.map((block) => {
         const task = tasks.get(block.taskId); const project = day.projects.find((project) => project.id === task?.projectId);
-        const completionMarker = block.recorded && lastCompletedRecord.get(block.taskId) === block.id;
         const title = task?.title ?? day.calendarTitles[block.taskId] ?? 'Completed task';
         return <button key={block.id} className={`calendar-block ${block.completed ? 'is-completed' : ''} ${block.recorded?'is-recorded':''} ${block.endMinute - block.startMinute < 35 ? 'is-short' : ''}`}
-          style={{ top: block.startMinute * scale, height: (block.endMinute - block.startMinute) * scale, '--block-color': project?.color ?? '#c9a15e' } as CSSProperties} data-testid={block.recorded?'recorded-block':'calendar-block'} data-task-id={block.taskId} data-completed={block.completed || completionMarker}
-          data-completion-marker={completionMarker}
-          aria-label={`${title}, ${formatTime(block.startMinute)} to ${formatTime(block.endMinute)}${block.recorded?', actual focus time':block.completed ? ', completed' : ''}${completionMarker?', task completed':''}`}
+          style={{ top: block.startMinute * scale, height: (block.endMinute - block.startMinute) * scale, '--block-color': project?.color ?? '#c9a15e' } as CSSProperties} data-testid={block.recorded?'recorded-block':'calendar-block'} data-task-id={block.taskId} data-completed={block.completed}
+          aria-label={`${title}, ${formatTime(block.startMinute)} to ${formatTime(block.endMinute)}${block.recorded?', actual focus time':block.completed ? ', completed' : ''}`}
           title={`${title} · ${formatTime(block.startMinute)} – ${formatTime(block.endMinute)} · ${formatDuration(block.endMinute - block.startMinute)}`}
-          onClick={() => { if (task) onEdit(task); }} disabled={!task || busy}><strong>{(block.completed || completionMarker) && <Icon name="check" size={12} />}{title}</strong><span>{formatTime(block.startMinute)} – {formatTime(block.endMinute)}</span></button>;
+          onClick={() => { if (task) onEdit(task); }} disabled={!task || busy}><strong>{block.completed && <Icon name="check" size={12} />}{title}</strong><span>{formatTime(block.startMinute)} – {formatTime(block.endMinute)}</span></button>;
       })}
       {visualEvents.map((entry) => {
         const event = day.events.find((event) => event.id === entry.id)!;

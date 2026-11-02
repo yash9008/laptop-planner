@@ -198,7 +198,6 @@ kbd { font-family: inherit; font-size: 10px; background: #ffffff06; border: 1px 
 .calendar-block.is-short>span { display: none; }
 .calendar-block.is-completed { background: #3a3b42; border-color: #686a76; color: #a6a8b4; opacity: .6; }
 .calendar-block.is-recorded { background-color: #78694c; background-image: repeating-linear-gradient(135deg,#ffffff16 0 1px,transparent 1px 4px); border-color: #baa46c; color: #e1d5b5; }
-.calendar-block[data-completion-marker="true"] > strong > svg { flex: 0 0 auto; color: #fff; background: #35a862; border-radius: 50%; }
 .now-line { position: absolute; display: flex; align-items: center; left: 2px; right: 0; height: 1px; z-index: 4; pointer-events: none; }
 .now-line>span { width: 43px; color: #df857b; font-size: 7px; background: var(--canvas); padding-right: 3px; text-align: right; }
 .now-line>i { flex: 1; height: 1px; background: #c2675c; position: relative; }
